@@ -19,7 +19,7 @@ typedef enum en_bspec{
 	BSPEC_LIST(FUNC1)
 }Bspec;
 
-Bspec Bspec_parse(const char* str){
+int Bspec_parse(const char* str){
 	BSPEC_LIST(FUNC2)
 	{
 		printf("Unknown bspec : %s\n",str);
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
 	int mat[2][2] = {{0,0},{0,0}};
 	double energy,ec=0.5*C_e0,bc=0.5/C_u0,bx,by,bz,ex,ey,ez;
 	double r=0;
-	Bspec bspec;
+	int bspec;
 	
 	Data dataex,dataey,dataez,databx,databy,databz,databd;
 	LinkedList datalist,list,s;
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
 			   "dir   : input directory name\n"
 			   "bspec : boundary specification. bspec can be either one of\n"
 			   "        {xmin,xmax,ymin,ymax,zmin,zmax};\n"
-			   "r     : distance between detector plane and boundary plane.\n"
+			   "r     : distance between detector plane and boundary plane.\n",
 			   argv[0]
 			   );
 		exit(0);
