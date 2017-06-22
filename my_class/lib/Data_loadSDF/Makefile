@@ -2,12 +2,12 @@ COMPILER = gcc
 CFLAGS = -g -O3
 LDFLAGS = -lm
 LIBS =
-INCLUDE = -I ~/Documents/epochmate/my_class/inc
+INCLUDE = -I ../../inc
 SRCDIR = ./src
 OBJDIR = ./obj
 TARGET = ./lib/libData_loadSDF.a
 
-COMOBJDIR = ~/Documents/epochmate/my_class/obj
+COMOBJDIR = ../../obj
 COMOBJNAMES = utilities.o LinkedList.o Data.o
 COMOBJS = $(addprefix $(COMOBJDIR)/,$(COMOBJNAMES))
 

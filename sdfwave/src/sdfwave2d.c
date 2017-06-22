@@ -130,7 +130,7 @@ int main(int argc, char *argv[]){
 		LinkedList_deleteRoot(datalist,Data_vdelete);
 	}
 	fileout = allocate(10);
-	snprintf(fileout,"%s.bmat",bspecstr,10);
+	snprintf(fileout,10,"%s.bmat",bspecstr);
 	Data_output(databd,fileout,p_float);
 	LinkedList_deleteRoot(list,deallocate);
 	deallocate(fileout);
