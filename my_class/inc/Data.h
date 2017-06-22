@@ -35,6 +35,7 @@ void ReadOptions_setLineSeparators(ReadOptions options, int lineSeparatorsCount,
 void ReadOptions_setFieldSeparators(ReadOptions options, int fieldSeparatorsCount, ...);
 
 Data Data_create(int row, int column);
+void Data_vdelete(void *data);
 void Data_delete(Data data);
 
 Data Data_load(char *file, int ofsr, int ofsc, int r, int c, char *sep);

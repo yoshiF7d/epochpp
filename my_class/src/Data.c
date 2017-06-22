@@ -21,6 +21,9 @@ void Data_delete(Data data){
 		deallocate(data);
 	}
 }
+
+void Data_vdelete(void *data){Data_delete(data);}
+
 char *String_read2(char *file);
 
 #include <time.h>
