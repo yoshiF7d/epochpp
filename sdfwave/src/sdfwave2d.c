@@ -36,7 +36,7 @@ int main(int argc, char *argv[]){
 	char *dirin,*filename,*fileout,*bspecstr,fullpath[512];
 	
 	int i,j,n,ii,jj;
-	int mat[2][2] = {{10,0},{10,0}};
+	int mat[2][2] = {{0,0},{0,0}};
 	double energy,ec=0.5*C_e0,bc=0.5/C_u0,bx,by,bz,ex,ey,ez;
 	double r=0;
 	int bspec;
@@ -84,6 +84,7 @@ int main(int argc, char *argv[]){
 			list = LinkedList_append(list,String_copy(entry->d_name));
 		}
 	}
+	closedir(dp);
 	list = LinkedList_sort(list,compare);
 	filename = LinkedList_get(list);
 	snprintf(fullpath,512,"%s/%s",dirin,filename);
@@ -108,7 +109,7 @@ int main(int argc, char *argv[]){
 		break;
 	}
 	Data_delete(dataex);
-	databd = Data_create(n,LinkedList_getLength(list));
+	databd = Data_create(LinkedList_getLength(list),n);
 	
 	for(s=list,i=0;s;s=s->next,i++){
 		filename = LinkedList_get(s);
