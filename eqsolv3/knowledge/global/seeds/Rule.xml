@@ -1,8 +1,0 @@
-<NAME>Rule</NAME>
-<PRECEDENCE>120</PRECEDENCE>
-<ASSOCIATIVITY>bi_right</ASSOCIATIVITY>
-<SIGN>"->"</SIGN>
-<ATTRIBUTES>Locked|Protected</ATTRIBUTES>
-<DOC>
-lhs->rhs represents a rule that transforms lhs to rhs.
-</DOC>

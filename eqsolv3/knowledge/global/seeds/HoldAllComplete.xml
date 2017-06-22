@@ -1,7 +1,0 @@
-<NAME>HoldAllComplete</NAME>
-<PRECEDENCE>670</PRECEDENCE>
-<ATTRIBUTES>Locked|Protected</ATTRIBUTES>
-<DOC>
-HoldAllComplete is an attibute which specifies that all arguments to be a
-function are not to be modified or looked at in any way in the process of evaluation.
-</DOC>

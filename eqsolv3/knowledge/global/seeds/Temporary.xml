@@ -1,6 +1,0 @@
-<NAME>Temporary</NAME>
-<PRECEDENCE>670</PRECEDENCE>
-<ATTRIBUTES>Locked|Protected</ATTRIBUTES>
-<DOC>
-Temporary is an attribute assigned to symbols which are created as local variables by Module.
-</DOC>

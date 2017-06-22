@@ -1,7 +1,0 @@
-<NAME>HoldFirst</NAME>
-<PRECEDENCE>670</PRECEDENCE>
-<ATTRIBUTES>Locked|Protected</ATTRIBUTES>
-<DOC>
-HoldFirst os an attibute which specifies that the first argument to a funtion is to be
-maintained in unevaluated form.
-</DOC>

@@ -1,6 +1,0 @@
-<NAME>ReadProtected</NAME>
-<PRECEDENCE>670</PRECEDENCE>
-<ATTRIBUTES>Locked|Protected</ATTRIBUTES>
-<DOC>
-ReadProtected is an attibute that prevents values associated with a symbol from being seen.
-</DOC>

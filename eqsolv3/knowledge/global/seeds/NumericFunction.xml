@@ -1,8 +1,0 @@
-<NAME>NumericFunction</NAME>
-<PRECEDENCE>670</PRECEDENCE>
-<ATTRIBUTES>Locked|Protected</ATTRIBUTES>
-<DOC>
-NumericFunction is an attibute that can be assigned to a symbol f to indicate that 
-f[arg_1,arg_2,...] should be considered a numeric quantity whenever all the arg_i are
-numeric qunatities.
-</DOC>
