@@ -1,0 +1,26 @@
+#!/bin/sh
+dir=${1:-.}
+emin=${2:-0}
+emax=${3:-1e+6}
+s=${4:-1}
+files="${dir}/*.sdf"
+
+for filepath in ${files}
+do
+	echo sdfen $filepath $emin $emax $s 
+	sdfen $filepath $emin $emax $s
+done
+
+echo visiter -c "series(${dir}/en/een/bmat,sum(${dir}/en/ett.txt))"
+visiter -c "series(${dir}/en/een/bmat,sum(${dir}/en/ett.txt))"
+echo visiter -c "series(${dir}/en/ben/bmat,sum(${dir}/en/btt.txt))"
+visiter -c "series(${dir}/en/ben/bmat,sum(${dir}/en/btt.txt))"
+echo visiter -c "series(${dir}/en/ken/bmat,sum(${dir}/en/ktt.txt))"
+visiter -c "series(${dir}/en/ken/bmat,sum(${dir}/en/ktt.txt))"
+
+awk>${dir}/en/et.txt '{sub(".bmat","")}{print}' ${dir}/en/ett.txt
+awk>${dir}/en/bt.txt '{sub(".bmat","")}{print}' ${dir}/en/btt.txt
+awk>${dir}/en/kt.txt '{sub(".bmat","")}{print}' ${dir}/en/ktt.txt
+rm ${dir}/en/ett.txt
+rm ${dir}/en/btt.txt
+rm ${dir}/en/ktt.txt

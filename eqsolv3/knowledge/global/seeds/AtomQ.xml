@@ -1,0 +1,36 @@
+<NAME>AtomQ</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+Expr AtomQ(Expr expr);
+int AtomQ_mod(Expr expr);
+</PROTO>
+<SOURCE>
+Expr AtomQ(Expr expr){
+	Expr child = expr->child;
+	if(!child){return expr;}
+	if(AtomQ_mod(expr->child)){
+		expr->symbol = SymbolTable_get(id_True);
+	}else{
+		expr->symbol = SymbolTable_get(id_False);
+	}
+	expr->child=NULL;
+	Expr_deleteRoot(child);
+	return expr;
+}
+
+int AtomQ_mod(Expr expr){
+	switch(expr->symbol->id){
+	  case id_Integer:
+	  case id_Real:
+	  case id_String:
+		return 1;
+	  default:
+		break;
+	}
+	return 0;
+}
+</SOURCE>
+<DOC>
+AtomQ[expr] yields True if expr is an expression which cannot be divided into subexpressions, and yields False otherwise.
+</DOC>

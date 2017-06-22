@@ -1,0 +1,9 @@
+set xl "Angle [deglee]" font "Helvetica,30"
+set yl "Energy [keV]" font "Helvetica,30" offset -2,0
+set lmargin at screen 0.15
+set rmargin at screen 0.78
+set bmargin at screen 0.15
+set tmargin at screen 0.95
+set pm3d map
+set palette rgb 21,22,23
+splot "probe_side/polar2d/0001polar2d.txt"

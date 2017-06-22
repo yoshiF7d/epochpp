@@ -1,0 +1,20 @@
+<NAME>Wpe</NAME>
+<ALIAS>{電子プラズマ角振動数}</ALIAS>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Protected|Constant</ATTRIBUTES>
+<BUILTINRULES>
+{
+	Wpe[n_] -> Sqrt[(n e^2)/(e0 me)],
+	Wpe -> Sqrt[(n e^2)/(e0 me)]
+}
+</BUILTINRULES>
+<PROTO>
+</PROTO>
+<SOURCE>
+</SOURCE>
+
+<DOC>
+Electron plasma angular frequency.
+usage : Wpe/.n->(value of electron density [/cc])
+usage2 : Wpe[(value of electron density [/cc])]
+</DOC>

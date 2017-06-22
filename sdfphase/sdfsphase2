@@ -1,0 +1,62 @@
+dir=${1:-.}
+spname=$2
+hmin=${3:--1}
+hmax=${4:--1}
+hbin=${5:-512}
+vmin=${6:--1}
+vmax=${7:--1}
+vbin=${8:-512}
+mode=${9:-07}
+skip=${10:-1}
+outdirname=""
+
+if [ $# -ge 12 ]; then
+	if [ $# -ge 14 ]; then
+		if [ $# -ge 16 ]; then
+			command="${spname} ${hmin} ${hmax} ${hbin} ${vmin} ${vmax} ${vbin} ${mode} ${11} ${12} ${13} ${14} ${15} ${16}"
+			if [ $# -ge 17 ]; then
+				outdirname=${17}
+			fi
+		else
+			command="${spname} ${hmin} ${hmax} ${hbin} ${vmin} ${vmax} ${vbin} ${mode} ${11} ${12} ${13} ${14}"
+			if [ $# -ge 15 ]; then
+				outdirname=${15}
+			fi
+		fi
+	else	
+		command="${spname} ${hmin} ${hmax} ${hbin} ${vmin} ${vmax} ${vbin} ${mode} ${11} ${12}"
+		if [ $# -ge 13 ]; then
+			outdirname=${13}
+		fi
+	fi
+else	
+	command="${spname} ${hmin} ${hmax} ${hbin} ${vmin} ${vmax} ${vbin} ${mode}"
+	if [ $# -ge 11 ]; then
+		outdirname=${11}
+	fi
+fi
+
+echo ${command}
+
+count=0
+outdir=""
+for file in ${dir}/*.sdf
+do
+	mod=$(($count % $skip))
+	if [ $mod -eq 0 ]; then
+		echo sdfphase2 ${file} ${command} 
+		outdir=$(sdfphase2 ${file} ${command})
+		#echo ${outdir}
+	fi
+	count=$(($count+1))
+done
+
+if [ ${#outdirname} -gt 0 ]; then
+	echo mv ${outdir} ${outdirname}
+	mv ${outdir} ${outdirname}	
+fi
+#echo cd ${outdir}
+#cd ${outdir}
+#movname=${outdir##*/}
+#./plot.sh
+#convert -verbose png/*.png ${movname}.mov

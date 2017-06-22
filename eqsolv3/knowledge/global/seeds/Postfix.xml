@@ -1,0 +1,24 @@
+<NAME>Postfix</NAME>
+<PRECEDENCE>70</PRECEDENCE>
+<ASSOCIATIVITY>bi_left</ASSOCIATIVITY>
+<SIGN>"//"</SIGN>
+<ATTRIBUTES>Protected|HoldAll</ATTRIBUTES>
+<PROTO>
+Expr Postfix(Expr expr);
+</PROTO>
+<SOURCE>
+Expr Postfix(Expr expr){
+	Expr e;
+	if(!expr->child){return expr;}
+	if(!expr->child->next){return expr;}
+	e = expr->child->next;
+	Expr_isolate(expr->child);
+	Expr_appendChild(e,expr->child);
+	Expr_replace(expr,e);
+	Expr_delete(expr);
+	return Evaluate(e);
+}
+</SOURCE>
+<DOC>
+Postfix[expr,f] or expr//f evaluates to f[expr].
+</DOC>

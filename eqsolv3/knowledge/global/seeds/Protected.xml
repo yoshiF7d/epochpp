@@ -1,0 +1,6 @@
+<NAME>Protected</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Locked|Protected</ATTRIBUTES>
+<DOC>
+Protected is an attibutes which prevents any values associated with a symbol from being modified.
+</DOC>

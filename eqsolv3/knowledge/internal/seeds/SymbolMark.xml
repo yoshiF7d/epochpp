@@ -1,0 +1,8 @@
+<NAME>SymbolMark</NAME>
+<PRECEDENCE>660</PRECEDENCE>
+<ASSOCIATIVITY>un_post</ASSOCIATIVITY>
+<SIGN>"$"</SIGN>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<DOC>
+PreSymbolMark is a internal symbol which is used to represent special symbol.
+</DOC>

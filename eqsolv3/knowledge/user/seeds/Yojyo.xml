@@ -1,0 +1,21 @@
+<NAME>Yojyo</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+extern int output_flag;
+Expr Yojyo(Expr expr);
+</PROTO>
+<SOURCE>
+Expr Yojyo(Expr expr){
+	char yojyo[]=
+	"　  ∞ \r\n\
+  (\'-\' ) \r\n\
+   ( ﾉ)　,. ,.\r\n";
+	puts(yojyo);
+	output_flag=0;
+	return expr;
+}
+</SOURCE>
+<DOC>
+Yojyo[] displays yojyo.
+</DOC>

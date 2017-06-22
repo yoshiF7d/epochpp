@@ -1,0 +1,23 @@
+<NAME>Last</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+Expr Last(Expr expr);
+Expr Last_mod(Expr expr);
+</PROTO>
+<SOURCE>
+Expr Last(Expr expr){
+	Expr e;
+	if(!expr->child){return expr;}
+	Expr_replace(expr,e=Expr_copyRoot(Last_mod(expr->child)));
+	Expr_deleteRoot(expr);
+	return e;
+}
+Expr Last_mod(Expr expr){
+	for(;expr->next;expr=expr->next){}
+	return expr;
+}
+</SOURCE>
+<DOC>
+Last[expr] gives the last element in expr.
+</DOC>

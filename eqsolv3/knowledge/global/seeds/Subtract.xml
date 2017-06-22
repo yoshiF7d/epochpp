@@ -1,0 +1,30 @@
+<NAME>Subtract</NAME>
+<ALIAS>{減算}</ALIAS>
+<PRECEDENCE>310</PRECEDENCE>
+<ASSOCIATIVITY>bi_left</ASSOCIATIVITY>
+<SIGN>"-"</SIGN>
+<ATTRIBUTES>Listable|NumericFunction|Protected</ATTRIBUTES>
+<PROTO>
+Expr Subtract(Expr expr);
+</PROTO>
+<SOURCE>
+Expr Subtract(Expr expr){
+	Expr e1,eo;
+	int arglen;
+	
+	if(!expr->child){return expr;}
+	arglen = Expr_getLength(expr->child);
+	if(arglen!=2){return expr;}
+	
+	expr->symbol = SymbolTable_get(id_Plus);
+	e1 = Expr_create(id_Times);
+	Expr_replace(eo=expr->child->next,e1);
+	Expr_isolate(eo);
+	Expr_appendChild(e1,Integer_createInt(-1));
+	Expr_appendChild(e1,eo);
+	return expr;
+}
+</SOURCE>
+<DOC>
+x - y is equivalent to x + (-1 * y).
+</DOC>

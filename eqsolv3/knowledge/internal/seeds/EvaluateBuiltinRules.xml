@@ -1,0 +1,72 @@
+<NAME>EvaluateBuiltinRules</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Locked|Protected</ATTRIBUTES>
+<PROTO>
+extern int message_flag;
+Expr EvaluateBuiltinRules(Expr expr);
+</PROTO>
+<SOURCE>
+/**/
+Expr EvaluateBuiltinRules(Expr expr){
+	Expr e=NULL,prev;
+	if(!expr){return NULL;}
+	message_flag=0;
+  reeval:
+	if(!expr->symbol){return expr;}
+	if(!(expr->symbol->attributes & SequenceHold) && expr->symbol->id == id_Sequence){
+	expr = Sequence(expr); goto reeval;
+	}
+	if(!(expr->symbol->attributes & HoldAllComplete)){
+		for(e = expr->child;e;e=e->next){
+			if(e->symbol->id == id_Sequence){e = Sequence(e);}
+		}
+	}
+	if(expr->symbol->attributes & Listable){
+		//Expr_printTree(expr);
+		e=Thread_mod(expr,NULL,NULL);
+		if(e!=expr){
+			expr=e;
+			goto reeval;
+		}
+		expr=e;
+	}
+	if(expr->symbol->attributes & Flat){
+		expr = Flatten_mod(expr,NULL,0,-1);
+		//Expr_printTree(expr);
+	}
+	//printAttributes(sd->attributes);
+	//puts("e1");
+	if(!((expr->symbol->attributes & HoldAllComplete) || (expr->symbol->attributes & HoldAll)) && expr->child){
+		if(!(expr->symbol->attributes & HoldFirst)){
+			expr->child = EvaluateBuiltinRules(expr->child);
+		}
+		if(!(expr->symbol->attributes & HoldRest) && (e=expr->child->next)){
+			for(;e;e=e->next){
+				e = EvaluateBuiltinRules(e);
+			}
+		}
+	}
+	//puts("e2");
+	if(expr->symbol->attributes & Orderless){
+		expr->child = Sort_mod(expr->child);
+	}
+	//puts("e3");
+	if(!expr->symbol->function){
+		message_flag=1;
+		return expr;
+	}
+	if(expr->symbol->id!=id_EvaluateBuiltinRules){
+		//printf("Symbol:%s is defined\n",node->data.symbol);
+		expr = expr->symbol->function(expr);
+	}else{
+		Expr_replace(expr,e=expr->child);
+		Expr_delete(expr);
+		expr = e;
+	}
+	message_flag=1;
+	return expr;
+}
+</SOURCE>
+<DOC>
+EvaluateBuiltinRules[expr] evaluates expression expr without using builtin rules in order to evaluates builtin rules itself.
+</DOC>

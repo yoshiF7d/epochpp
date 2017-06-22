@@ -1,0 +1,21 @@
+<NAME>Slot</NAME>
+<PRECEDENCE>740</PRECEDENCE>
+<ASSOCIATIVITY>un_pre</ASSOCIATIVITY>
+<SIGN>"#"</SIGN>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+Expr Integer_createInt(int k);
+Expr Slot_pre(Expr expr);
+</PROTO>
+<SOURCE>
+Expr Slot_pre(Expr expr){
+	if(!expr->child){
+		Expr_appendChild(expr,Integer_createInt(1));
+	}
+	return expr;
+}
+</SOURCE>
+<DOC>
+# represents the first argument supplied to a pure function.
+# n represents the nth argument.
+</DOC>

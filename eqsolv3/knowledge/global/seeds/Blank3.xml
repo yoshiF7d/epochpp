@@ -1,0 +1,30 @@
+<NAME>Blank3</NAME>
+<PRECEDENCE>730</PRECEDENCE>
+<ASSOCIATIVITY>un_pre</ASSOCIATIVITY>
+<SIGN>"___"</SIGN>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+char *Blank3_toString(Expr expr);
+void Blank3_data_init(union un_data *data);
+void Blank3_data_copy(union un_data *datas, union un_data *datad);
+</PROTO>
+<SOURCE>
+char *Blank3_toString(Expr expr){
+	char *buf=NULL;
+	int needed;
+	if(expr->data.symbol){
+		needed = snprintf(buf,0,"___%s",expr->data.symbol->name);
+		buf = allocate(needed+1);
+		snprintf(buf,needed+1,"___%s",expr->data.symbol->name);
+	}else{
+		return String_copy("___");
+	}
+	return buf;
+}
+void Blank3_data_init(union un_data *data){data->symbol = NULL;}
+void Blank3_data_copy(union un_data *datas, union un_data *datad){datad->symbol = datas->symbol;}
+</SOURCE>
+<DOC>
+___(three _ characters) or Blank3[] is a pattern object that can stand for any squence of zero or more expressions.
+___h or Blank3[h] can stand for any sequence of expressions, all of which have head h.
+</DOC>

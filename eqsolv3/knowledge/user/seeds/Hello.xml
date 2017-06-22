@@ -1,0 +1,17 @@
+<NAME>Hello</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+extern int output_flag;
+Expr Hello(Expr expr);
+</PROTO>
+<SOURCE>
+Expr Hello(Expr expr){
+	printf("( ﾟ∀ﾟ)ﾉｨｮ―ｩ\n");
+	output_flag=0;
+	return expr;
+}
+</SOURCE>
+<DOC>
+Hello[] displays greeting message.
+</DOC>

@@ -1,0 +1,7 @@
+<NAME>SequenceHold</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Locked|Protected</ATTRIBUTES>
+<DOC>
+SequenceHold is an attibute that specifies that Sequence objects appearing in the arguments of
+a function should not automatically be flattened out.
+</DOC>

@@ -1,0 +1,10 @@
+<NAME>Indeterminate</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+</PROTO>
+<SOURCE>
+</SOURCE>
+<DOC>
+Indeterminate is a symbol that represents a numerical quantity whose magnitude cannot be determined.
+</DOC>

@@ -1,0 +1,15 @@
+<NAME>Equal</NAME>
+<PRECEDENCE>290</PRECEDENCE>
+<SIGN>"=="</SIGN>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+Expr Equal(Expr expr);
+</PROTO>
+<SOURCE>
+Expr Equal(Expr expr){
+	return expr;
+}
+</SOURCE>
+<DOC>
+SameQ[expr] yields yields True if the expression lhs is identical to rhs, and yields False otherwise.
+</DOC>

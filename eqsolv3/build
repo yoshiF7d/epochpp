@@ -1,0 +1,21 @@
+gmp=$(ld -lgmp 2>&1 > /dev/null | tail -n 1 | awk '{print $2}')
+mpfr=$(ld -lmpfr 2>&1 > /dev/null | tail -n 1 | awk '{print $2}')
+curses=$(ld -lncurses 2>&1 > /dev/null | tail -n 1 | awk '{print $2}')
+readline=$(ld -lreadline 2>&1 > /dev/null | tail -n 1 | awk '{print $2}')
+if [ ${gmp} = "library" ]; then
+	cd mp
+	tar jxvf gmp-6.0.0a.tar.bz2
+	cd gmp-6.0.0
+	./configure && make && make check && sudo make install
+	cd ../../
+fi
+
+if [ ${mpfr} = "library" ]; then
+	cd mp
+	tar jxvf mpfr-3.1.2.tar.bz2
+	cd mpfr-3.1.2
+	./configure && make && make check && sudo make install
+	cd ../../
+fi
+make learn
+make

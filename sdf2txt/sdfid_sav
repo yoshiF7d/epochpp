@@ -1,0 +1,5 @@
+#!/bin/sh
+
+file=$1
+#echo $files
+	sdf2txt ${file} | grep "b->id"

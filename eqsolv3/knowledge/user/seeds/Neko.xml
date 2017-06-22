@@ -1,0 +1,22 @@
+<NAME>Neko</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+extern int output_flag;
+Expr Neko(Expr expr);
+</PROTO>
+<SOURCE>
+Expr Neko(Expr expr){
+	char neko[]=
+"　  ∧_∧\r\n\
+　ﾐ,,・_・ﾐ\r\n\
+ヾ(,_ｕｕﾉ\r\n\
+";
+	puts(neko);
+	output_flag=0;
+	return expr;
+}
+</SOURCE>
+<DOC>
+Neko[] displays neko.
+</DOC>

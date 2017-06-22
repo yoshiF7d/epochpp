@@ -1,0 +1,17 @@
+<NAME>Sequence</NAME>
+<PRECEDENCE>1000</PRECEDENCE>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+Expr Sequence(Expr expr);
+</PROTO>
+<SOURCE>
+Expr Sequence(Expr expr){
+	Expr e;
+	Expr_replace(expr,e=expr->child);
+	Expr_delete(expr);
+	return e;
+}
+</SOURCE>
+<DOC>
+Sequence[expr1,expr2,...] represents a sequence of arguments to be spliced automatically into any function.
+</DOC>

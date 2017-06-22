@@ -1,0 +1,406 @@
+#include <stdio.h>
+#include "script.h"
+#include "Data.h"
+
+#define SEP " "
+#define XOFS 1
+#define YOFS 3
+#define C_mc2 8.187105065459161e-14
+#define C_mcs 7.457947496566811e-44
+#define C_q 1.60217657e-19
+#define C_pi 3.14159265358973
+#define N 1441
+#define N0 720
+#define scale 4
+#define RADIUS 2
+
+#define toev(joule) ((joule)/C_q)
+#define tokev(joule) ((joule)/C_q/1000)
+#define todeg(radian) ((radian)*180/C_pi)
+
+/*unit*/
+/*energy : kev*/
+/*angle : degree*/
+
+/*axis (last argument)*/
+
+Data topolar(Data data,int nr,int nc){
+	int i,j,k,n,ix,iy,ii,jj;
+	double r,r0,t,x,y,x0,y0,val;
+	Data nd;
+	/*row : deg1 -> r*/
+	/*column : deg2 -> theta*/
+	n = Data_getRow(data);
+	nd = Data_create(N,N);
+	for(i<0;i<N;i++){
+		for(j=0;j<N;j++){		
+			Data_set(nd,i,j,0);
+		}
+	}
+	printf("n : %d\n",n);
+	r0 = ((double)180/(N-1))*RADIUS;
+
+	for(i=0;i<nr;i++){
+		for(j=0;j<nc;j++){
+			r = Data_get(data,i*nc+j,0);
+			t = Data_get(data,i*nc+j,1);
+			val = Data_get(data,i*nc+j,2);
+			//printf("r,t,val : %lf,%lf,%lf\n",r,t,val);		
+			x = r*cos((C_pi*t)/180);
+			y = r*sin((C_pi*t)/180);
+			ix = ((N0*x/90)+N0);
+			iy = (-(N0*y/90)+N0);
+			if(ix>=0 && iy>=0 && ix<N && iy<N){
+				Data_set(nd,ix,iy,val);
+			}	
+			/*
+			for(ii=ix-RADIUS;ii<ix+RADIUS;ii++){
+				for(jj=iy-RADIUS;jj<iy+RADIUS;jj++){
+					x0 = (double)(ii + 0.5 - N0)*90/N0;
+					y0 = -(double)(jj + 0.5 - N0)*90/N0;
+					if(ii>=0 && jj>=0 && ii<N && jj<N){
+						Data_set(nd,ii,jj,val*exp(-(((x-x0)*(x-x0)+(y-y0)*(y-y0))/(r0*r0))));
+					}	
+				}			
+			}*/
+			//printf("ix,iy,val : %d,%d,%lf\n",ix,iy,val);
+		}
+	}
+	return nd;
+}
+void fprintangd(Data data, FILE *fp){
+	int i,j;
+	for(i=0;i<N;i++){
+		for(j=0;j<N;j++){
+			fprintf(fp,"%e%s",(double)(i + 0.5 - N0)*90/N0,SEP);
+			fprintf(fp,"%e%s",-(double)(j + 0.5 - N0)*90/N0,SEP);
+			fprintf(fp,"%e\n",Data_get(data,i,j));
+		}
+		fprintf(fp,"\n");	
+	}
+}
+
+void fprintPolar2D(Data data,FILE *fp, int adebinc, int addbinc){
+	int i,j,binc;
+	
+	binc = adebinc*addbinc;
+	for(i=0;i<addbinc;i++){
+		for(j=0;j<adebinc;j++){
+			fprintf(fp,"%d%s",(int)Data_get(data,i*adebinc+j,0),SEP);
+			fprintf(fp,"%e%s",Data_get(data,i*adebinc+j,1),SEP);
+			fprintf(fp,"%e%s",Data_get(data,i*adebinc+j,2),SEP);
+			fprintf(fp,"\n");
+		}
+		fprintf(fp,"\n");
+	}
+}
+
+int main(int argc, char *argv[]){
+	char filesdf[256];	
+	char pname[256];
+	char filepx[256];
+	char filepy[256];
+	char filepz[256];
+	char filew[256];
+	
+	char fileespc[256];
+	//char filepolar[256];
+	char fileangd[256];	
+	char fileangdpolar[256];	
+	char fileangd2d[256];
+	char filename[256];
+	
+	char plotespc[256];
+	char plotangd[256];	
+	char plotangd2d[256];
+	
+	char command[1024];
+	char axis[3] = {'x','\0','\0'};
+	
+	int i,j,n=0,r,c,ii,jj,esbinc,adebinc,addbinc,ix,iy,iz=0;
+	double min,max,px,py,pz,minp,maxp;
+	Data datapx,datapy,datapz,dataw,data,hist,angd,angd2d,angd2,angd2d2,angdpolar;
+	
+	FILE *fp;
+	
+	if(argc >= 3){
+		strncpy(filesdf,argv[1],256);
+		strncpy(pname,argv[2],256);
+	}else{
+		loadfile(filesdf,256,"input sdf file");
+		loadfile(pname,256,"input probe name");
+	}
+	if(access(filesdf,F_OK)==-1){
+		fprintf(stderr,"sdf file does not exist\n"); exit(1);
+	}
+
+	snprintf(filename,256,"%s",getFileName(filesdf));
+	snprintf(filename,strlen(filename)-3,"%s",filename);
+	
+	if(argc >= 11){
+		strncpy(axis,argv[10],2); 
+		axis[3] = '\0';
+	}
+
+	snprintf(filepx,256,"%s/bmat/%spx.bmat",pname,filename);
+	snprintf(filepy,256,"%s/bmat/%spy.bmat",pname,filename);
+	snprintf(filepz,256,"%s/bmat/%spz.bmat",pname,filename);
+	snprintf(filew,256,"%s/bmat/%sw.bmat",pname,filename);
+	
+	snprintf(fileespc,256,"%s/%s/espc/%sespc.txt",pname,axis,filename);
+	snprintf(fileangd,256,"%s/%s/angd/%sangd.txt",pname,axis,filename);	
+	snprintf(fileangdpolar,256,"%s/%s/angdpolar/%sangdpolar.txt",pname,axis,filename);	
+	snprintf(fileangd2d,256,"%s/%s/angd2d/%sangd2d.txt",pname,axis,filename);
+	
+	snprintf(plotespc,256,"%s/%s/plotespc.sh",pname,axis);
+	snprintf(plotangd,256,"%s/%s/plotangd.sh",pname,axis);
+	snprintf(plotangd2d,256,"%s/%s/plotangd2d.sh",pname,axis);
+	
+	
+	snprintf(command,1024,"%s",pname);
+	mkdir(command,0777);
+	snprintf(command,1024,"%s/bmat",pname);
+	mkdir(command,0777);
+	snprintf(command,1024,"%s/%s",pname,axis);
+	mkdir(command,0777);
+	snprintf(command,1024,"%s/%s/espc",pname,axis);
+	mkdir(command,0777);
+	snprintf(command,1024,"%s/%s/angd",pname,axis);
+	mkdir(command,0777);
+	snprintf(command,1024,"%s/%s/angdpolar",pname,axis);
+	mkdir(command,0777);
+	snprintf(command,1024,"%s/%s/angd2d",pname,axis);
+	mkdir(command,0777);
+	
+#pragma omp parallel
+#pragma omp sections private(command)
+{
+	#pragma omp section
+	if(access(filepx,F_OK)==-1){
+		snprintf(command,1024,"sdf2bmat -cni -v %s/Px -f %s %s",pname,filepx,filesdf);
+		fprintf(stderr,"%s\n",command);
+		system(command);
+	}
+	#pragma omp section
+	if(access(filepy,F_OK)==-1){
+		snprintf(command,1024,"sdf2bmat -cni -v %s/Py -f %s %s",pname,filepy,filesdf);
+		fprintf(stderr,"%s\n",command);	
+		system(command);
+	}
+	#pragma omp section
+	if(access(filepz,F_OK)==-1){
+		snprintf(command,1024,"sdf2bmat -cni -v %s/Pz -f %s %s",pname,filepz,filesdf);
+		fprintf(stderr,"%s\n",command);	
+		system(command);
+	}
+	#pragma omp section
+	if(access(filew,F_OK)==-1){
+		snprintf(command,1024,"sdf2bmat -cni -v %s/weight -f %s %s",pname,filew,filesdf);
+		fprintf(stderr,"%s\n",command);	
+		system(command);
+	}
+}
+	datapx = Data_input(filepx);
+	datapy = Data_input(filepy);
+	datapz = Data_input(filepz);
+	dataw = Data_input(filew);
+	
+	n = r = Data_getRow(dataw);
+	c = Data_getColumn(dataw);
+	data = Data_create(n,5);
+	
+	/*data(kev,weight,px,py,pz)*/
+	for(i=0;i<n;i++){
+		ii = i/c; jj = i%c;
+		px = Data_translate(datapx,ii,jj,data,i,2);
+		py = Data_translate(datapy,ii,jj,data,i,3);
+		pz = Data_translate(datapz,ii,jj,data,i,4);
+		Data_translate(dataw,ii,jj,data,i,1);
+		/* E =(m*c^2)*sqrt(1 +( p^2/(m*c))^2 )-C_mc2*/
+		Data_set(data,i,0,tokev(C_mc2*sqrt(1+((px*px+py*py+pz*pz)/C_mcs))-C_mc2 ));
+	}
+	
+	//Data_print(data);
+	
+	if(argc >= 4){
+		esbinc = atoi(argv[3]);
+		min = atof(argv[4]);
+		max = atof(argv[5]);
+	}else{
+		puts("energy spectrum");
+	  again:
+		puts("input energy bin count");
+		if(scanf("%d",&esbinc) != 1){
+			scanf("%*s");
+			goto again;
+		}
+		puts("input minimum energy (negative value : auto)");
+		if(scanf("%lf",&min) != 1){
+			scanf("%*s");
+			goto again;
+		}
+		puts("input maximum energy (negative value : auto)");
+		if(scanf("%lf",&max) != 1){
+			scanf("%*s");
+			goto again;
+		}
+	}
+	if(argc >= 8){
+		adebinc = atoi(argv[6]);
+		addbinc = atof(argv[7]);
+	}else{
+		puts("angular distribution");
+	  again2:
+		puts("input energy bin count");
+		if(scanf("%d",&adebinc) != 1){
+			scanf("%*s");
+			goto again2;
+		}
+		puts("input degree bin count");
+		if(scanf("%d",&addbinc) != 1){
+			scanf("%*s");
+			goto again2;
+		}
+	}
+	if(argc >= 10){
+		minp = atof(argv[8]);
+		maxp = atof(argv[9]);
+	}else{
+	  again3:
+		puts("input minimum energy (negative value : auto)");
+		if(scanf("%lf",&minp) != 1){
+			scanf("%*s");
+			goto again3;
+		}
+		puts("input maximum energy (negative value : auto)");
+		if(scanf("%lf",&maxp) != 1){
+			scanf("%*s");
+			goto again3;
+		}
+	}
+	
+	if(min<0){min = Data_min(data,0);}
+	if(max<0){max = Data_max(data,0);}
+	if(minp<0){minp = Data_min(data,0);}
+	if(maxp<0){maxp = Data_max(data,0);}
+	
+	printf("min : %e\n",min);
+	printf ("max : %e\n",max);
+	printf("minp : %e\n",minp);
+	printf ("maxp : %e\n",maxp);
+	
+	hist = Data_histogram(data,min,max,esbinc);
+	angd = Data_create(n,3);
+	switch(axis[0]){
+	  case 'x':
+		switch(axis[1]){
+		  case 'y':
+			ix = 2; iy = 3; break;
+		  case 'z':
+			ix = 2; iy = 4; break;
+		  default:
+			ix = 3; iy = 4; iz = 2; break;
+		}
+		break;
+	  case 'y':
+		switch(axis[1]){
+		  case 'z':
+			ix = 3; iy = 4; break;
+		  case 'x':
+			ix = 3; iy = 2; break;
+		  default:
+			ix = 4; iy = 2; iz = 3; break;
+		}
+		break;
+	  case 'z':
+		switch(axis[1]){
+		  case 'x':
+			ix = 4; iy = 2; break;
+		  case 'y':
+			ix = 4; iy = 3; break;
+		  default:
+			ix = 2; iy = 3; iz = 4; break;
+		}
+		break;
+	  default:
+		ix = 3; iy = 4; iz = 2; break;
+	}
+	printf("ix : %d\n",ix);
+	printf("iy : %d\n",iy);
+	printf("iz : %d\n",iz);
+	printf("n : %d\n",n);
+	if(iz){
+		angd2 = Data_create(n,3);
+#
+		#pragma omp parallel for
+		for(i=0;i<n;i++){
+			//printf("%d\n",i);
+			px = Data_get(data,i,ix);
+			py = Data_get(data,i,iy);
+			pz = Data_get(data,i,iz);
+			Data_set(angd,i,0,todeg(atan2(sqrt(px*px+py*py),pz)));
+			Data_set(angd,i,1,Data_get(data,i,0)); /*energy*/
+			Data_set(angd,i,2,Data_get(data,i,1)); /*weight*/
+			Data_set(angd2,i,0,todeg(atan2(sqrt(px*px+py*py),pz)));
+			Data_set(angd2,i,1,todeg(atan2(py,px)));
+			Data_set(angd2,i,2,Data_get(data,i,1)); /*weight*/
+		}
+		angd2d2 = Data_histogram2D(angd2,-90,-180,90,180,addbinc,addbinc);
+		Data_delete(angd2);
+		fp = fopen(fileangd,"w");
+		Data_fprint(angd2d2,fp,SEP);
+		fclose(fp);
+		//puts("hi");
+		angdpolar = topolar(angd2d2,addbinc,addbinc);
+		//puts("hi2");
+		Data_delete(angd2d2);
+		fp = fopen(fileangdpolar,"w");
+		fprintangd(angdpolar,fp);
+		fclose(fp);
+		//puts("hi3");
+		Data_delete(angdpolar);
+	}else{
+		angd2 = NULL;
+		angd2d2 = NULL;
+		for(i=0;i<n;i++){
+			Data_set(angd,i,0,todeg(atan2(Data_get(data,i,iy),Data_get(data,i,ix))));
+			Data_set(angd,i,1,Data_get(data,i,0)); /*energy*/
+			Data_set(angd,i,2,Data_get(data,i,1)); /*weight*/
+		}
+	}
+	angd2d = Data_histogram2D(angd,-90,minp,90,maxp,addbinc,adebinc);
+	//Data_print(polar2d);
+	
+	fp = fopen(fileespc,"w");
+	Data_fprint(hist,fp,SEP);
+	fclose(fp);
+	
+	fp = fopen(fileangd2d,"w");
+	fprintPolar2D(angd2d,fp,adebinc,addbinc);
+	fclose(fp);
+	
+	fp = fopen(plotespc,"w");
+	fprintf(fp,PLOTESPC,min,max);
+	fclose(fp);
+	chmod(plotespc,0777);
+	
+	fp = fopen(plotangd2d,"w");
+	fprintf(fp,PLOTPOLAR2D,minp,maxp);
+	fclose(fp);
+	chmod(plotangd2d,0777);
+	
+	fp = fopen(plotangd,"w");
+	fprintf(fp,PLOTPOLAR);
+	fclose(fp);
+	chmod(plotangd,0777);
+	
+	Data_delete(datapx);
+	Data_delete(datapy);
+	Data_delete(datapz);
+	Data_delete(dataw);
+	Data_delete(data);
+	Data_delete(hist);
+	Data_delete(angd);
+	Data_delete(angd2d);
+	return 0;
+}

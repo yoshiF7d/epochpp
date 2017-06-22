@@ -1,0 +1,6 @@
+sdf2.h にSDF_DPRNTar2(a,len,col)という関数を作った。
+sdf_input_cartesian2.cの中で上の関数を使用。
+他ファイルはsdf2.hをインクルードする以外は変更してない。
+
+SDF_DPRINTarは10列ずつプリントするので、グリッドのXとYに合わせた
+行列形式でプリントするようにした。

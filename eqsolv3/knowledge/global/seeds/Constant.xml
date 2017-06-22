@@ -1,0 +1,6 @@
+<NAME>Constant</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Locked|Protected</ATTRIBUTES>
+<DOC>
+Constant is an attibute that indicates zero derivative of a symbol with respect to all parameters.
+</DOC>

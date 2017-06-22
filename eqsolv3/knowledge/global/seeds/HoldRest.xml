@@ -1,0 +1,7 @@
+<NAME>HoldRest</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Locked|Protected</ATTRIBUTES>
+<DOC>
+HoldRest is an attibute which specifies that all but the first argument to a function
+are to be maintained in an unevaluated form.
+</DOC>

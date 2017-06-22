@@ -1,0 +1,29 @@
+<NAME>PointerHead</NAME>
+<PRECEDENCE>1000</PRECEDENCE>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+char *PointerHead_toString(Expr expr);
+Expr PointerHead_create(Expr e);
+void PointerHead_data_init(union un_data *data);
+void PointerHead_data_finish(union un_data *data);
+void PointerHead_data_copy(union un_data *datas, union un_data *datad);
+</PROTO>
+<SOURCE>
+Expr PointerHead_create(Expr e){
+	Expr rtn;
+	rtn = Expr_create(id_PointerHead);
+	rtn->data.expr = e;
+	return rtn;
+}
+char *PointerHead_toString(Expr expr){
+	return OutputForm_mod_str(expr->data.expr);
+}
+void PointerHead_data_init(union un_data *data){data->expr = NULL;}
+void PointerHead_data_finish(union un_data *data){Expr_deleteRoot(data->expr); data->expr = NULL;}
+void PointerHead_data_copy(union un_data *datas, union un_data *datad){
+	datad->expr = Expr_copyRoot(datas->expr);
+}
+</SOURCE>
+<DOC>
+PointerHead is a internal symbol used to represent head of expression consists of multiple symbols.
+</DOC>

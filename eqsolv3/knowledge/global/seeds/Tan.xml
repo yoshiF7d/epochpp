@@ -1,0 +1,51 @@
+<NAME>Tan</NAME>
+<ALIAS>{正接}</ALIAS>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Listable|NumericFunction|Protected</ATTRIBUTES>
+<PROTO>
+Expr Tan(Expr expr);
+</PROTO>
+<BUILTINRULES>
+{
+	Tan[0]->0,
+	Tan[Pi]->0,
+	Tan[Pi*n_Integer]->0,
+	Tan[Pi/2]->ComplexInfinity,
+	Tan[Pi/3]->Sqrt[3],
+	Tan[2*Pi/3]->-Sqrt[3],
+	Tan[Pi/4]->1,
+	Tan[3*Pi/4]->-1,
+	Tan[Pi/5]->Sqrt[5 - 2*Sqrt[5]],
+	Tan[2*Pi/5]->Sqrt[5 + 2*Sqrt[5]],
+	Tan[3*Pi/5]->-Sqrt[5 + 2*Sqrt[5]],
+	Tan[4*Pi/4]->-Sqrt[5 - 2*Sqrt[5]],
+	Tan[Pi/6]->1/Sqrt[3],
+	Tan[5*Pi/6]->-Sqrt[3]/2
+}
+</BUILTINRULES>
+<SOURCE>
+Expr Tan(Expr expr){
+	Expr child = expr->child;
+	if(!child){return expr;}
+	switch(child->symbol->id){
+	  case id_Integer:
+		/*do nothing*/ break;
+	  case id_Real:
+		if(child->data.REAL_PREC <= R64_LIMIT){
+			child->data.REAL_MP = tan(child->data.REAL_MP);
+		}else{
+			mpfr_tan(child->data.REAL_AP,child->data.REAL_AP,MPFR_RNDN);
+		}
+		Expr_replace(expr,child);
+		Expr_delete(expr);
+		expr = child;
+		break;
+	  case id_Times:
+		break;
+	}
+	return expr;
+}
+</SOURCE>
+<DOC>
+Tan[z] gives the tangent of z.
+</DOC>

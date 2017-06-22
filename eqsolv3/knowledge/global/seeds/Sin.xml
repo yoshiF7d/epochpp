@@ -1,0 +1,49 @@
+<NAME>Sin</NAME>
+<ALIAS>{正弦}</ALIAS>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Listable|NumericFunction|Protected</ATTRIBUTES>
+<BUILTINRULES>
+{
+	Sin[0]->0,
+	Sin[Pi]->0,
+	Sin[Pi*n_Integer]->0,
+	Sin[Pi/2]->1,
+	Sin[Pi/3]->Sqrt[3]/2,
+	Sin[2*Pi/3]->Sqrt[3]/2,
+	Sin[Pi/4]->1/Sqrt[2],
+	Sin[3*Pi/4]->1/Sqrt[2],
+	Sin[Pi/5]->Sqrt[(5 - Sqrt[5])/8],
+	Sin[2*Pi/5]->Sqrt[(5 + Sqrt[5])/8],
+	Sin[3*Pi/5]->Sqrt[(5 + Sqrt[5])/8],
+	Sin[4*Pi/4]->Sqrt[(5 - Sqrt[5])/8],
+	Sin[Pi/6]->Sqrt[3]/2,
+	Sin[5*Pi/6]->-Sqrt[3]/2
+}
+</BUILTINRULES>
+<PROTO>
+Expr Sin(Expr expr);
+</PROTO>
+<SOURCE>
+Expr Sin(Expr expr){
+	Expr child = expr->child;
+	if(!child){return expr;}
+	switch(child->symbol->id){
+	  case id_Real:
+		if(child->data.REAL_PREC <= R64_LIMIT){
+			child->data.REAL_MP = sin(child->data.REAL_MP);
+		}else{
+			mpfr_sin(child->data.REAL_AP,child->data.REAL_AP,MPFR_RNDN);
+		}
+		Expr_replace(expr,child);
+		Expr_delete(expr);
+		expr = child;
+		break;
+	  default:
+		break;
+	}
+	return expr;
+}
+</SOURCE>
+<DOC>
+Sin[z] gives the sine of z.
+</DOC>

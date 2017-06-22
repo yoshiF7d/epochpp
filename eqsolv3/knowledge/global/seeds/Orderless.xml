@@ -1,0 +1,8 @@
+<NAME>Orderless</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Locked|Protected</ATTRIBUTES>
+<DOC>
+Orderless is an attribute that can be assigned to a symbol f to indicate that the
+elements e_i in expressions of the form f[e_1,e_2,...] should automatically be
+sorted into canonical order. This property is accounted for in pattern matching.
+</DOC>

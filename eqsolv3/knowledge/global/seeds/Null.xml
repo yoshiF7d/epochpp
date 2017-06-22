@@ -1,0 +1,8 @@
+<NAME>Null</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Locked|Protected</ATTRIBUTES>
+<DOC>
+Null is a symbol used to indicate the absence of an expression or a result.
+It is not displayed in ordinary output. 
+When Null appears as a complete output expression, no output is printed.
+</DOC>

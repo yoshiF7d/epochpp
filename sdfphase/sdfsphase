@@ -1,0 +1,26 @@
+dir=${1:-.}
+spname=$2
+hmin=${3:--1}
+hmax=${4:--1}
+hbin=${5:-512}
+vmin=${6:--1}
+vmax=${7:--1}
+vbin=${8:-512}
+mode=${9:-07}
+skip=${10:-1}
+
+count=0
+for file in ${dir}/*.sdf
+do
+	mod=$(($count % $skip))
+	if [ $mod -eq 0 ]; then
+		echo sdfphase ${file} ${spname} ${hmin} ${hmax} ${hbin} ${vmin} ${vmax} ${vbin} ${mode}
+		outdir=$(sdfphase ${file} ${spname} ${hmin} ${hmax} ${hbin} ${vmin} ${vmax} ${vbin} ${mode})
+	fi
+	count=$(($count+1))
+done
+#echo cd ${outdir}
+#cd ${outdir}
+#movname=${outdir##*/}
+#./plot.sh
+#convert -verbose png/*.png ${movname}.mov

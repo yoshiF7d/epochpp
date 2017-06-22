@@ -1,0 +1,26 @@
+<NAME>Pointer</NAME>
+<PRECEDENCE>1000</PRECEDENCE>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+Expr Pointer_create(Expr e);
+void Pointer_data_init(union un_data *data);
+void Pointer_data_finish(union un_data *data);
+void Pointer_data_copy(union un_data *datas, union un_data *datad);
+</PROTO>
+<SOURCE>
+Expr Pointer_create(Expr e){
+	Expr rtn;
+	rtn = Expr_create(id_Pointer);
+	rtn->data.expr = e;
+	return rtn;
+}
+void Pointer_data_init(union un_data *data){data->expr = NULL;}
+void Pointer_data_finish(union un_data *data){data->expr = NULL;}
+void Pointer_data_copy(union un_data *datas, union un_data *datad){datad->expr = datas->expr;}
+</SOURCE>
+<DATA>
+Expr expr;
+</DATA>
+<DOC>
+Pointer is a internal symbol used in matching function to store submatch expression.
+</DOC>

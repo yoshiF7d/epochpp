@@ -1,0 +1,24 @@
+<NAME>First</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+Expr First(Expr expr);
+Expr First_mod(Expr expr);
+</PROTO>
+<SOURCE>
+Expr First(Expr expr){
+	Expr e;
+	if(!expr->child){return expr;}
+	Expr_replace(expr,e=Expr_copyRoot(expr->child));
+	Expr_deleteRoot(expr);
+	return e;
+}
+Expr First_mod(Expr expr){
+	Expr e;
+	for(e=expr;e->previous;e=e->previous){}
+	return e;
+}
+</SOURCE>
+<DOC>
+Last[expr] gives the first element in expr.
+</DOC>

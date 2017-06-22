@@ -1,0 +1,12 @@
+<NAME>True</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ASSOCIATIVITY>0</ASSOCIATIVITY>
+<SIGN>NULL</SIGN>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+</PROTO>
+<SOURCE>
+</SOURCE>
+<DOC>
+True is the symbol for the Boolean value true.
+</DOC>

@@ -1,0 +1,6 @@
+<NAME>Symbol</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<DOC>
+Symbol["name"] refers to a symbol with the specified name. 
+</DOC>

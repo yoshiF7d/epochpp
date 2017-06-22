@@ -1,0 +1,27 @@
+#!/bin/sh
+
+dir=$1
+id=$2
+tstp=${3:-1}
+
+echo $#
+if [ $# -ge 4 ]; then
+ filename=$4
+else
+ filename=${id##*/}
+fi
+
+files="$dir/*.sdf" 
+
+#echo $files
+
+mkdir $dir/$filename
+
+for filepath in ${files}
+do
+	tmp=${filepath##*/}
+	tmp=${tmp%.*}
+	tmp="${tmp//[![:digit:]]/}"
+	echo "processing ${filepath}"
+	sdf2bmat -f $dir/$filename/$tmp.bmat -cni -v $id $filepath
+done

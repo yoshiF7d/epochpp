@@ -1,0 +1,23 @@
+<NAME>Span</NAME>
+<PRECEDENCE>305</PRECEDENCE>
+<ASSOCIATIVITY>asso_special</ASSOCIATIVITY>
+<SIGN>";;"</SIGN>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+Expr Span(Expr expr);
+</PROTO>
+<SOURCE>
+Expr Span(Expr expr){
+	return expr;
+}
+</SOURCE>
+<DOC>
+i;;j represents a span of elements i through j.
+i;; represents a span from i to the end.
+;;j represents a span from the beginning to j.
+;; represents a span that includes all elements.
+i;;j;;k represents a span from i through j in steps of k.
+i;; ;;k represents a span from i to the end in steps of k.
+;;j;;k represents a span from the beginning to j in steps of k.
+;; ;;k represents a span from the beginning to the end in steps of k.
+</DOC>

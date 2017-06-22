@@ -1,0 +1,13 @@
+<NAME>ComplexInfinity</NAME>
+<PRECEDENCE>1000</PRECEDENCE>
+<ASSOCIATIVITY>0</ASSOCIATIVITY>
+<SIGN>NULL</SIGN>
+<ATTRIBUTES>Protected</ATTRIBUTES>
+<PROTO>
+</PROTO>
+<SOURCE>
+</SOURCE>
+<DOC>
+ComplexInfinity represents a quantity with infinite magnitude,
+but undetermined complex phase.
+</DOC>

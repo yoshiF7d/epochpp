@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<Object name="TemplateOptions">
+    <Field name="VERSION" type="string">2.8.0</Field>
+    <Field name="TITLE" type="string">"New template"</Field>
+    <Field name="DESCRIPTION" type="string">Description</Field>
+    <Field name="PREVIEWIMAGE" type="string"></Field>
+    <Field name="TEMPLATEFILE" type="string">/home/hillab/Documents/hayashi/visit/visit2_8_0.linux-x86_64/2.8.0/linux-x86_64/resources/movietemplates/visitmovietemplate.py</Field>
+    <Object name="VIEWPORTS">
+        <Object name="Viewport 1">
+            <Field name="coordinates" type="floatArray" length="4">0 0 0.5 1 </Field>
+            <Field name="compositing" type="int">0</Field>
+            <Field name="opacity" type="double">1</Field>
+            <Field name="replaceColor" type="intArray" length="3">255 255 255 </Field>
+            <Field name="dropShadow" type="bool">false</Field>
+            <Field name="sequenceList" type="stringVector">"Window 3" </Field>
+        </Object>
+        <Object name="Viewport 2">
+            <Field name="coordinates" type="floatArray" length="4">0.5 0 1 1 </Field>
+            <Field name="compositing" type="int">0</Field>
+            <Field name="opacity" type="double">1</Field>
+            <Field name="replaceColor" type="intArray" length="3">255 255 255 </Field>
+            <Field name="dropShadow" type="bool">false</Field>
+            <Field name="sequenceList" type="stringVector">"Window 4" </Field>
+        </Object>
+    </Object>
+    <Object name="SEQUENCEDATA">
+        <Object name="Window 1">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+        <Object name="Window 2">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+        <Object name="Window 3">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+        <Object name="Window 4">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+        <Object name="Window 5">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+        <Object name="Window 6">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+        <Object name="Window 7">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+        <Object name="Window 8">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+        <Object name="Window 9">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+        <Object name="Window 10">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+        <Object name="Window 11">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+        <Object name="Window 12">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+        <Object name="Window 13">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+        <Object name="Window 14">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+        <Object name="Window 15">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+        <Object name="Window 16">
+            <Field name="sequenceType" type="string">CurrentPlots</Field>
+        </Object>
+    </Object>
+</Object>

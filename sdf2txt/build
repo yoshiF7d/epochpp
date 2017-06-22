@@ -1,0 +1,47 @@
+#! /bin/sh
+
+SDFDIR=./src
+EXTDIR=./ext
+
+clean=0
+CFLAGS="-DSDF_DEBUG_ALL -D_XOPEN_SOURCE=600 -I$SDFDIR -I$EXTDIR"
+OPT="$CFLAGS -O3"
+
+while getopts crdph name
+do
+   case $name in
+      c) clean=2 ;;
+      r) clean=1 ;;
+      d) OPT="$CFLAGs -g -O0 -Wall -Wno-unused-function -std=c99 -pedantic";
+         PYDBG="-g" ;;
+      h) cat <<EOF
+build script options:
+  -c: Clean up files. Do not build anything.
+  -r: Rebuild. Clean up files and then build.
+  -d: Build with debugging flags enabled.
+EOF
+         exit ;;
+   esac
+done
+
+selfdir=$PWD
+cd `dirname $0`/.
+
+if [ $clean -ge 1 ] ; then
+  rm -rf sdf2txt sdf2txt.dSYM
+fi
+if [ $clean -le 1 ] ; then
+  gcc $OPT -o sdf2txt sdf2ascii.c \
+      $SDFDIR/sdf_control2.c $SDFDIR/sdf_input2.c $SDFDIR/sdf_input_cartesian2.c \
+      $SDFDIR/sdf_input_point2.c $SDFDIR/sdf_input_station2.c $SDFDIR/sdf_util2.c \
+      $SDFDIR/utilities.c $SDFDIR/Data.c \
+      -ldl -lm
+  gcc $OPT -o sdf2bmat sdf2bmat.c \
+      $SDFDIR/sdf_control2.c $SDFDIR/sdf_input2.c $SDFDIR/sdf_input_cartesian3.c \
+      $SDFDIR/sdf_input_point3.c $SDFDIR/sdf_input_station2.c $SDFDIR/sdf_util2.c \
+      $SDFDIR/utilities.c $SDFDIR/Data.c \
+      -ldl -lm
+  sed -i _sav -e "s:BINDIR=.*:BINDIR=$selfdir:g" sdfs2txts
+  sed -i _sav -e "s:BINDIR=.*:BINDIR=$selfdir:g" sdfid
+fi
+

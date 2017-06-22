@@ -1,0 +1,17 @@
+#!/bin/sh
+
+dir=${1:-.}
+out=${2:-./pngs}
+emin=${3:-0}
+emax=${4:-1}
+if [ $# -ge 5 ]; then
+	com=$5
+fi
+
+files="$dir/*.bmat"
+
+for file in ${files}
+do
+	echo bmatplot ${file} ${out} ${emin} ${emax} ${com}
+	bmatplot ${file} ${out} ${emin} ${emax} ${com}
+done

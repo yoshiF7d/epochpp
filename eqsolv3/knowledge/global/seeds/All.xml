@@ -1,0 +1,7 @@
+<NAME>All</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Locked|Protected</ATTRIBUTES>
+<DOC>
+All is a setting used for certain options. In Part and related functions,
+All specifies all parts at a particular level.
+</DOC>

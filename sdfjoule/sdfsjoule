@@ -1,0 +1,13 @@
+#!/bin/sh
+dir=${1:-.}
+emin=${2:-0}
+emax=${3:-1e+6}
+files="${dir}/*.sdf"
+
+for filepath in ${files}
+do
+	echo sdfjoule $filepath $emin $emax
+	sdfjoule $filepath $emin $emax
+done
+
+convert -verbose ${dir}/sdfjoule/pngs/*.png ${dir}/sdfjoule/joule.mpeg

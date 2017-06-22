@@ -1,0 +1,6 @@
+<NAME>E</NAME>
+<PRECEDENCE>670</PRECEDENCE>
+<ATTRIBUTES>Constant|Protected|ReadProtected</ATTRIBUTES>
+<DOC>
+E is the exponential constant e (base of natural lograithms), with numerical value ~ 2.71828.
+</DOC>
