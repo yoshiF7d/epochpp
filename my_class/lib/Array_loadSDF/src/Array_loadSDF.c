@@ -58,13 +58,13 @@ Array Array_loadSDF(char *file, char *variable){
 		if(!memcmp(b->id,variable,len)){
 			switch(b->blocktype){
 			  case SDF_BLOCKTYPE_PLAIN_VARIABLE:
-				array = sdf_read_plain_variable(h);
+				array = Array_sdf_read_plain_variable(h);
 				break;
 			  case SDF_BLOCKTYPE_POINT_VARIABLE:
-			  	array = sdf_read_point_variable(h);
+			  	array = Array_sdf_read_point_variable(h);
 				break;
 			  case SDF_BLOCKTYPE_PLAIN_MESH:
-				array = sdf_read_plain_mesh(h);
+				array = Array_sdf_read_plain_mesh(h);
 				break;
 			  //case SDF_BLOCKTYPE_POINT_MESH:
 			  //	array = sdf_read_point_mesh(h);
@@ -138,13 +138,13 @@ LinkedList Array_loadSDFList(char *file, int n, ...){
 			if(!memcmp(b->id,buflist[j],len)){
 				switch(b->blocktype){
 				  case SDF_BLOCKTYPE_PLAIN_VARIABLE:
-					array = sdf_read_plain_variable(h);
+					array = Array_sdf_read_plain_variable(h);
 					break;
 				  case SDF_BLOCKTYPE_PLAIN_MESH:
-					array = sdf_read_plain_mesh(h);
+					array = Array_sdf_read_plain_mesh(h);
 					break;
 				  case SDF_BLOCKTYPE_POINT_VARIABLE:
-					array = sdf_read_point_variable(h);
+					array = Array_sdf_read_point_variable(h);
 					break;
 				  default:
 					break;
@@ -207,13 +207,13 @@ LinkedList Array_loadSDFList2(char *file, LinkedList namelist){
 			if(!memcmp(b->id,buf,len)){
 				switch(b->blocktype){
 				  case SDF_BLOCKTYPE_PLAIN_VARIABLE:
-					array = sdf_read_plain_variable(h);
+					array = Array_sdf_read_plain_variable(h);
 					break;
 				  case SDF_BLOCKTYPE_PLAIN_MESH:
-					array = sdf_read_plain_mesh(h);
+					array = Array_sdf_read_plain_mesh(h);
 					break;
 				  case SDF_BLOCKTYPE_POINT_VARIABLE:
-					array = sdf_read_point_variable(h);
+					array = Array_sdf_read_point_variable(h);
 					break;
 				  default:
 					break;

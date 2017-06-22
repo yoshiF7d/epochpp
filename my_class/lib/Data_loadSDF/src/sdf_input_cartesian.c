@@ -394,7 +394,7 @@ static int sdf_helper_read_array(sdf_file_t *h, void **var_in, int count)
     return 0;
 }
 
-Data sdf_read_plain_mesh(sdf_file_t *h){
+Data Data_sdf_read_plain_mesh(sdf_file_t *h){
 	sdf_block_t *b = h->current_block;
 	int i,n,col,row;
 	Data data = NULL;
@@ -406,8 +406,6 @@ Data sdf_read_plain_mesh(sdf_file_t *h){
 	if (b->done_data) return NULL;
 	if (!b->done_info) sdf_read_blocklist(h);
 	
-	printf("A\n");
-	
 	sdf_factor(h);
 	h->current_location = b->data_location;
 	if (!b->grids) b->grids = calloc(3, sizeof(float*));
@@ -418,8 +416,6 @@ Data sdf_read_plain_mesh(sdf_file_t *h){
 	}
 	
 	col--;
-	printf("row : %d\n",row);
-	printf("col : %d\n",col);
 	
 	data = Data_create(row,col);
 	Data_setall(data,0);
@@ -552,19 +548,19 @@ int sdf_read_lagran_mesh(sdf_file_t *h)
 
 
 
-Data sdf_read_plain_variable(sdf_file_t *h)
+Data Data_sdf_read_plain_variable(sdf_file_t *h)
 {
 	Data data=NULL;
 	//fprintf(stderr,"sdf_read_plain_variable\n");
-    sdf_block_t *b = h->current_block;
+   	sdf_block_t *b = h->current_block;
 	int i,j,n,row,col;
 	
 	union un_array{
 		double *d;
 		float *f;
 	}a;
-
-	if (b->done_data) return NULL;
+    
+    if (b->done_data) return NULL;
     if (!b->done_info) sdf_read_plain_variable_info(h);
 
     h->current_location = b->data_location;
@@ -573,8 +569,7 @@ Data sdf_read_plain_variable(sdf_file_t *h)
 
     sdf_helper_read_array(h, &b->data, b->nelements_local);
 
-    sdf_free_distribution(h);
-	
+    	sdf_free_distribution(h);
 	n = b->nelements_local;
 	col = b->local_dims[0];
 	row = n/col;

@@ -237,7 +237,7 @@ int sdf_point_factor(sdf_file_t *h, int *nelements_local)
     return 0;
 }
 
-Data sdf_read_point_variable(sdf_file_t *h)
+Data Data_sdf_read_point_variable(sdf_file_t *h)
 {
 	//fprintf(stderr,"sdf_read_point_variable\n");
 	Data data=NULL;

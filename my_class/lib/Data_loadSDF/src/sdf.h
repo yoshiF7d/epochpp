@@ -261,7 +261,7 @@ int sdf_read_blocklist(sdf_file_t *h);
 int sdf_read_blocklist_all(sdf_file_t *h);
 int sdf_read_summary(sdf_file_t *h);
 int sdf_read_block_info(sdf_file_t *h);
-Data sdf_read_data(sdf_file_t *h);
+Data Data_sdf_read_data(sdf_file_t *h);
 int sdf_read_bytes(sdf_file_t *h, char *buf, int buflen);
 int sdf_free_blocklist_data(sdf_file_t *h);
 int sdf_broadcast(sdf_file_t *h, void *buf, int size);
@@ -284,14 +284,14 @@ int sdf_read_stitched_obstacle_group(sdf_file_t *h);
 int sdf_read_stitched(sdf_file_t *h);
 int sdf_read_constant(sdf_file_t *h);
 
-Data sdf_read_plain_mesh(sdf_file_t *h);
+Data Data_sdf_read_plain_mesh(sdf_file_t *h);
 int sdf_read_plain_mesh_info(sdf_file_t *h);
-Data sdf_read_plain_variable(sdf_file_t *h);
+Data Data_sdf_read_plain_variable(sdf_file_t *h);
 int sdf_read_plain_variable_info(sdf_file_t *h);
 
 int sdf_read_point_mesh(sdf_file_t *h);
 int sdf_read_point_mesh_info(sdf_file_t *h);
-Data sdf_read_point_variable(sdf_file_t *h);
+Data Data_sdf_read_point_variable(sdf_file_t *h);
 int sdf_read_point_variable_info(sdf_file_t *h);
 int sdf_read_lagran_mesh(sdf_file_t *h);
 int sdf_read_station_info(sdf_file_t *h);

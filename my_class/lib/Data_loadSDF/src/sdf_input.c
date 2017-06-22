@@ -267,42 +267,6 @@ int sdf_read_next_block_header(sdf_file_t *h)
 
 
 
-Data sdf_read_data(sdf_file_t *h)
-{
-    sdf_block_t *b;
-
-    b = h->current_block;
-
-    if (b->populate_data) {
-        b->populate_data(h, b);
-    }else{
-        switch(b->blocktype){
-          case SDF_BLOCKTYPE_PLAIN_VARIABLE:
-            return sdf_read_plain_variable(h);
-          case SDF_BLOCKTYPE_POINT_MESH:
-            return sdf_read_point_variable(h);
-          default:
-            break;
-        }
-    }
-    /*
-    if (b->blocktype == SDF_BLOCKTYPE_PLAIN_MESH)
-        return sdf_read_plain_mesh(h);
-    else if (b->blocktype == SDF_BLOCKTYPE_LAGRANGIAN_MESH)
-        return sdf_read_lagran_mesh(h);
-    else if (b->blocktype == SDF_BLOCKTYPE_POINT_MESH)
-        return sdf_read_point_mesh(h);
-    else if (b->blocktype == SDF_BLOCKTYPE_PLAIN_VARIABLE)
-        return sdf_read_plain_variable(h);
-    else if (b->blocktype == SDF_BLOCKTYPE_POINT_VARIABLE)
-        return sdf_read_point_variable(h);
-    else if (b->blocktype == SDF_BLOCKTYPE_ARRAY
-            || b->blocktype == SDF_BLOCKTYPE_CPU_SPLIT)
-        return sdf_read_array(h);
-        */
-    
-    return NULL;
-}
 
 
 

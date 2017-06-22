@@ -1,6 +1,6 @@
 COMPILER = gcc
 CFLAGS = -O3 -g
-LIBS = ../my_class/lib/libArray_loadSDF.a ../my_class/lib/libData_loadSDF.a
+LIBS = ../my_class/lib/libData_loadSDF.a
 INCLUDE = -I ../my_class/inc 
 LDFLAGS = -lm
 TARGET1 = sdfwave2d
@@ -41,7 +41,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 .POHNY : clean cleanall cleanlib
 clean :
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(OBJS1) $(TARGET1)
 cleanall:
 	cd $(COMDIR) && make clean
 cleanlib :

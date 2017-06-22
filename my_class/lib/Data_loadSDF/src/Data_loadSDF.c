@@ -14,9 +14,6 @@ Data Data_loadSDF(char *file, char *variable){
 	sdf_block_t *b;
 	Data data=NULL;
 	
-	printf("file name : %s\n",file);
-	printf("variable name : %s\n",variable);
-	
 	err = stat(file,&statbuf);
 	if(err){
 		fprintf(stderr,"Error opening file %s\n", file);
@@ -49,20 +46,20 @@ Data Data_loadSDF(char *file, char *variable){
 	h->buffer = NULL;
 
 	b = h->current_block = h->blocklist;
-	
+
 	len = strlen(variable)+1;
 	for(i=0;i<h->nblocks;i++,h->current_block = b->next){
 		b = h->current_block;
 		if(!memcmp(b->id,variable,len)){
 			switch(b->blocktype){
 			  case SDF_BLOCKTYPE_PLAIN_VARIABLE:
-				data = sdf_read_plain_variable(h);
+				data = Data_sdf_read_plain_variable(h);
 				break;
 			  case SDF_BLOCKTYPE_PLAIN_MESH:
-				data = sdf_read_plain_mesh(h);
+				data = Data_sdf_read_plain_mesh(h);
 				break;
 			  case SDF_BLOCKTYPE_POINT_MESH:
-				data = sdf_read_point_variable(h);
+				data = Data_sdf_read_point_variable(h);
 				break;
 			  default:
 				break;
@@ -129,13 +126,13 @@ LinkedList Data_loadSDFList(char *file, int n, ...){
 			if(!memcmp(b->id,buflist[j],len)){
 				switch(b->blocktype){
 				  case SDF_BLOCKTYPE_PLAIN_VARIABLE:
-					data = sdf_read_plain_variable(h);
+					data = Data_sdf_read_plain_variable(h);
 					break;
 				  case SDF_BLOCKTYPE_PLAIN_MESH:
-					data = sdf_read_plain_mesh(h);
+					data = Data_sdf_read_plain_mesh(h);
 					break;
 				  case SDF_BLOCKTYPE_POINT_MESH:
-					data = sdf_read_point_variable(h);
+					data = Data_sdf_read_point_variable(h);
 					break;
 				  default:
 					break;
@@ -197,13 +194,13 @@ LinkedList Data_loadSDFList2(char *file, LinkedList namelist){
 			if(!memcmp(b->id,buf,len)){
 				switch(b->blocktype){
 				  case SDF_BLOCKTYPE_PLAIN_VARIABLE:
-					data = sdf_read_plain_variable(h);
+					data = Data_sdf_read_plain_variable(h);
 					break;
 				  case SDF_BLOCKTYPE_PLAIN_MESH:
-					data = sdf_read_plain_mesh(h);
+					data = Data_sdf_read_plain_mesh(h);
 					break;
 				  case SDF_BLOCKTYPE_POINT_MESH:
-					data = sdf_read_point_variable(h);
+					data = Data_sdf_read_point_variable(h);
 					break;
 				  default:
 					break;

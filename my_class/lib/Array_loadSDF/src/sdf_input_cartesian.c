@@ -394,7 +394,7 @@ static int sdf_helper_read_array(sdf_file_t *h, void **var_in, int count)
     return 0;
 }
 
-Array sdf_read_plain_mesh(sdf_file_t *h){
+Array Array_sdf_read_plain_mesh(sdf_file_t *h){
 	sdf_block_t *b = h->current_block;
 	int i,n,col,row;
 	Array array;
@@ -548,7 +548,7 @@ int sdf_read_lagran_mesh(sdf_file_t *h)
     return 0;
 }
 
-Array sdf_read_plain_variable(sdf_file_t *h){
+Array Array_sdf_read_plain_variable(sdf_file_t *h){
 	Array array = NULL;
 	//fprintf(stderr,"sdf_read_plain_variable\n");
     sdf_block_t *b = h->current_block;
