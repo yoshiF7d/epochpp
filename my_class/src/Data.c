@@ -1122,7 +1122,7 @@ Data Data_histogram(Data data, double min, double max, int binc){
 	int i,j;
 	double *weight = allocate(binc*sizeof(double));
 	double dx = (max-min)/binc;
-	double sum=0;
+	double coeff = 1.0/dx;
 	
 	Data data2 = Data2D_create(binc);
 	
@@ -1136,8 +1136,7 @@ Data Data_histogram(Data data, double min, double max, int binc){
 			weight[j] += data->elem[i][1];
 		}
 	}
-	for(i=0;i<binc;i++){sum += weight[i];}
-	for(i=0;i<binc;i++){data2->elem[i][1] = weight[i]/sum;}
+	for(i=0;i<binc;i++){data2->elem[i][1] = weight[i]*coeff;}
 	deallocate(weight);
 	return data2;
 }
@@ -1148,7 +1147,7 @@ Data Data_histogram2D(Data data, double min1, double min2, double max1, double m
 	double *weight = allocate(binc*sizeof(double));
 	double dx = (max1-min1)/binc1;
 	double dy = (max2-min2)/binc2;
-	double sum=0;
+	double coeff = 1.0/(dx*dy);
 	
 	Data data2 = Data_create(binc,3);
 	for(i=0;i<binc;i++){
@@ -1168,8 +1167,7 @@ Data Data_histogram2D(Data data, double min1, double min2, double max1, double m
 	
 	/*printf("binc %d\n",binc);*/
 	
-	for(i=0;i<binc;i++){sum += weight[i];}
-	for(i=0;i<binc;i++){data2->elem[i][2] = weight[i]/sum; /*printf("%f\n",data2->elem[i][2]);*/}
+	for(i=0;i<binc;i++){data2->elem[i][2] = weight[i]*coeff; /*printf("%f\n",data2->elem[i][2]);*/}
 	deallocate(weight);
 	return data2;
 }

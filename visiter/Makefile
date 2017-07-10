@@ -14,7 +14,7 @@ COMLIBNAMES = Data_loadSDF Data_loadPNG
 COMLIBS = $(addprefix $(COMLIBDIR)/,$(COMLIBNAMES))
 LIBS = $(addsuffix .a ,$(addprefix $(COMLIBDIR)/lib,$(COMLIBNAMES))) 
 
-COMOBJNAMES = utilities.o Arraylist.o Data.o HashTable2.o LinkedList.o
+COMOBJNAMES = utilities.o ArrayList.o Data.o HashTable2.o LinkedList.o
 COMOBJS = $(addprefix $(COMOBJDIR)/,$(COMOBJNAMES))
 
 SRCS = $(wildcard $(SRCDIR)/*.c)

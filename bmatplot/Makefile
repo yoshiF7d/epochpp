@@ -1,5 +1,6 @@
 COMPILER = gcc 
 CFLAGS = -O3 -g
+LDFLAGS = -lm
 TARGET = bmatplot
 
 OBJDIR = ./obj

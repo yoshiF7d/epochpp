@@ -3,8 +3,8 @@ CFLAGS = -O3 -g
 LIBS = ../my_class/lib/libArray_loadSDF.a 
 INCLUDE = -I ../my_class/inc 
 LDFLAGS = -lm
-TARGET1 = sdfint
-TARGET2 = sdfsubbg
+TARGET1 = sdfintarea
+TARGET2 = sdfint
 
 OBJDIR = ./obj
 SRCDIR = ./src
@@ -14,11 +14,14 @@ COMDIR = ../my_class/
 COMOBJNAMES = LinkedList.o Array.o utilities.o
 COMOBJS = $(addprefix $(COMDIR)/obj/,$(COMOBJNAMES))
 
-SRC1 = $(SRCDIR)/sdfint.c
-SRC2 = $(SRCDIR)/sdfsubbg.c
+SRC1 = $(SRCDIR)/sdfintarea.c
+SRC2 = $(SRCDIR)/sdfint.c
 
 OBJS1 = $(addprefix $(OBJDIR)/,$(notdir $(SRC1:.c=.o)))
 OBJS2 = $(addprefix $(OBJDIR)/,$(notdir $(SRC2:.c=.o)))
+
+all:
+	make $(TARGET1) ; make $(TARGET2)
 
 $(TARGET1): $(OBJS1) $(COMOBJS) $(LIBS)
 	echo $(OBJS1)
@@ -41,7 +44,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 .POHNY : clean cleanall cleanlib
 clean :
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(OBJS1) $(TARGET1) $(OBJS2) $(TARGET2)
 cleanall:
 	cd $(COMDIR) && make clean
 cleanlib :

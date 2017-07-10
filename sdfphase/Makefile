@@ -1,32 +1,35 @@
 COMPILER = gcc
 CFLAGS = -O3 -g -fopenmp
-LIBS =
-INCLUDE = 
+LIBS = ../my_class/lib/libData_loadSDF.a
+INCLUDE = -I ../my_class/inc
 LDFLAGS = -lm
-TARGET1 = sdfphase
+TARGET = sdfphase
 
 OBJDIR = ./obj
 SRCDIR = ./src
 VPATH =
 
-SOURCENAMES = sdfphase.c 
+COMDIR = ../my_class/
+COMOBJNAMES = Data.o LinkedList.o utilities.o
+COMOBJS = $(addprefix $(COMDIR)/obj/,$(COMOBJNAMES))
 
-all: $(TARGET1) $(TARGET2)
+SRCS = $(wildcard $(SRCDIR)/*.c)
+OBJS = $(addprefix $(OBJDIR)/,$(notdir $(SRCS:.c=.o)))
 
-$(TARGET1): $(OBJECTS1) $(LIBS)
-	$(COMPILER) $(CFLAGS) -o $@ $^ $(LDFLAGS)
-$(TARGET2): $(OBJECTS2) $(LIBS)
+$(TARGET): $(OBJS) $(COMOBJS) $(LIBS)
 	$(COMPILER) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 	
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	$(COMPILER) $(CFLAGS) $(INCLUDE) -o $@ -c $<
+$(COMOBJS) :
+	cd $(COMDIR) && make
+$(LIBS) :
+	cd $(COMDIR)/lib && make
 
-$(OBJDIR)/sdfphase.o : $(SRCDIR)/Data.h $(SRCDIR)/utilities.h
-$(OBJDIR)/sdfphase2.o : ${SRCDIR}/Data.h ${SRCDIR}/utilities.h
-$(OBJDIR)/Data.o : $(SRCDIR)/Data.h $(SRCDIR)/utilities.h
-$(OBJDIR)/utilities.o : $(SRCDIR)/utilities.h
-
-.POHNY : clean
+.POHNY : clean cleanall cleanlib
 clean :
-	rm -f $(OBJECTS1) $(TARGET1) 
-	rm -f $(OBJECTS2) $(TARGET2)
+	rm -f $(OBJECTS) $(TARGET)
+cleanall:
+	cd $(COMDIR) && make clean
+cleanlib:
+	cd $(COMDIR)/lib/Data_loadSDF && make clean

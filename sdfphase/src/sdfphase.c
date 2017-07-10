@@ -228,7 +228,7 @@ int main(int argc, char *argv[]){
 		if(hmin==-1){hmin = Data_min(data,0);}
 		if(hmax==-1){hmax = Data_max(data,0);}
 		fprintf(stderr,"hmin : %e, hmax : %e, vbin : %d\n",hmin,hmax,vbin);
-		hist = Data_histogram2(data,hmin,hmax,vbin);
+		hist = Data_histogram(data,hmin,hmax,vbin);
 		Data_fprint(hist,fp,SEP);
 		fclose(fp);
 		snprintf(plotfile,256,"%s/plot.sh",command);
@@ -251,7 +251,7 @@ int main(int argc, char *argv[]){
 		if(vmax==-1){vmax = Data_max(data,1);}
 		fprintf(stderr,"hmin : %e, hmax : %e, hbin : %d\n",hmin,hmax,hbin);
 		fprintf(stderr,"vmin : %e, vmax : %e, vbin : %d\n",vmin,vmax,vbin);
-		hist = Data_histogram2D2(data,hmin,vmin,hmax,vmax,hbin,vbin);
+		hist = Data_histogram2D(data,hmin,vmin,hmax,vmax,hbin,vbin);
 		fprinthist2D(hist,fp,hbin,vbin);
 		fclose(fp);
 		fp = fopen(filehist2,"w");

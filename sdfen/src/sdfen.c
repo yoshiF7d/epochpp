@@ -11,7 +11,6 @@
 /*ben : total magnetic field energy per grid*/
 /*ken : total kinetic energy per grid*/
 
-void Data_vdelete(void *data){Data_delete(data);}
 
 int main(int argc, char *argv[]){
 	char filesdf[256];	

@@ -1,7 +1,7 @@
 COMPILER = gcc
 CFLAGS = -O3 -g
-LIBS = lib/libData_loadSDF.a
-INCLUDE = 
+LIBS = ../my_class/lib/libData_loadSDF.a
+INCLUDE = -I ../my_class/inc 
 LDFLAGS = -lm
 TARGET = sdf1d
 
