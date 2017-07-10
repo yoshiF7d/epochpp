@@ -47,12 +47,12 @@ int main(int argc, char *argv[]){
 	dp = opendir(dirsdf);	
 	if(!dp){perror("sdfplot");exit(1);} 
 	while((entry=readdir(dp))!=NULL){
-		if(entry->d_name[0]=='.'){continue;}
+		
 		if(!strcmp(".sdf",getFileExtension(entry->d_name))){
 			list = LinkedList_append(list,String_copy(entry->d_name));
 		}
 	}
-	puts("AA");	
+	closedir(dp);
 	mkdir(dirout,0777);
 	list = LinkedList_sort(list,compare);
 	for(s=list;s;s=s->next){
@@ -82,7 +82,7 @@ void Data_pngout(Data data,char *dirout,char *index,char *comfile){
 	double x;
 	int i,j;
 	gp = popen("gnuplot -persist\n","w");
-	if(gp==NULL){perror("gnuplot"); exit(1);}
+	if(gp==NULL){perror("Data_gnuplot"); exit(1);}
 	fprintf(gp,"set term png size %d,%d\n",data->column,data->row);
 	fprintf(gp,"set xr[%d:%d]\n",0,data->column);
 	fprintf(gp,"set yr[%d:%d]\n",0,data->row);
@@ -101,5 +101,4 @@ void Data_pngout(Data data,char *dirout,char *index,char *comfile){
 		}
 	}
 	pclose(gp);
-
 }
