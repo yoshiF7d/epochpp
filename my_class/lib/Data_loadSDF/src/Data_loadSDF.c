@@ -209,5 +209,6 @@ LinkedList Data_loadSDFList2(char *file, LinkedList namelist){
 			}
 		}
 	}
+	sdf_close(h);
 	return datalist;
 }

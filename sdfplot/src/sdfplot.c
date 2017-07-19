@@ -5,7 +5,7 @@
 #include <dirent.h>
 
 int compare(void *c1, void *c2);
-void Data_pngout(Data data,char *variable,char *index,char *comfile);
+void Data_pngout(Data data,char *dirout,char *index,char *comfile);
 
 int main(int argc, char *argv[]){
 	DIR *dp=NULL;
@@ -14,6 +14,7 @@ int main(int argc, char *argv[]){
 
 	char *dirsdf,*variable,*dirout=NULL,*comfile=NULL,*filename,index[5]={0,0,0,0,0};
 	int skip=1;
+	double multiplier = 1.0;
 	
 	LinkedList s,list=NULL;
 	Data data;
@@ -23,8 +24,9 @@ int main(int argc, char *argv[]){
 			   "usage : %s [inputdir name]"
 			   " [variable]"
 			   " [outputdir name : (variable)]"
+			   " [gnuplot command file : (default)]",
 			   " [skip : 1]"
-			   " [gnuplot command file : (default)]\n",
+			   " [multiplier : 1]\n",	   
 			   argv[0]
 			   );
 		exit(0);
@@ -38,12 +40,14 @@ int main(int argc, char *argv[]){
 		dirout = String_copy(variable);
 	}
 	if(argc >= 5){
-		skip = atoi(argv[4]);
+		comfile = String_copy(argv[4]);
 	}
 	if(argc >= 6){
-		comfile = String_copy(argv[5]);
+		skip = atoi(argv[5]);
 	}
-
+	if(argc >= 7){
+		multiplier = atof(argv[6]);
+	}
 	dp = opendir(dirsdf);	
 	if(!dp){perror("sdfplot");exit(1);} 
 	while((entry=readdir(dp))!=NULL){
@@ -60,8 +64,8 @@ int main(int argc, char *argv[]){
 		printf("filename : %s\n",filename);
 		snprintf(index,5,"%s",filename);
 		index[4]='\0';
-		printf("index : %s\n",index);
 		data=Data_loadSDF(filename,variable);
+		Data_muls(data,multiplier,data);
 		Data_pngout(data,dirout,index,comfile);
 		Data_delete(data);
 	}
@@ -81,16 +85,17 @@ void Data_pngout(Data data,char *dirout,char *index,char *comfile){
 	FILE *gp;
 	double x;
 	int i,j;
-	gp = popen("gnuplot -persist\n","w");
+	
+	gp = popen("gnuplot","w");
 	if(gp==NULL){perror("Data_gnuplot"); exit(1);}
 	fprintf(gp,"set term png size %d,%d\n",data->column,data->row);
 	fprintf(gp,"set xr[%d:%d]\n",0,data->column);
 	fprintf(gp,"set yr[%d:%d]\n",0,data->row);
 	fprintf(gp,"set size ratio %f\n",(double)(data->row)/(data->column));
-	if(comfile){fprintf(gp,"%s\n",comfile);}
+	if(comfile){fprintf(gp,"load \"%s\"\n",comfile);}
 	fprintf(gp,"set output \"%s/%s.png\"\n",dirout,index);
 	fprintf(gp,
-			"plot '-' binary array=(%d,%d) format=\"\%%float64\""
+			"plot '-' binary array=(%d,%d) format=\"%%float64\""
 			"endian=little w image notitle\n",
 			data->column,data->row
 	);
@@ -100,5 +105,6 @@ void Data_pngout(Data data,char *dirout,char *index,char *comfile){
 			fwrite(&x,sizeof(double),1,gp);
 		}
 	}
+	fflush(gp);
 	pclose(gp);
 }
