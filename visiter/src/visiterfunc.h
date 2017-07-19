@@ -1,16 +1,18 @@
 #ifndef VISITERFUNC_H
 #define VISITERFUNC_H
 
-#include "LinkedList.h"
-#include "Data.h"
-#include "HashTable.h"
-#include "utilities.h"
+#include <LinkedList.h>
+#include <Data.h>
+#include <Data_FFT.h>
+#include <HashTable.h>
+#include <utilities.h>
 #define LOAD_BARY
 #define LOAD_BMAT
 #include "Data_loadSDF.h"
 #define LOAD_SDF
 #include "Data_loadPNG.h"
 #define LOAD_PNG
+#include 
 
 typedef struct st_funccontainer *FuncContainer;
 typedef void (*Func)(LinkedList list);

@@ -10,7 +10,7 @@ COMDIR = ../my_class
 COMOBJDIR = $(COMDIR)/obj
 COMLIBDIR = $(COMDIR)/lib
 
-COMLIBNAMES = Data_loadSDF Data_loadPNG
+COMLIBNAMES = Data_loadSDF Data_loadPNG Data_FFT
 COMLIBS = $(addprefix $(COMLIBDIR)/,$(COMLIBNAMES))
 LIBS = $(addsuffix .a ,$(addprefix $(COMLIBDIR)/lib,$(COMLIBNAMES))) 
 

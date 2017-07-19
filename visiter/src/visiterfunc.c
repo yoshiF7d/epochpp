@@ -986,12 +986,12 @@ void visiter_rfourier(LinkedList list){
 	FILE *fp = NULL;
 	VisiterInfo vi = NULL;
 	Data data=NULL, data2=NULL, data3=NULL;	
-	int len, cs=0, ce=0,i,n, pad=0;
-	double real, imaginal;	
+	int len, cs=0, ce=0,i,n;
+	double real, imaginal,dk;
 	char *buf;
 	
 	len = LinkedList_getLength(list);
-	if(len != 1 && len != 2 && len != 3 && len != 4 && len != 5){printdoc_imp(visiter_rfourier); return;}
+	if(len != 1 && len != 2 && len != 3 && len != 4){printdoc_imp(visiter_rfourier); return;}
 	vi = LinkedList_getIndex(list,0);
 	data = VisiterInfo_getData(vi);
 	if(data==NULL){printf("no data is loaded. please use \"load\" function\n"); return;}
@@ -1023,45 +1023,36 @@ void visiter_rfourier(LinkedList list){
 		buf = LinkedList_getIndex(list,3);
 		fp = wopen(String_stripdq(buf));
 	}
-	if(len == 5){
-		cs = atoi(LinkedList_getIndex(list,1));
-		ce = atoi(LinkedList_getIndex(list,2));
-		pad = atoi(LinkedList_getIndex(list,3));
-		buf = LinkedList_getIndex(list,4);
-		fp = wopen(String_stripdq(buf));
-	}
 	data2 = Data_rslice(data,cs,ce);
 	if(!data2){goto data2null;}
 	n = Data_getRow(data2);
+	dk = 2*M_Pi/(Data_get(data2,data2->row-1,1)-Data_get(data2,1));
 	Data_cswap(data2,0,1);
 	for(i=0;i<n;i++){Data_set(data2,i,1,0);}
-	data3 = Data_fourier2(data2,-1,pad);
-	n = Data_getRow(data3);
-	Data_delete(data2);
-	data2 = Data_create(n,3);
-	
+	Data_FFT(data2);
+	data3 = Data_create(n,3);
 	for(i=0;i<n;i++){
-		Data_set(data2,i,0,i);
-		real = Data_get(data3,i,0);
-		imaginal = Data_get(data3,i,1);
-		Data_set(data2,i,1,sqrt(real*real+imaginal*imaginal));
-		Data_set(data2,i,2,atan2(imaginal,real));
+		Data_set(data3,i,0,i*dk);
+		real = Data_get(data2,i,0);
+		imaginal = Data_get(data2,i,1);
+		Data_set(data3,i,1,sqrt(real*real+imaginal*imaginal));
+		Data_set(data3,i,2,atan2(imaginal,real));
 	}
-	Data_delete(data3);
+	Data_delete(data2);
   data2null:
-	if(fp){Data_fprint(data2,fp,vi->options.fieldSeparators[0]); fclose(fp); Data_delete(data2);}
-	else{Data_delete(data); VisiterInfo_setData(vi,data2);}	
+	if(fp){Data_fprint(data3,fp,vi->options.fieldSeparators[0]); fclose(fp); Data_delete(data3);}
+	else{Data_delete(data); VisiterInfo_setData(vi,data3);}	
 }
 void visiter_cfourier(LinkedList list){
 	FILE *fp = NULL;
 	VisiterInfo vi = NULL;
 	Data data=NULL, data2=NULL, data3=NULL;	
-	int len, rs=0, re=0,i,n,pad=0;
-	double real, imaginal;	
+	int len, rs=0, re=0,i,n;
+	double real,imaginal,dk;
 	char *buf;
 	
 	len = LinkedList_getLength(list);
-	if(len != 1 && len != 2 && len != 3 && len != 4 && len != 5){printdoc_imp(visiter_cfourier); return;}
+	if(len != 1 && len != 2 && len != 3 && len != 4){printdoc_imp(visiter_cfourier); return;}
 	vi = LinkedList_getIndex(list,0);
 	data = VisiterInfo_getData(vi);
 	if(data==NULL){printf("no data is loaded. please use \"load\" function\n"); return;}
@@ -1093,49 +1084,39 @@ void visiter_cfourier(LinkedList list){
 		buf = LinkedList_getIndex(list,3);
 		fp = wopen(String_stripdq(buf));
 	}
-	if(len == 5){
-		rs = atoi(LinkedList_getIndex(list,1));
-		re = atoi(LinkedList_getIndex(list,2));
-		pad = atoi(LinkedList_getIndex(list,3));
-		buf = LinkedList_getIndex(list,4);
-		fp = wopen(String_stripdq(buf));
-	}
 	data2 = Data_cslice(data,rs,re);
 	if(!data2){goto data2null;}
 	n = Data_getRow(data2);
+	dk = 2*M_Pi/(Data_get(data2,data2->row-1,1)-Data_get(data2,1));
 	Data_cswap(data2,0,1);
 	for(i=0;i<n;i++){Data_set(data2,i,1,0);}
 
-	data3 = Data_fourier2(data2,-1,pad);
-	n = Data_getRow(data3);
-	
-	Data_delete(data2);
-	data2 = Data_create(n,3);
+	Data_FFT(data2);
+	data3 = Data_create(n,3);
 	
 	for(i=0;i<n;i++){
-		Data_set(data2,i,0,i);
-		real = Data_get(data3,i,0);
-		imaginal = Data_get(data3,i,1);
-		Data_set(data2,i,1,sqrt(real*real+imaginal*imaginal));
-		Data_set(data2,i,2,atan2(imaginal,real));
+		Data_set(data3,i,0,i*dk);
+		real = Data_get(data2,i,0);
+		imaginal = Data_get(data2,i,1);
+		Data_set(data3,i,1,sqrt(real*real+imaginal*imaginal));
+		Data_set(data3,i,2,atan2(imaginal,real));
 	}
-	
-	Data_delete(data3);
+	Data_delete(data2);
   data2null:
-	if(fp){Data_fprint(data2,fp,vi->options.fieldSeparators[0]); fclose(fp); Data_delete(data2);}
-	else{Data_delete(data); VisiterInfo_setData(vi,data2);}
+	if(fp){Data_fprint(data3,fp,vi->options.fieldSeparators[0]); fclose(fp); Data_delete(data3);}
+	else{Data_delete(data); VisiterInfo_setData(vi,data3);}
 }
 
 void visiter_fourier(LinkedList list){
 	FILE *fp = NULL;
 	VisiterInfo vi = NULL;
 	Data data=NULL, data2=NULL, data3=NULL;	
-	int len,i,n,pad=0;
+	int len,i,n;
 	double real, imaginal;
 	char *buf;
 	
 	len = LinkedList_getLength(list);
-	if(len != 1 && len != 2 && len != 3){printdoc_imp(visiter_fourier); return;}
+	if(len != 1 && len != 2){printdoc_imp(visiter_fourier); return;}
 	vi = LinkedList_getIndex(list,0);
 	data = VisiterInfo_getData(vi);
 	if(data==NULL){printf("no data is loaded. please use \"load\" function\n"); return;}
@@ -1144,10 +1125,6 @@ void visiter_fourier(LinkedList list){
 		buf = LinkedList_getIndex(list,1);
 		if(isInt(buf)){pad = atoi(buf);}
 		else{fp = wopen(String_stripdq(buf));}
-	}
-	if(len == 3){
-		fp = wopen(String_stripdq(LinkedList_getIndex(list,1)));
-		pad = atoi(LinkedList_getIndex(list,2));
 	}
 	data2 = Data_create(n = Data_getRow(data),2);
 	if(Data_getColumn(data)==1){
@@ -1162,55 +1139,52 @@ void visiter_fourier(LinkedList list){
 		}
 	}
 	
-	data3 = Data_fourier2(data2,-1,pad);
-	n = Data_getRow(data3);
-	
-	Data_delete(data2);
-	data2 = Data_create(n,3);
-	
+	Data_FFT(data2);
+	data3 = Data_create(n,3);
 	for(i=0;i<n;i++){
-		Data_set(data2,i,0,i);
-		real = Data_get(data3,i,0);
-		imaginal = Data_get(data3,i,1);
-		Data_set(data2,i,1,sqrt(real*real+imaginal*imaginal));
-		Data_set(data2,i,2,atan2(imaginal,real));
+		Data_set(data3,i,0,i);
+		real = Data_get(data2,i,0);
+		imaginal = Data_get(data2,i,1);
+		Data_set(data3,i,1,sqrt(real*real+imaginal*imaginal));
+		Data_set(data3,i,2,atan2(imaginal,real));
 	}
-	
-	Data_delete(data3);
-	if(fp){Data_fprint(data2,fp,vi->options.fieldSeparators[0]); fclose(fp); Data_delete(data2);}
-	else{Data_delete(data); VisiterInfo_setData(vi,data2);}
+	Data_delete(data2);
+	if(fp){Data_fprint(data3,fp,vi->options.fieldSeparators[0]); fclose(fp); Data_delete(data3);}
+	else{Data_delete(data); VisiterInfo_setData(vi,data3);}
 }
 
 void visiter_fourier2D(LinkedList list){
 	FILE *fp = NULL;
 	VisiterInfo vi = NULL;
-	Data data=NULL,data2=NULL;
-	F2Data f2data=NULL;
-	int len,i,n,pad=0;
+	Data data=NULL,re=NULL,im=NULL;
+	int len,i,j,n,pad=0;
 	double real, imaginal;
 	char *buf;
 	
 	len = LinkedList_getLength(list);
-	if(len != 1 && len != 2 && len != 3){printdoc_imp(visiter_fourier2D); return;}
+	if(len != 1 && len != 2){printdoc_imp(visiter_fourier2D); return;}
 	vi = LinkedList_getIndex(list,0);
 	data = VisiterInfo_getData(vi);
 	if(data==NULL){printf("no data is loaded. please use \"load\" function\n"); return;}
 	
 	if(len == 2){
 		buf = LinkedList_getIndex(list,1);
-		if(isInt(buf)){pad = atoi(buf);}
-		else{fp = wopen(String_stripdq(buf));}
+		fp = wopen(String_stripdq(buf));
 	}
-	if(len == 3){
-		fp = wopen(String_stripdq(LinkedList_getIndex(list,1)));
-		pad = atoi(LinkedList_getIndex(list,2));
+	re = Data_copy(data);
+	im = Data_create(data->row,data->column);
+	for(i=0;i<data->row;i++){
+		for(j=0;j<data->column;j++){
+			im->elem[i][j] = 0;
+		}
 	}
-	
-	f2data = F2Data_convert(data,pad);
-	Data_fourier2D(f2data,-1);
-	data2 = F2Data_powerSpectrum(f2data);
-	
-	if(fp){Data_fprint(data2,fp,vi->options.fieldSeparators[0]); fclose(fp); Data_delete(data2);}
+	Data_FFT2D(re,im);
+	for(i=0;i<data->row;i++){
+		for(j=0;j<data->column;j++){
+			re->elem[i][j] = (re->elem[i][j])*(re->elem[i][j]) + (im->elem[i][j])*(im->elem[i][j]);
+		}
+	}
+	if(fp){Data_fprint(re,fp,vi->options.fieldSeparators[0]); fclose(fp); Data_delete(re);}
 	else{Data_delete(data); VisiterInfo_setData(vi,data2);}
 }
 
