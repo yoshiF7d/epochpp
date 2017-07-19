@@ -12,7 +12,6 @@
 #define LOAD_SDF
 #include "Data_loadPNG.h"
 #define LOAD_PNG
-#include 
 
 typedef struct st_funccontainer *FuncContainer;
 typedef void (*Func)(LinkedList list);

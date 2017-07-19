@@ -1026,7 +1026,7 @@ void visiter_rfourier(LinkedList list){
 	data2 = Data_rslice(data,cs,ce);
 	if(!data2){goto data2null;}
 	n = Data_getRow(data2);
-	dk = 2*M_Pi/(Data_get(data2,data2->row-1,1)-Data_get(data2,1));
+	dk = 2*M_PI/(Data_get(data2,data2->row-1,1)-Data_get(data2,0,1));
 	Data_cswap(data2,0,1);
 	for(i=0;i<n;i++){Data_set(data2,i,1,0);}
 	Data_FFT(data2);
@@ -1087,7 +1087,7 @@ void visiter_cfourier(LinkedList list){
 	data2 = Data_cslice(data,rs,re);
 	if(!data2){goto data2null;}
 	n = Data_getRow(data2);
-	dk = 2*M_Pi/(Data_get(data2,data2->row-1,1)-Data_get(data2,1));
+	dk = 2*M_PI/(Data_get(data2,data2->row-1,1)-Data_get(data2,0,1));
 	Data_cswap(data2,0,1);
 	for(i=0;i<n;i++){Data_set(data2,i,1,0);}
 
@@ -1123,8 +1123,7 @@ void visiter_fourier(LinkedList list){
 	
 	if(len == 2){
 		buf = LinkedList_getIndex(list,1);
-		if(isInt(buf)){pad = atoi(buf);}
-		else{fp = wopen(String_stripdq(buf));}
+		fp = wopen(String_stripdq(buf));
 	}
 	data2 = Data_create(n = Data_getRow(data),2);
 	if(Data_getColumn(data)==1){
@@ -1157,7 +1156,7 @@ void visiter_fourier2D(LinkedList list){
 	FILE *fp = NULL;
 	VisiterInfo vi = NULL;
 	Data data=NULL,re=NULL,im=NULL;
-	int len,i,j,n,pad=0;
+	int len,i,j,n;
 	double real, imaginal;
 	char *buf;
 	
@@ -1185,7 +1184,7 @@ void visiter_fourier2D(LinkedList list){
 		}
 	}
 	if(fp){Data_fprint(re,fp,vi->options.fieldSeparators[0]); fclose(fp); Data_delete(re);}
-	else{Data_delete(data); VisiterInfo_setData(vi,data2);}
+	else{Data_delete(data); VisiterInfo_setData(vi,re);}
 }
 
 void visiter_fwhm(LinkedList list){

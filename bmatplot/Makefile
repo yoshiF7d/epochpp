@@ -27,7 +27,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 .POHNY: clean cleanall cleanlib
 clean:
-	rm -f $(OBJECTS) $(TARGET)
+	rm -f $(OBJS) $(TARGET)
 cleanall:
 	cd $(COMDIR) && make clean
 cleanlib:
