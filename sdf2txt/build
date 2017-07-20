@@ -41,7 +41,5 @@ if [ $clean -le 1 ] ; then
       $SDFDIR/sdf_input_point3.c $SDFDIR/sdf_input_station2.c $SDFDIR/sdf_util2.c \
       $SDFDIR/utilities.c $SDFDIR/Data.c \
       -ldl -lm
-  sed -i _sav -e "s:BINDIR=.*:BINDIR=$selfdir:g" sdfs2txts
-  sed -i _sav -e "s:BINDIR=.*:BINDIR=$selfdir:g" sdfid
 fi
 

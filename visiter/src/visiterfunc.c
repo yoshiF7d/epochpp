@@ -1180,8 +1180,24 @@ void visiter_fourier2D(LinkedList list){
 	Data_FFT2D(re,im);
 	for(i=0;i<data->row;i++){
 		for(j=0;j<data->column;j++){
-			re->elem[i][j] = (re->elem[i][j])*(re->elem[i][j]) + (im->elem[i][j])*(im->elem[i][j]);
+			re->elem[i][j] = (re->elem[i][j])*(re->elem[i][j]) + (im->elem[i][j])*(im->elem[i][j])/(data->row*data->column);
 		}
+	}
+	for(i=0;i<re->row/2;i++){
+		for(j=0;j<re->column;j++){
+			n = i + re->row/2;
+			real = re->elem[n][j];
+			re->elem[n][j] = re->elem[i][j];
+			re->elem[i][j] = real;	
+		} 
+	}
+	for(j=0;j<re->column/2;j++){
+		for(i=0;i<re->row;i++){
+			n = j + re->column/2;
+			real = re->elem[i][n];
+			re->elem[i][n] = re->elem[i][j];
+			re->elem[i][j] = real;	
+		} 
 	}
 	if(fp){Data_fprint(re,fp,vi->options.fieldSeparators[0]); fclose(fp); Data_delete(re);}
 	else{Data_delete(data); VisiterInfo_setData(vi,re);}

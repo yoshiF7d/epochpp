@@ -712,7 +712,7 @@ Data Data_loadBARY(char *filein){
 	FILE *fp=fopen(filein,"rb");
 	Data data;
 	int depth=0,dim[2]={0,0},len,i,j;
-	size_t size;
+	unsigned long size = getFileSizeBin(filein);
 	float *f;
 	double *elem;
 	enum precision p;
@@ -730,15 +730,15 @@ Data Data_loadBARY(char *filein){
 	elem = allocate(len*sizeof(double));
 	switch(p){
 	  case p_double:
-		if(size != sizeof(enum precision) + depth*sizeof(int) + len*sizeof(double)){
-			fprintf(stderr,"Data_loadBARY : array size should be %lu byte, but is %lu byte\n",sizeof(enum precision) + depth*sizeof(int) + len*sizeof(double),size);
+		if(size != sizeof(enum precision) + depth*sizeof(int) + sizeof(int) + len*sizeof(double)){
+			fprintf(stderr,"Data_loadBARY : array size should be %lu byte, but is %lu byte\n",sizeof(enum precision) + depth*sizeof(int) + sizeof(int) + len*sizeof(double),size);
 			return NULL;
 		}
 		fread(elem,sizeof(double),len,fp);
 		break;
 	  case p_float:
-		if(size != sizeof(enum precision) + depth*sizeof(int) + len*sizeof(float)){
-			fprintf(stderr,"Data_loadBARY : array size should be %lu byte, but is %lu byte\n",sizeof(enum precision) + depth*sizeof(int) + len*sizeof(float),size);
+		if(size != sizeof(enum precision) + depth*sizeof(int) + sizeof(int) + len*sizeof(float)){
+			fprintf(stderr,"Data_loadBARY : array size should be %lu byte, but is %lu byte\n",sizeof(enum precision) + depth*sizeof(int) + sizeof(int) +len*sizeof(float),size);
 			return NULL;
 		}
 		f = allocate(len*sizeof(float));
