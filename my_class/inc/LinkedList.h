@@ -62,7 +62,7 @@ LinkedList LinkedList_getPrevious(LinkedList root, LinkedList list);
 int LinkedList_getLength(LinkedList root);
 
 int LinkedList_count(LinkedList list,int (* equals)(void*,void*),void *content);
-char *LinkedList_print_func(void *x);
+char *LinkedList_vprintf(void *x);
 void LinkedList_print(LinkedList root, char *(*toString)(void *a));
 void LinkedList_enum(LinkedList root, void (func)(void *));
 void *LinkedList_toArray(LinkedList root, size_t size);

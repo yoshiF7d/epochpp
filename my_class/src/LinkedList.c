@@ -426,7 +426,7 @@ void LinkedList_print(LinkedList root, char *(*toString)(void *a)){
 	printf("\n");
 }
 
-char *LinkedList_print_func(void *x){return (char*)x;}
+char *LinkedList_vprintf(void *x){return (char*)x;}
 
 void LinkedList_enum(LinkedList root, void (func)(void *)){
 	int n;

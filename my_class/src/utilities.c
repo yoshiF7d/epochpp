@@ -938,6 +938,10 @@ char *String_stripdq(char *buf){
 		for(p=buf;*p;p++){*p = p[1];}
 		p[-2]='\0';
 	}
+	if(buf[0] == '`' && strtail(buf)[-1] =='`'){
+		for(p=buf;*p;p++){*p = p[1];}
+		p[-2]='\0';
+	}
 	return buf;
 }
 

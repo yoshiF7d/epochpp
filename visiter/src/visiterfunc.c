@@ -264,6 +264,7 @@ void visiter_print(LinkedList list){
 	if(len == 6 || len == 2 || len == 3){fclose(fp);}
 }
 
+void visiter_plot(LinkedList list){visiter_draw(list);}
 void visiter_draw(LinkedList list){
 	int i,j,len;
 	int rs=0,cs=0,re=0,ce=0;
@@ -277,6 +278,7 @@ void visiter_draw(LinkedList list){
 	
 	len = LinkedList_getLength(list);
 	vi = LinkedList_getIndex(list,0); data = VisiterInfo_getData(vi);
+	if(data->column <= 2){visiter_draw1d(list); return;}
 	if(len != 5 && len != 1 && len != 2 && len != 6){printdoc_imp(visiter_draw);return;}
 	if(len==1 || len==2){
 		if(data){rs=0;cs=0;re=Data_getRow(data)-1;ce=Data_getColumn(data)-1;}
@@ -305,7 +307,7 @@ void visiter_draw(LinkedList list){
 	}
 	pclose(gp);
 }
-
+void visiter_plot1d(LinkedList list){visiter_draw1d(list);}
 void visiter_draw1d(LinkedList list){
 	int i,k,len,oned=0;
 	int rs=0,re=0;
@@ -330,13 +332,123 @@ void visiter_draw1d(LinkedList list){
 	}else{
 		if(!check(data,rs,0,re,1)){return;}
 	}
-	
-	printf("row : %d\tcolumn : %d\n",Data_getRow(data),Data_getColumn(data));
-	
+	//printf("row : %d\tcolumn : %d\n",Data_getRow(data),Data_getColumn(data));
 	gp = popen("gnuplot -persist\n","w");
 	if(gp == NULL){perror("gnuplot");return;}
 	//printf("plot '-' binary record=(%d,%d) format=\"%%int32%%float64\" endian=little using 1:2 notitle\n",1,re-rs+1);
 	
+	if(oned){
+		fprintf(gp,"plot '-' binary record=(%d,%d) format=\"%%int32%%float64\" endian=little using 1:2 notitle\n",1,re-rs+1);
+		for(i=rs;i<=re;i++){
+			k = i-rs; fwrite(&k,sizeof(int),1,gp);
+			x = Data_get(data,i,0); fwrite(&x,sizeof(double),1,gp);
+			//printf("%d\t%f\n",k,x);
+		}
+	}else{
+		fprintf(gp,"plot '-' binary record=(%d,%d) format=\"%%float64%%float64\" endian=little using 1:2 notitle\n",1,re-rs+1);
+		for(i=rs;i<=re;i++){
+			x = Data_get(data,i,0); fwrite(&x,sizeof(double),1,gp);
+			y = Data_get(data,i,1); fwrite(&y,sizeof(double),1,gp);
+			//printf("%d\t%f\n",k,x);
+		}
+	}
+	pclose(gp);
+}
+
+void visiter_plotpng(LinkedList list){visiter_drawpng(list);}
+void visiter_drawpng(LinkedList list){
+	int i,j,len;
+	int rs=0,cs=0,re=0,ce=0;
+	double ratio,x;
+	int r,c;
+	char *comfile=NULL,*name=NULL,*filename=NULL,*dirname=NULL;
+	FILE *gp=NULL;
+	
+	Data data=NULL;
+	VisiterInfo vi=NULL;
+	
+	len = LinkedList_getLength(list);
+	vi = LinkedList_getIndex(list,0); data = VisiterInfo_getData(vi);
+	if(data->column <= 2){visiter_draw1dpng(list); return;}
+	if(len != 1 && len != 2 && len != 3){printdoc_imp(visiter_drawpng);return;}
+	if(data){rs=0;cs=0;re=Data_getRow(data)-1;ce=Data_getColumn(data)-1;}
+	else{return;}
+	if(len==2){
+		dirname = String_stripdq(LinkedList_getIndex(list,1));
+	}
+	if(len==3){
+		dirname = String_stripdq(LinkedList_getIndex(list,1));
+		comfile = String_stripdq(LinkedList_getIndex(list,2));
+	}
+	if(!check(data,rs,cs,re,ce)){return;}
+	r = Data_getRow(data);
+	c = Data_getColumn(data);
+	
+	gp = popen("gnuplot -persist\n","w");
+	if(gp == NULL){perror("gnuplot");return;}
+	fprintf(gp,"set term png size %d,%d\n",c,r);
+	filename = getFileName(vi->filename);
+	name=String_ncopy(filename,strlen(filename)-strlen(getFileExtension(filename)));
+	if(dirname){
+		mkdir(dirname,0777);
+		fprintf(gp,"set output \"%s/%s.png\"\n",dirname,name);
+	}else{
+		fprintf(gp,"set output \"%s.png\"\n",name);
+	}
+	ratio = (re-rs+1)/(ce-cs+1);
+	fprintf(gp,"set size ratio %f\n",ratio);
+	if(comfile){fprintf(gp,"load \"%s\"\n",comfile);}
+	fprintf(gp,"plot '-' binary array=(%d,%d) format=\"%%float64\" endian=little w image notitle\n",ce-cs+1,re-rs+1);	
+	
+	for(i=rs;i<=re;i++){
+		for(j=cs;j<=ce;j++){
+			x = Data_get(data,i,j);
+			fwrite(&x,sizeof(double),1,gp);
+		}
+	}
+	pclose(gp);
+	deallocate(name);
+}
+
+void visiter_plot1dpng(LinkedList list){visiter_draw1dpng(list);}
+void visiter_draw1dpng(LinkedList list){
+	int i,k,len,oned=0;
+	int rs=0,re=0;
+	double x,y;
+	FILE *gp=NULL;
+	
+	Data data=NULL;
+	VisiterInfo vi=NULL;
+	char *name=NULL,*dirname=NULL,*filename=NULL,*comfile=NULL;
+	
+	len = LinkedList_getLength(list);
+	vi = LinkedList_getIndex(list,0); data = VisiterInfo_getData(vi);
+	if(len > 3){printdoc_imp(visiter_draw1d);return;}
+	rs=0;re=Data_getRow(data)-1;	
+	if(len==2){
+		dirname = String_stripdq(LinkedList_getIndex(list,1));
+	}
+	if(len==3){
+		dirname = String_stripdq(LinkedList_getIndex(list,1));
+		comfile = String_stripdq(LinkedList_getIndex(list,2));
+	}
+	if(data && Data_getColumn(data)==1){
+		if(!check(data,rs,0,re,0)){return;}
+		oned=1;
+	}else{
+		if(!check(data,rs,0,re,1)){return;}
+	}
+	gp = popen("gnuplot -persist\n","w");
+	if(gp == NULL){perror("gnuplot");return;}
+	filename = getFileName(vi->filename);
+	name=String_ncopy(filename,strlen(filename)-strlen(getFileExtension(filename)));
+	if(dirname){
+		mkdir(dirname,0777);
+		fprintf(gp,"set output \"%s/%s.png\"\n",dirname,name);
+	}else{
+		fprintf(gp,"set output \"%s.png\"\n",name);
+	}
+	if(comfile){fprintf(gp,"load \"%s\"\n",comfile);}
 	if(oned){
 		fprintf(gp,"plot '-' binary record=(%d,%d) format=\"%%int32%%float64\" endian=little using 1:2 notitle\n",1,re-rs+1);
 		for(i=rs;i<=re;i++){
@@ -604,20 +716,21 @@ void visiter_series(LinkedList list){
 	char optdef[128],pathname[256];
 	
 	struct stat statbuf;
-	char *full,*dir,*name,*file,*funcstr,*optstr = optdef,*fname; 
+	char *full,*dir,*name,*file,*funcstr,*optstr,*fname; 
 	int len,loadlen,fopened=0;
 	size_t needed;
 	
 	VisiterInfo vi = NULL;
 	HashTable ht=NULL;
 	Data data;
-	LinkedList arglist=NULL,optlist=NULL,dirlist=NULL,templist=NULL;
+	LinkedList arglist=NULL,optlist=NULL,dirlist=NULL,tail=NULL,s,t;
 	Func func=NULL,loader=NULL;
 
 	len = LinkedList_getLength(list);
 	vi=LinkedList_getIndex(list,0);
-	/*list[3,4] :  (0 : VisiterInfo ) -> (1 : dirname ) -> (2 : funcstr ) [ -> (3 : optstr )]*/
-	if(len != 3 && len != 4){printdoc_imp(visiter_series); return;}
+	/*list[3,4] :  (0 : VisiterInfo ) -> (1 : dirname ) -> (2 : funcstr ) -> (3 : funcstr2)
+	 -> ... [ -> (n : optstr )]*/
+	if(len < 3){printdoc_imp(visiter_series); return;}
 	
 	ht = VisiterInfo_getHashTable(vi);
 	snprintf(optdef,128,"%s%s%s","load(0,0,-1,-1,\"",vi->options.fieldSeparators[0],"\")");
@@ -630,19 +743,9 @@ void visiter_series(LinkedList list){
 		
 	if((dp = opendir(dir))==NULL){perror("visiter_series"); return;}
 	
-	arglist = parsefunc(funcstr = LinkedList_getIndex(list,2));
-	fname = LinkedList_getIndex(arglist,0);
-	if(NULL==(func=HashTable_get(ht,fname = LinkedList_getIndex(arglist,0)))){
-		printf("visiter_series : I don't understand\n");
-		return;
-	}
-	if(func==visiter_load || func == visiter_unload || func == visiter_draw || func == visiter_spot || func == visiter_series){
-		printf("visiter_series : %s is unsupported in visiter_series\n",fname);
-		return;
-	}
-
-	/*(3 : optstr)*/			
-	if(len==4){optstr = LinkedList_getIndex(list,3);}
+	/*(3 : optstr)*/
+	optstr = LinkedList_get(tail=LinkedList_tail(list));
+	if(strncmp(optstr,"load",4)){optstr=optdef;tail=NULL;}
 	if((optlist = parsefunc(optstr))==NULL){return;}
 	/*optlist : (0 : VisiterInfo) -> ...*/
 	VisiterInfo_setSeriesOn(vi);
@@ -660,7 +763,7 @@ void visiter_series(LinkedList list){
 	}
 	closedir(dp);
 	/*sort directory name list*/
-	templist = dirlist = LinkedList_sort(dirlist,compare);
+	dirlist = LinkedList_sort(dirlist,compare);
 	//StringList_print(templist);
 	/*visiter_load(optlist)*/
 	/*optlist :  (0 : VisiterInfo <= data is loaded in here)  -> ...*/
@@ -668,20 +771,42 @@ void visiter_series(LinkedList list){
 	/*func(arglist) */
 	/*arglist :  (0 : VisiterInfo <= optlist[0] ) -> ...*/
 	
-	while(templist){
-		file = LinkedList_get(templist); 
+	LinkedList_print(list,LinkedList_vprintf);
+	for(s=list->next->next;s!=tail;s=s->next){
+		s->content = parsefunc(funcstr = s->content);
+	}
+	
+	for(t=dirlist;t;t=t->next){
+		file = LinkedList_get(t); 
 		snprintf(pathname,256,"%s/%s",dir,file);
 		LinkedList_setIndex(optlist,1,pathname);
 		visiter_load(optlist);
-		LinkedList_setIndex(arglist,0,LinkedList_getIndex(optlist,0));
-		func(arglist);
+		for(s=list->next->next;s!=tail;s=s->next){
+			arglist = LinkedList_get(s);
+			fname = LinkedList_getIndex(arglist,0);
+			LinkedList_print(arglist,LinkedList_vprintf);
+			if(NULL==(func=HashTable_get(ht,fname))){
+				printf("visiter_series : I don't understand\n");
+				return;
+			}
+			if(func==visiter_load || func == visiter_unload || 
+			   func == visiter_draw || func == visiter_spot || 
+			   func == visiter_series){
+				printf("visiter_series : %s is unsupported in visiter_series\n",fname);
+				return;
+			}
+			LinkedList_setIndex(arglist,0,LinkedList_getIndex(optlist,0));
+			func(arglist);
+			LinkedList_setIndex(arglist,0,fname);
+		}
 		visiter_unload(optlist);
-		templist = LinkedList_increment(templist);
+	}
+	for(s=list->next->next;s!=tail;s=s->next){
+		LinkedList_deleteRoot(s->content,NULL);
 	}
 	deallocate(dir);
 	deallocate(name);
 	deallocate(full);
-	LinkedList_deleteRoot(arglist,NULL);
 	LinkedList_deleteRoot(optlist,NULL);
 	StringList_finish(dirlist);
 	VisiterInfo_setFileName(vi,NULL);
@@ -1465,11 +1590,11 @@ void printdoc_imp(Func func){
 	)
 	doc(series,
 		printf(
-		BOLD "%-10s" USAGE "series(\"DIRECTORY\",func(args[,\"OUTPUTFILE\"]) [,load(row offset, column offset[,row, column] [,\"SEPARATOR\"])])\n"
-		"%-10s" EXAMPLE "series(\"DIRECTORY\",ave)\n"
-		"%-10s" EXAMPLE "series(\"DIRECTORY\",ave(10,10,20,20,\"OUTPUTFILE\"),load(10,10,-1,-1,\",\"))\n"
+			   BOLD "%-10s" USAGE "series(\"FILENAME WILDCARD\",func(args[,\"OUTPUTFILE\"]),func2(args[,\"OUTPUTFILE\"]),... [,load(row offset, column offset[,row, column] [,\"SEPARATOR\"])])\n"
+			   "%-10s" EXAMPLE "series(\"FILENAME WILDCARD\",ave)\n"
+			   "%-10s" EXAMPLE "series(\"FILENAME WILDCARD\",ave(10,10,20,20,\"OUTPUTFILE\"),load(10,10,-1,-1,\",\"))\n"
 		RESET
-		"%-10s" KNRM "files in \"DIRECTORY\" is processed in series, using function command at 2nd slot.\n"
+			   "%-10s" KNRM "files that matches to \"FILENAME WILDCARD\" is processed in series, using function command at 2nd slot.\n"
 		"%-10s" "you can use most of visiter functions like max, ave, etc..\n"
 		"%-10s" "load options can be set by adding load(args) commadn at last. see help of load command\n\n"
 		,"series",p,p,p,p,p
@@ -1717,22 +1842,20 @@ void printdoc_imp(Func func){
 	)
 	doc(fourier,
 		printf(
-		BOLD "%-10s" USAGE "fourier[([pad][,\"OUTPUTFILE\"])]\n"
-		"%-10s" EXAMPLE "fourier,fourier(pad), fourier(pad,\"OUTPUTFILE\")\n"
+		BOLD "%-10s" USAGE "fourier[([,\"OUTPUTFILE\"])]\n"
+		"%-10s" EXAMPLE "fourier, fourier(\"OUTPUTFILE\")\n"
 		RESET
-		"%-10s" KNRM "calculate fourier transform of 1d data\n\n"
-		"%-10s" KNRM "pad is a power of two integer. this determines array size at the time when computing fft\n\n"
-		,"fourier",p,p,p
+	   "%-10s" KNRM "calculate fourier transform of 1d data\n\n"
+		,"fourier",p,p
 		)
 	)
 	doc(fourier2D,
 		printf(
-		BOLD "%-10s" USAGE "fourier2D[([pad][,\"OUTPUTFILE\"])]\n"
-		"%-10s" EXAMPLE "fourier2D, fourier2D(\"OUTPUTFILE\"), fourier2D(pad,\"OUTPUTFILE\")\n"
+		BOLD "%-10s" USAGE "fourier2D[[,\"OUTPUTFILE\"]]\n"
+		"%-10s" EXAMPLE "fourier2D, fourier2D(\"OUTPUTFILE\")\n"
 		RESET
 		"%-10s" KNRM "calculate 2d fourier power spectrum of 2d data\n\n"
-		"%-10s" KNRM "pad is a power of two integer. this determines array size at the time when computing fft\n\n"
-		,"fourier2D",p,p,p
+		,"fourier2D",p,p
 		)
 	)
 	doc(fwhm,

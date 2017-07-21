@@ -57,6 +57,12 @@ FUNC(max) \
 FUNC(print) \
 FUNC(draw) \
 FUNC(draw1d) \
+FUNC(drawpng) \
+FUNC(draw1dpng) \
+FUNC(plot) \
+FUNC(plot1d) \
+FUNC(plotpng) \
+FUNC(plot1dpng) \
 FUNC(spot) \
 FUNC(load) \
 FUNC(unload) \

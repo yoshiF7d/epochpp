@@ -107,23 +107,17 @@ int main(int argc, char *argv[]){
 		fname = LinkedList_getIndex(arglist,0);
 		LinkedList_setIndex(arglist,0,vi);
 		
-		if(!strcmp(fname,"plot")){func = visiter_draw;}
-		else if(!strcmp(fname,"plot1d")){func = visiter_draw1d;}
-		else{
-			if(NULL==(func=(Func)HashTable_get(ht,fname))){
-				printf("(?_?) pardon?\n");
-				goto loopend;
-			}
+		if(NULL==(func=(Func)HashTable_get(ht,fname))){
+			printf("(?_?) pardon?\n");
+			goto loopend;
 		}
 		if(func == visiter_load || func==visiter_unload ||
 		   func == visiter_shape || func == visiter_rslice ||
 		   func == visiter_cslice || func == visiter_rappend ||
-		   func == visiter_cappend || func == visiter_cfourier ||
-		   func == visiter_rfourier || func == visiter_fourier || 
-		   func == visiter_aveload || func == visiter_fourier2D ||
-		   func == visiter_transpose || func == visiter_rrotate ||
-		   func == visiter_lrotate || func == visiter_vreflect || 
-		   func == visiter_hreflect
+		   func == visiter_cappend || func == visiter_rfourier ||
+		   func == visiter_aveload || func == visiter_transpose || 
+		   func == visiter_rrotate || func == visiter_lrotate || 
+		   func == visiter_vreflect || func == visiter_hreflect
 		   )
 		{promptok=0;}
 		
@@ -150,5 +144,3 @@ int main(int argc, char *argv[]){
 	//watcher_print();
 	return 0;
 } 
-
-
