@@ -771,7 +771,7 @@ void visiter_series(LinkedList list){
 	/*func(arglist) */
 	/*arglist :  (0 : VisiterInfo <= optlist[0] ) -> ...*/
 	
-	LinkedList_print(list,LinkedList_vprintf);
+	//LinkedList_print(list,LinkedList_vprintf);
 	for(s=list->next->next;s!=tail;s=s->next){
 		s->content = parsefunc(funcstr = s->content);
 	}
@@ -784,7 +784,7 @@ void visiter_series(LinkedList list){
 		for(s=list->next->next;s!=tail;s=s->next){
 			arglist = LinkedList_get(s);
 			fname = LinkedList_getIndex(arglist,0);
-			LinkedList_print(arglist,LinkedList_vprintf);
+			//LinkedList_print(arglist,LinkedList_vprintf);
 			if(NULL==(func=HashTable_get(ht,fname))){
 				printf("visiter_series : I don't understand\n");
 				return;
