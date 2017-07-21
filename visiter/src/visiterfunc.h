@@ -89,6 +89,7 @@ FUNC(rfourier) \
 FUNC(cfourier) \
 FUNC(fourier) \
 FUNC(fourier2D) \
+FUNC(fourierMask) \
 FUNC(rpow) \
 FUNC(cpow) \
 FUNC(fwhm) \

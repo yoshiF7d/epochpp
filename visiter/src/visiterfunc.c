@@ -517,7 +517,9 @@ void visiter_load(LinkedList list){
 	len = LinkedList_getLength(list);
 	vi = LinkedList_getIndex(list,0);
 	
-	if(len !=2 &&  len != 3 && len != 4 && len != 5 && len != 6 && len != 7){printf("argcount : %d\n",len-1); printdoc_imp(visiter_load); return;}	
+	if(len !=2 &&  len != 3 && len != 4 && len != 5 && len != 6 && len != 7){
+		printf("argcount : %d\n",len-1); printdoc_imp(visiter_load); return;
+	}
 	
 	file = String_stripdq(LinkedList_getIndex(list,1));
 	if(len==3){
@@ -574,7 +576,8 @@ void visiter_load(LinkedList list){
 	}
 #endif
 #ifdef LOAD_TIFF
-	if(!strcmp(".tif",getFileExtension(file)) || !strcmp(".tiff",getFileExtension(file)) || !strcmp(".gel",getFileExtension(file))){
+	if(!strcmp(".tif",getFileExtension(file)) || !strcmp(".tiff",getFileExtension(file)) || 
+	   !strcmp(".gel",getFileExtension(file))){
 		VisiterInfo_setData(vi,Data_loadTIFF(file));
 		goto loaded;
 	}
@@ -1326,6 +1329,114 @@ void visiter_fourier2D(LinkedList list){
 	}
 	if(fp){Data_fprint(re,fp,vi->options.fieldSeparators[0]); fclose(fp); Data_delete(re);}
 	else{Data_delete(data); VisiterInfo_setData(vi,re);}
+	Data_delete(im);
+}
+
+void visiter_fourierMask(LinkedList list){
+	FILE *fp = NULL;
+	VisiterInfo vi = NULL;
+	Data data=NULL,re=NULL,im=NULL,mask=NULL;
+	int len,i,j,n;
+	double real, imaginal;
+	char *buf,*maskfile;
+	
+	len = LinkedList_getLength(list);
+	if(len != 2){printdoc_imp(visiter_fourierMask); return;}
+	vi = LinkedList_getIndex(list,0);
+	data = VisiterInfo_getData(vi);
+	if(data==NULL){printf("no data is loaded. please use \"load\" function\n"); return;}
+	
+	maskfile = LinkedList_getIndex(list,1);
+	mask = 
+	re = Data_copy(data);
+	im = Data_create(data->row,data->column);
+	for(i=0;i<data->row;i++){
+		for(j=0;j<data->column;j++){
+			im->elem[i][j] = 0;
+		}
+	}
+	Data_FFT2D(re,im);
+	for(i=0;i<re->row/2;i++){
+		for(j=0;j<re->column;j++){
+			n = i + re->row/2;
+			real = re->elem[n][j];
+			re->elem[n][j] = re->elem[i][j];
+			re->elem[i][j] = real;	
+		} 
+	}
+	for(j=0;j<re->column/2;j++){
+		for(i=0;i<re->row;i++){
+			n = j + re->column/2;
+			real = re->elem[i][n];
+			re->elem[i][n] = re->elem[i][j];
+			re->elem[i][j] = real;	
+		} 
+	}
+#ifdef LOAD_BMAT
+	if(!strcmp(".bmat",getFileExtension(file))){
+		mask = Data_loadBMAT(maskfile);
+		goto loaded;
+	}
+#endif
+#ifdef LOAD_BARY
+	if(!strcmp(".bary",getFileExtension(file))){
+		mask = Data_loadBARY(maskfile);
+		goto loaded;
+	}
+#endif
+#ifdef LOAD_PNG
+	if(!strcmp(".png",getFileExtension(file))){
+		mask = Data_loadPNG(maskfile);
+		goto loaded;
+	}
+#endif
+#ifdef LOAD_TIFF
+	if(!strcmp(".tif",getFileExtension(file)) || !strcmp(".tiff",getFileExtension(file)) || 
+	   !strcmp(".gel",getFileExtension(file))){
+		mask = Data_loadTIFF(maskfile);
+		goto loaded;
+	}
+#endif
+  loaded:
+	if(mask->row != re->row || mask->column != re->column){
+		fprintf(stdout,
+				"visiter_fourierMask : The dimension of mask array (%d,%d) is not equal to that of data array (%d,%d)\n",
+				mask->row,mask->column,re->row,re->column
+				);
+		Data_delete(mask); return;
+	}
+	for(i=0;i<re->row;i++){
+		for(j=0;j<re->column;j++){
+			re->elem[i][j] *= mask->elem[i][j];
+			im->elem[i][j] *= mask->elem[i][j];
+		}
+	}
+	for(i=0;i<re->row/2;i++){
+		for(j=0;j<re->column;j++){
+			n = i + re->row/2;
+			real = re->elem[n][j];
+			imaginal = im->elem[n][j];
+			re->elem[n][j] = re->elem[i][j];
+			im->elem[n][j] = im->elem[i][j];
+			re->elem[i][j] = real;
+			im->elem[i][j] = imaginal;
+		} 
+	}
+	for(j=0;j<re->column/2;j++){
+		for(i=0;i<re->row;i++){
+			n = j + re->column/2;
+			real = re->elem[i][n];
+			imaginal = im->elem[n][j];
+			re->elem[i][n] = re->elem[i][j];
+			im->elem[i][n] = im->elem[i][j];
+			re->elem[i][j] = real;
+			im->elem[i][j] = imaginal;
+		} 
+	}
+	Data_IFFT2D(re,im);
+	if(fp){Data_fprint(re,fp,vi->options.fieldSeparators[0]); fclose(fp); Data_delete(re);}
+	else{Data_delete(data); VisiterInfo_setData(vi,re);}
+	Data_delete(im);
 }
 
 void visiter_fwhm(LinkedList list){
@@ -1851,12 +1962,25 @@ void printdoc_imp(Func func){
 	)
 	doc(fourier2D,
 		printf(
-		BOLD "%-10s" USAGE "fourier2D[[,\"OUTPUTFILE\"]]\n"
+		BOLD "%-10s" USAGE "fourier2D([,\"OUTPUTFILE\"])\n"
 		"%-10s" EXAMPLE "fourier2D, fourier2D(\"OUTPUTFILE\")\n"
 		RESET
 		"%-10s" KNRM "calculate 2d fourier power spectrum of 2d data\n\n"
 		,"fourier2D",p,p
 		)
+	)
+	doc(fourierMask,
+		printf(
+	   BOLD "%-10s" USAGE "fourierMask(,\"MASKFILE\")\n"
+			   "%-10s" EXAMPLE "fourierMask(\"MASKFILE\")\n"
+	   RESET
+		    "%-10s" KNRM "multiply the mask array element-wise to the 2d fourier transform of the current array,
+			 and return 2d inverse transform of the obtained array.\n"
+			"%-10s" KNRM "mask array is obtained from \"MASKFILE\", The dimension of the mask array must be same as 
+			that of the current array.\n\n"
+			"%-10s" KNRM "Each element of the mask array should be a real value ranges from 0 to 1\n\n"
+	   ,"fourier2D",p,p,p
+	   )
 	)
 	doc(fwhm,
 		printf(
