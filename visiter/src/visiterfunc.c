@@ -1347,7 +1347,6 @@ void visiter_fourierMask(LinkedList list){
 	if(data==NULL){printf("no data is loaded. please use \"load\" function\n"); return;}
 	
 	maskfile = LinkedList_getIndex(list,1);
-	mask = 
 	re = Data_copy(data);
 	im = Data_create(data->row,data->column);
 	for(i=0;i<data->row;i++){
@@ -1360,16 +1359,22 @@ void visiter_fourierMask(LinkedList list){
 		for(j=0;j<re->column;j++){
 			n = i + re->row/2;
 			real = re->elem[n][j];
+			imaginal = im->elem[n][j];
 			re->elem[n][j] = re->elem[i][j];
-			re->elem[i][j] = real;	
+			im->elem[n][j] = im->elem[i][j];
+			re->elem[i][j] = real;
+			im->elem[i][j] = imaginal;
 		} 
 	}
 	for(j=0;j<re->column/2;j++){
 		for(i=0;i<re->row;i++){
 			n = j + re->column/2;
 			real = re->elem[i][n];
+			imaginal = im->elem[i][n];
 			re->elem[i][n] = re->elem[i][j];
-			re->elem[i][j] = real;	
+			im->elem[i][n] = im->elem[i][j];
+			re->elem[i][j] = real;
+			im->elem[i][j] = imaginal;
 		} 
 	}
 #ifdef LOAD_BMAT
@@ -1426,7 +1431,7 @@ void visiter_fourierMask(LinkedList list){
 		for(i=0;i<re->row;i++){
 			n = j + re->column/2;
 			real = re->elem[i][n];
-			imaginal = im->elem[n][j];
+			imaginal = im->elem[i][n];
 			re->elem[i][n] = re->elem[i][j];
 			im->elem[i][n] = im->elem[i][j];
 			re->elem[i][j] = real;
