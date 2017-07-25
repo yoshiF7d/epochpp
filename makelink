@@ -6,7 +6,7 @@ if [ $# -ne 1 ]; then
 fi
 list=("sdf1d/sdf1d" "sdf1d/sdfs1d" "sdf2txt/sdf2txt" "sdf2txt/sdf2bmat" "sdf2txt/sdfs2txts" "sdf2txt/sdfs2bmats" "sdf2txt/sdfid" \
 "sdfen/sdfen" "sdfen/sdfsen" "sdfplot/sdfplot" "bmatplot/bmatplot" "bmatplot/bmatsplot" "sdfint/sdfint" "sdfphase/sdfphase" \
-"sdfphase/sdfsphase" "sdfprobe/sdfprobe" "sdfprobe/sdfsprobe" "sdfwave/sdfwave2d" "visiter/visiter")
+"sdfphase/sdfsphase" "sdfprobe/sdfprobe" "sdfprobe/sdfsprobe" "sdfwave/sdfwave2d" "visiter/visiter" "makemask/makemask")
 
 cd ${tdir} &&
 for p in "${list[@]}"; do
