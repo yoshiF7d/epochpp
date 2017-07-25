@@ -550,7 +550,7 @@ void Data_IFFT2D(Data re, Data im){
 		ctemp->elem[i][3] = Data_FFT_sin(i,re->column);
 	}
 	
-	Data_FFT2D_mod_row(re,im,rtemp,1,1);
+	Data_FFT2D_mod_row(re,im,ctemp,1,1);
 	for(i=0;i<re->row;i++){
 		for(j=0;j<re->row;j++){
 			re->elem[i][j] /= re->column;
@@ -559,7 +559,7 @@ void Data_IFFT2D(Data re, Data im){
 	}
 	re2=Data_transpose(re);
 	im2=Data_transpose(im);
-	Data_FFT2D_mod_row(re2,im2,ctemp,1,1);
+	Data_FFT2D_mod_row(re2,im2,rtemp,1,1);
 	for(i=0;i<re2->row;i++){
 		for(j=0;j<re2->row;j++){
 			re2->elem[i][j] /= re2->column;
