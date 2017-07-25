@@ -1373,26 +1373,26 @@ void visiter_fourierMask(LinkedList list){
 		} 
 	}
 #ifdef LOAD_BMAT
-	if(!strcmp(".bmat",getFileExtension(file))){
+	if(!strcmp(".bmat",getFileExtension(maskfile))){
 		mask = Data_loadBMAT(maskfile);
 		goto loaded;
 	}
 #endif
 #ifdef LOAD_BARY
-	if(!strcmp(".bary",getFileExtension(file))){
+	if(!strcmp(".bary",getFileExtension(maskfile))){
 		mask = Data_loadBARY(maskfile);
 		goto loaded;
 	}
 #endif
 #ifdef LOAD_PNG
-	if(!strcmp(".png",getFileExtension(file))){
+	if(!strcmp(".png",getFileExtension(maskfile))){
 		mask = Data_loadPNG(maskfile);
 		goto loaded;
 	}
 #endif
 #ifdef LOAD_TIFF
-	if(!strcmp(".tif",getFileExtension(file)) || !strcmp(".tiff",getFileExtension(file)) || 
-	   !strcmp(".gel",getFileExtension(file))){
+	if(!strcmp(".tif",getFileExtension(maskfile)) || !strcmp(".tiff",getFileExtension(maskfile)) || 
+	   !strcmp(".gel",getFileExtension(maskfile))){
 		mask = Data_loadTIFF(maskfile);
 		goto loaded;
 	}
@@ -1972,14 +1972,14 @@ void printdoc_imp(Func func){
 	doc(fourierMask,
 		printf(
 	   BOLD "%-10s" USAGE "fourierMask(,\"MASKFILE\")\n"
-			   "%-10s" EXAMPLE "fourierMask(\"MASKFILE\")\n"
+		    "%-10s" EXAMPLE "fourierMask(\"MASKFILE\")\n"
 	   RESET
-		    "%-10s" KNRM "multiply the mask array element-wise to the 2d fourier transform of the current array,
-			 and return 2d inverse transform of the obtained array.\n"
-			"%-10s" KNRM "mask array is obtained from \"MASKFILE\", The dimension of the mask array must be same as 
-			that of the current array.\n\n"
+			"%-10s" KNRM "multiply the mask array element-wise to the 2d fourier transform of the current array,\n"
+			"%-10s" KNRM "and return 2d inverse transform of the obtained array.\n"
+		    "%-10s" KNRM "mask array is obtained from \"MASKFILE\", The dimension of the mask array must be same as\n"
+			"%-10s" KNRM "that of the current array.\n"
 			"%-10s" KNRM "Each element of the mask array should be a real value ranges from 0 to 1\n\n"
-	   ,"fourier2D",p,p,p
+			   ,"fourierMask",p,p,p,p,p,p
 	   )
 	)
 	doc(fwhm,
