@@ -1,5 +1,6 @@
 #include "utilities.h"
 #include "Data.h"
+#include "Data_loadSDF.h"
 #include "LinkedList.h"
 #include "script.h"
 
@@ -59,7 +60,6 @@ void fprinthist1D(Data data, FILE *fp, int hbin, int vbin){
 
 int main(int argc, char *argv[]){
 	char filesdf[256],filename[256],specname[256],specname2[256];
-	char filegrid[256],filepx[256],filepy[256],filepz[256],fileek[256],filew[256];
 	char filehist[256],filehist2[256],plotfile[256];
 	char command[512],command2[512]; 
 	char htag[8],vtag[8],*hname,*vname,*hlegend,*vlegend;
@@ -128,7 +128,15 @@ int main(int argc, char *argv[]){
 	namelist = LinkedList_append(namelist,String_join("ek/",specname));
 	namelist = LinkedList_append(namelist,String_join("weight/",specname));
 	
+	datalist = Data_loadSDFList2(filesdf,namelist);
+	datagrid = LinkedList_getIndex(datalist,0);
+	datapx = LinkedList_getIndex(datalist,1);
+	datapy = LinkedList_getIndex(datalist,2);
+	datapz = LinkedList_getIndex(datalist,3);
+	dataek = LinkedList_getIndex(datalist,4);
+	dataw = LinkedList_getIndex(datalist,5);
 
+	/*
 	snprintf(command,512,"phase/%s/weight",specname2); mkdir(command,0777); 
 	snprintf(filew,256,"%s/%s.bmat",command,filename);
 	if(access(filew,F_OK)==-1){
@@ -136,6 +144,7 @@ int main(int argc, char *argv[]){
 		fprintf(stderr,"%s\n",command);
 		system(command);
 	}
+	*/
 	/*
 	datagrid = Data_input(filegrid);
 	datapx = Data_input(filepx); datapy = Data_input(filepy); datapz = Data_input(filepz);
@@ -161,7 +170,6 @@ int main(int argc, char *argv[]){
 	Data_delete(dataek); Data_delete(dataw);
 	exit(1);	
 	*/
-	dataw = Data_input(filew);
 	n = Data_getRow(dataw);
 	hi = mode/10; vi = mode%10;
 	//fprintf(stderr,"hi : %d, vi : %d\n",hi,vi);
@@ -171,7 +179,7 @@ int main(int argc, char *argv[]){
 	
 	vii = 0; hii = 0;
 	snprintf(command,512,"phase/%s/%s-%s",specname2,hname,vname);
-	mkdir(command,0777);
+	mkdir(command,0777); chmod(command,0777);
 	snprintf(filehist,256,"%s/data/%s.txt",command,filename);
 	snprintf(filehist2,256,"%s/data2/%s.txt",command,filename);
 	fprintf(stdout,"%s",command);
@@ -180,17 +188,17 @@ int main(int argc, char *argv[]){
 		case 1:
 		case 2:
 		case 3:
-			datah = datagrid ? datagrid : (datagrid = Data_input(filegrid));
+			datah = datagrid;
 			Data_muls(datagrid,1e+06,datagrid);
 			hii = hi - 1;
 			break;
-		case 4: datah = datapx ? datapx : (datapx = Data_input(filepx)); 
+		case 4: datah = datapx; 
 			break;
-		case 5: datah = datapy ? datapy : (datapy = Data_input(filepy));
+		case 5: datah = datapy;
 			break;
-		case 6: datah = datapz ? datapz : (datapz = Data_input(filepz));
+		case 6: datah = datapz;
 			break;
-		default: datah = dataek ? dataek : (dataek = Data_input(fileek));
+		default: datah = dataek;
 			Data_muls(dataek,C_keV_inv,dataek);
 			break;
 	}
@@ -199,24 +207,24 @@ int main(int argc, char *argv[]){
 		case 1:
 		case 2:
 		case 3:
-			datagrid ? datagrid : (datagrid = Data_input(filegrid));
+			datav = datagrid;
 			Data_muls(datagrid,1e+06,datagrid);
 			vii = vi - 1;
 			break;
-		case 4: datav = datapx ? datapx : (datapx = Data_input(filepx)); 
+		case 4: datav = datapx; 
 			break;
-		case 5: datav = datapy ? datapy : (datapy = Data_input(filepy));
+		case 5: datav = datapy;
 			break;
-		case 6: datav = datapz ? datapz : (datapz = Data_input(filepz));
+		case 6: datav = datapz;
 			break;
-		default: datav = dataek ? dataek : (dataek = Data_input(fileek));
+		default: datav = dataek;
 			Data_muls(dataek,C_keV_inv,dataek);
 			break;
 	}
 	//fprintf(stderr,"hii : %d, vii : %d\n",hii,vii);
-	snprintf(command2,512,"%s/data",command); mkdir(command2,0777);
-	snprintf(command2,512,"%s/data2",command); mkdir(command2,0777);
-	snprintf(command2,512,"%s/png",command); mkdir(command2,0777);
+	snprintf(command2,512,"%s/data",command); mkdir(command2,0777); chmod(command2,0777);
+	snprintf(command2,512,"%s/data2",command); mkdir(command2,0777); chmod(command2,0777);
+	snprintf(command2,512,"%s/png",command); mkdir(command2,0777); chmod(command2,0777);
 	if((fp=fopen(filehist,"w"))==NULL){perror("phase");exit(1);}
 	
 	if(hi==0){
@@ -236,7 +244,6 @@ int main(int argc, char *argv[]){
 		fprintf(fp,PLOTDIST,vlegend,hmin,hmax);
 		fclose(fp);
 		chmod(plotfile,0777);
-		Data_delete(datav); datav = NULL;
 		
 	}else{
 		data = Data_create(n,3);
@@ -262,12 +269,10 @@ int main(int argc, char *argv[]){
 		fprintf(fp,PLOTPHASE,hlegend,vlegend,hmin,hmax,vmin,vmax);
 		fclose(fp);
 		chmod(plotfile,0777);
-		Data_delete(datah); datah = NULL;
-		Data_delete(datav); datav = NULL;			
 	}
-	
 	Data_delete(data); data = NULL; 
 	Data_delete(hist); hist = NULL;
-	Data_delete(dataw); dataw = NULL;
+	LinkedList_deleteRoot(datalist,Data_vdelete);
+	LinkedList_deleteRoot(namelist,deallocate);
 	return 0;
 }

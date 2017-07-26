@@ -163,52 +163,52 @@ static int sdf_helper_read_array(sdf_file_t *h, void **var_in, int count)
 
 
 
-int sdf_read_point_mesh(sdf_file_t *h)
-{
-	fprintf(stderr,"sdf_read_point_mesh\n");
+Data Data_sdf_read_point_mesh(sdf_file_t *h){
+    Data data=NULL;
     sdf_block_t *b = h->current_block;
-    int n;
+    union un_array{
+	double *d;
+	float *f;
+    }a;
+    int n,i;
 
     if (b->done_data) return 0;
     if (!b->done_info) sdf_read_point_mesh_info(h);
-
     sdf_point_factor(h, &b->nelements_local);
-
     h->current_location = b->data_location;
-
     if (!b->grids) b->grids = calloc(b->ndims, sizeof(float*));
-
-    if (h->print) {
-        h->indent = 0;
-        SDF_DPRNT("\n");
-        SDF_DPRNT("b->name: %s ", b->name);
-        for (n=0; n<b->ndims; n++) SDF_DPRNT("%i ",b->nelements_local);
-        SDF_DPRNT("\n");
-        h->indent = 2;
+    data = Data_create(b->nelements_local,b->ndims);
+    switch(b->datatype_out){
+	  case SDF_DATATYPE_REAL8:
+		for(n=0;n<b->ndims;n++){
+			sdf_helper_read_array(h, &b->grids[n], b->nelements_local);
+			sdf_free_distribution(h);
+			sdf_convert_array_to_float(h, &b->grids[n], b->nelements_local);	
+			a.d = b->grids[n];
+			for(i=0;i<b->nelements_local;i++){
+				Data_set(data,i,n,a.d[i]);
+			}
+		 	h->current_location = h->current_location + SDF_TYPE_SIZES[b->datatype] * b->dims[0];
+		}
+		break;
+	  case SDF_DATATYPE_REAL4:
+		for(n=0;n<b->ndims;n++){
+			sdf_helper_read_array(h, &b->grids[n], b->nelements_local);
+			sdf_free_distribution(h);
+			sdf_convert_array_to_float(h, &b->grids[n], b->nelements_local);	
+			a.f = b->grids[n];
+			for(i=0;i<b->nelements_local;i++){
+				Data_set(data,i,n,a.f[i]);
+			}
+		 	h->current_location = h->current_location + SDF_TYPE_SIZES[b->datatype] * b->dims[0];
+		}
+		break;
+	  default:
+		break;
     }
-    for (n = 0; n < 3; n++) {
-        if (b->ndims > n) {
-#ifdef PARALLEL
-            sdf_create_1d_distribution(h, b->dims[0], b->nelements_local,
-                    b->starts[0]);
-#endif
-            sdf_helper_read_array(h, &b->grids[n], b->nelements_local);
-            sdf_free_distribution(h);
-            sdf_convert_array_to_float(h, &b->grids[n], b->nelements_local);
-            if (h->use_random)
-                sdf_randomize_array(h, &b->grids[n], b->nelements_local);
-            if (h->print) {
-                SDF_DPRNT("%s: ", b->dim_labels[n]);
-                SDF_DPRNTar(b->grids[n], b->nelements_local);
-            }
-            h->current_location = h->current_location
-                    + SDF_TYPE_SIZES[b->datatype] * b->dims[0];
-        }
-    }
-
+	
     b->done_data = 1;
-
-    return 0;
+    return data;
 }
 
 
