@@ -1,0 +1,41 @@
+#!/bin/sh
+
+while getopts m:b: opt; do
+	case $opt in
+	b)
+	dirbg=${OPTARG} ;;
+	m)
+	filemask=${OPTARG} ;;
+	:\?) ;;
+	esac
+done
+
+shift `expr ${OPTIND} - 1`
+
+dir=${1:-.}
+dirout=${2:-int}
+
+mkdir ${dirout}
+
+for file in ${dir}/*.sdf
+do
+	tmp=${file##*/}
+	tmp=${tmp%.*}
+	if [[ -z ${dirbg} ]]; then
+		if [[ -z ${filemask} ]]; then
+			echo sdfint ${file} ${dirout}/${tmp}.bary 
+			sdfint ${file} ${dirout}/${tmp}.bary 
+		else
+			echo sdfint -m ${filemask} ${file} ${dirout}/${tmp}.bary 
+			sdfint -m ${filemask} ${file} ${dirout}/${tmp}.bary 
+		fi
+	else
+		if [[ -z ${filemask} ]]; then
+			echo sdfint -b ${dirbg}/${tmp}.sdf ${file} ${dirout}/${tmp}.bary 
+			sdfint -b ${dirbg}/${tmp}.sdf ${file} ${dirout}/${tmp}.bary 
+		else
+			echo sdfint -b ${dirbg}/${tmp}.sdf -m ${filemask} ${file} ${dirout}/${tmp}.bary 
+			sdfint -b ${dirbg}/${tmp}.sdf -m ${filemask} ${file} ${dirout}/${tmp}.bary 
+		fi
+	fi
+done
