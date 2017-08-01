@@ -399,7 +399,6 @@ void visiter_drawpng(LinkedList list){
 	fprintf(gp,"set size ratio %f\n",ratio);
 	if(comfile){fprintf(gp,"load \"%s\"\n",comfile);}
 	fprintf(gp,"plot '-' binary array=(%d,%d) format=\"%%float64\" endian=little w image notitle\n",ce-cs+1,re-rs+1);	
-	
 	for(i=rs;i<=re;i++){
 		for(j=cs;j<=ce;j++){
 			x = Data_get(data,i,j);

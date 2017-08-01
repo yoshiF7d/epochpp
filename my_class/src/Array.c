@@ -161,16 +161,16 @@ Array Array_input(char *filein){
 	for(i=0;i<depth;i++){len *= dim[i];}
 	switch(p){
 	  case p_double:
-		if(size != sizeof(enum precision) + depth*sizeof(int) + len*sizeof(double)){
-			fprintf(stderr,"Array_input : array size should be %lu byte, but is %lu byte\n",sizeof(enum precision) + depth*sizeof(int) + len*sizeof(double),size);
+		if(size != sizeof(enum precision) + sizeof(int) +depth*sizeof(int) + len*sizeof(double)){
+			fprintf(stderr,"Array_input : array size should be %lu byte, but is %lu byte\n",sizeof(enum precision) +sizeof(int) +  depth*sizeof(int) + len*sizeof(double),size);
 			return NULL;
 		}
 		array = Array_create2(depth,dim);
 		fread(array->elem,sizeof(double),len,fp);
 		break;
 	  case p_float:
-		if(size != sizeof(enum precision) + depth*sizeof(int) + len*sizeof(float)){
-			fprintf(stderr,"Array_input : array size should be %lu byte, but is %lu byte\n",sizeof(enum precision) + depth*sizeof(int) + len*sizeof(float),size);
+		if(size != sizeof(enum precision) + sizeof(int) + depth*sizeof(int) + len*sizeof(float)){
+			fprintf(stderr,"Array_input : array size should be %lu byte, but is %lu byte\n",sizeof(enum precision) + sizeof(int) + depth*sizeof(int) + len*sizeof(float),size);
 			return NULL;
 		}
 		array = Array_create2(depth,dim);
