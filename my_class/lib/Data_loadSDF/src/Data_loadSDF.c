@@ -58,6 +58,9 @@ Data Data_loadSDF(char *file, char *variable){
 			  case SDF_BLOCKTYPE_PLAIN_MESH:
 				data = Data_sdf_read_plain_mesh(h);
 				break;
+			  case SDF_BLOCKTYPE_POINT_VARIABLE:
+				data = Data_sdf_read_point_variable(h);
+				break;
 			  case SDF_BLOCKTYPE_POINT_MESH:
 				data = Data_sdf_read_point_variable(h);
 				break;
@@ -118,11 +121,12 @@ LinkedList Data_loadSDFList(char *file, int n, ...){
 	
 	free(h->buffer);
 	h->buffer = NULL;
-	b = h->current_block = h->blocklist;
-	for(i=0;i<h->nblocks;i++,h->current_block = b->next){
-		b = h->current_block;
-		for(j=0;j<n;j++){
-			len = strlen(buflist[j])+1;
+	for(j=0;j<n;j++){
+		data = NULL;
+		len = strlen(buflist[j])+1;
+		b = h->current_block = h->blocklist;
+		for(i=0;i<h->nblocks;i++,h->current_block = b->next){
+			b = h->current_block;
 			if(!memcmp(b->id,buflist[j],len)){
 				switch(b->blocktype){
 				  case SDF_BLOCKTYPE_PLAIN_VARIABLE:
@@ -131,15 +135,21 @@ LinkedList Data_loadSDFList(char *file, int n, ...){
 				  case SDF_BLOCKTYPE_PLAIN_MESH:
 					data = Data_sdf_read_plain_mesh(h);
 					break;
-				  case SDF_BLOCKTYPE_POINT_MESH:
+				  case SDF_BLOCKTYPE_POINT_VARIABLE:
 					data = Data_sdf_read_point_variable(h);
 					break;
+				  case SDF_BLOCKTYPE_POINT_MESH:
+					data = Data_sdf_read_point_mesh(h);
+					break;
 				  default:
+					printf("Data_loadSDFList : data type of variable %s is not supported\n",buflist[j]);
 					break;
 				}
-				datalist=LinkedList_append(datalist,data);
+				break;
 			}
 		}
+		if(!data){printf("Data_loadSDFList : variable %s is not loaded\n",buflist[j]);}
+		datalist=LinkedList_append(datalist,data);
 	}
 	sdf_close(h);
 	deallocate(buflist);
@@ -185,12 +195,13 @@ LinkedList Data_loadSDFList2(char *file, LinkedList namelist){
 	
 	free(h->buffer);
 	h->buffer = NULL;
-	b = h->current_block = h->blocklist;
-	for(i=0;i<h->nblocks;i++,h->current_block = b->next){
-		b = h->current_block;
-		for(list=namelist;list;list=LinkedList_increment(list)){
-			buf = LinkedList_get(list);
-			len = strlen(buf)+1;
+	for(list=namelist;list;list=LinkedList_increment(list)){
+		buf = LinkedList_get(list);
+		len = strlen(buf)+1;
+		b = h->current_block = h->blocklist;
+		data = NULL;
+		for(i=0;i<h->nblocks;i++,h->current_block = b->next){
+			b = h->current_block;
 			if(!memcmp(b->id,buf,len)){
 				switch(b->blocktype){
 				  case SDF_BLOCKTYPE_PLAIN_VARIABLE:
@@ -199,15 +210,21 @@ LinkedList Data_loadSDFList2(char *file, LinkedList namelist){
 				  case SDF_BLOCKTYPE_PLAIN_MESH:
 					data = Data_sdf_read_plain_mesh(h);
 					break;
-				  case SDF_BLOCKTYPE_POINT_MESH:
+				  case SDF_BLOCKTYPE_POINT_VARIABLE:
 					data = Data_sdf_read_point_variable(h);
+					break;  
+				  case SDF_BLOCKTYPE_POINT_MESH:
+					data = Data_sdf_read_point_mesh(h);
 					break;
-				  default:
+				default:
+	 				printf("Data_loadSDFList2 : data type of variable %s is not supported\n",buf);	
 					break;
 				}
-				datalist=LinkedList_append(datalist,data);
+				break;
 			}
 		}
+	 	if(!data){printf("Data_loadSDFList2 : variable %s is not loaded\n",buf);}
+		datalist=LinkedList_append(datalist,data);
 	}
 	sdf_close(h);
 	return datalist;

@@ -9,7 +9,7 @@
 #define __STDC_FORMAT_MACROS
 #endif
 #include <inttypes.h>
-#include "Data.h"
+#include <Data.h>
 extern char fileout[256];
 
 #ifdef PARALLEL
@@ -289,7 +289,7 @@ int sdf_read_plain_mesh_info(sdf_file_t *h);
 Data Data_sdf_read_plain_variable(sdf_file_t *h);
 int sdf_read_plain_variable_info(sdf_file_t *h);
 
-int sdf_read_point_mesh(sdf_file_t *h);
+Data Data_sdf_read_point_mesh(sdf_file_t *h);
 int sdf_read_point_mesh_info(sdf_file_t *h);
 Data Data_sdf_read_point_variable(sdf_file_t *h);
 int sdf_read_point_variable_info(sdf_file_t *h);

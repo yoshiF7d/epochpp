@@ -1,7 +1,7 @@
 COMPILER = gcc
 CFLAGS = -O3
 INCLUDE = -I include -I ../my_class/inc
-LDFLAGS = -lreadline -lncurses -lpng
+LDFLAGS = -L/lib64 -lreadline -lncurses -lpng
 TARGET = visiter
 
 OBJDIR = ./obj
