@@ -144,7 +144,42 @@ void Array_output(Array array, char *fileout, enum precision p){
 	}
 	fclose(fp);
 }
-
+Array Array_inputBMAT(char *filein){
+	Array array=NULL;
+	unsigned long size = getFileSizeBin(filein);
+	FILE *fp =fopen(filein,"rb");
+	int r=0,c=0,count=0,i,j;
+	float *f;
+	enum precision p;
+	if(!fp){fprintf(stderr,"Array_input : fopen error\n"); exit(1);}
+	fread(&p,sizeof(enum precision),1,fp);
+	if(p != p_double && p != p_float){fprintf(stderr,"Array_input : array type infomation is corrupted.\n"); exit(1);}
+	fread(&r,sizeof(int),1,fp);
+	fread(&c,sizeof(int),1,fp);
+	switch(p){
+	  case p_double:
+		if(size != sizeof(enum precision) + 2*sizeof(int) +r*c*sizeof(double)){
+			fprintf(stderr,"Array_input : array size should be %lu byte, but is %lu byte\n",sizeof(enum precision) + 2*sizeof(int) +r*c*sizeof(double),size);
+			return NULL;
+		}
+		array = Array_create(2,r,c);
+		fread(array->elem,sizeof(double),r*c,fp);
+		break;
+	  case p_float:
+		if(size != sizeof(enum precision) + 2*sizeof(int) +r*c*sizeof(float)){
+			fprintf(stderr,"Array_input : array size should be %lu byte, but is %lu byte\n",sizeof(enum precision) + 2*sizeof(int) +r*c*sizeof(float),size);
+			return NULL;
+		}
+		array = Array_create(2,r,c);
+		f = allocate(r*c*sizeof(float));
+		fread(f,sizeof(float),r*c,fp);
+		for(i=0;i<r*c;i++){array->elem[i] = f[i];}
+		deallocate(f);
+		break;
+	}
+	fclose(fp);
+	return array;
+}
 Array Array_input(char *filein){
 	Array array=NULL;
 	unsigned long size = getFileSizeBin(filein);
