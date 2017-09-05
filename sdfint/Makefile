@@ -3,7 +3,7 @@ CFLAGS = -O3 -g
 LIBS = ../my_class/lib/libArray_loadSDF.a 
 INCLUDE = -I ../my_class/inc 
 LDFLAGS = -lm
-TARGET1 = sdfintarea
+TARGET1 = sdfintb
 TARGET2 = sdfint
 
 OBJDIR = ./obj
@@ -14,7 +14,7 @@ COMDIR = ../my_class/
 COMOBJNAMES = LinkedList.o Array.o utilities.o
 COMOBJS = $(addprefix $(COMDIR)/obj/,$(COMOBJNAMES))
 
-SRC1 = $(SRCDIR)/sdfintarea.c
+SRC1 = $(SRCDIR)/sdfintb.c
 SRC2 = $(SRCDIR)/sdfint.c
 
 OBJS1 = $(addprefix $(OBJDIR)/,$(notdir $(SRC1:.c=.o)))

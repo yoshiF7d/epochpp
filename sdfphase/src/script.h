@@ -6,7 +6,7 @@
 \t\tname=${fname%%.txt}\n\
 \t\techo name : ${name}\n\
 \tgnuplot -e \\\n\
-\t\"set term png truecolor enhanced size 820, 510;\\\n\
+\t\"set term png truecolor enhanced size 720, 510;\\\n\
 \tset xl \'%s\' font \'Helvetica,26\' offset 0,-1;\\\n\
 \tset yl \'Count [a.u]\' font \'Helvetica,26\' offset -2,0;\\\n\
 \tset tics font \'Helvetica,14\';\\\n\
@@ -14,7 +14,7 @@
 \tset yr[1e-6:1e+0];\\\n\
 \tset format x \\\"%%g\\\";\\\n\
 \tset format y \\\"10^{%%L}\\\";\\\n\
-\tset lmargin at screen 0.17;\\\n\
+\tset lmargin at screen 0.15;\\\n\
 \tset rmargin at screen 0.95;\\\n\
 \tset bmargin at screen 0.18;\\\n\
 \tset tmargin at screen 0.95;\\\n\
@@ -35,9 +35,10 @@ done"
 \t\tset xr[%e:%e];\\\n\
 \t\tset yr[%e:%e];\\\n\
 \t\tset cbr[0:1e-04];\\\n\
+\t\tset size ratio 1;\\\n\
 \t\tset tics font \'Helvetica,14\';\\\n\
-\t\tset lmargin at screen 0.17;\\\n\
-\t\tset rmargin at screen 0.8;\\\n\
+\t\tset lmargin at screen 0.1;\\\n\
+\t\tset rmargin at screen 0.9;\\\n\
 \t\tset bmargin at screen 0.2;\\\n\
 \t\tset tmargin at screen 0.95;\\\n\
 \t\tset pm3d map;\\\n\
