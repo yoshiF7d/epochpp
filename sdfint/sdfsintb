@@ -1,0 +1,11 @@
+#!/bin/sh
+dirin=${1:-.}
+cellsize=${2:-1}
+out=${3:-intb.txt}
+
+for file in ${dirin}/*.sdf
+do
+	tmp=${file##*/}
+	tmp=${tmp%.*}
+	sdfinb ${file} >> ${out}
+done
