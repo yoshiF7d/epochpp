@@ -7,8 +7,8 @@ files="${dir}/*.sdf"
 
 for filepath in ${files}
 do
-	echo sdfen $filepath $emin $emax $s 
-	sdfen $filepath $emin $emax $s
+	echo sdfen ${filepath} ${emin} ${emax} ${s} 
+	sdfen ${filepath} ${emin} ${emax} ${s}
 done
 
 echo visiter -c "series(${dir}/en/een/bmat,sum(${dir}/en/ett.txt))"

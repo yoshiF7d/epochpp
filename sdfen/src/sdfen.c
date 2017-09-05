@@ -81,9 +81,7 @@ int main(int argc, char *argv[]){
 	
 	namelist = LinkedList_append(namelist,String_copy("number_density"));
 	namelist = LinkedList_append(namelist,String_copy("ekbar"));
-	
-	datalist = Data_loadSDFList(filesdf,namelist);
-	
+	datalist = Data_loadSDFList2(filesdf,namelist);
 	dataex = LinkedList_getIndex(datalist,0);
 	dataey = LinkedList_getIndex(datalist,1);
 	dataez = LinkedList_getIndex(datalist,2);
