@@ -70,7 +70,11 @@ int main(int argc, char *argv[]){
 	}
 
 	if(filemask){
-		mask = Array_input(filemask);
+		if(!strcmp(".bmat",getFileExtension(filemask))){
+			mask = Array_inputBMAT(filemask);	
+		}else{
+			mask = Array_input(filemask);
+		}
 	}
 	
 	aryout = Array_copy(aryex);

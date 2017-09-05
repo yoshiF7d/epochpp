@@ -21,6 +21,7 @@ double Array_get(Array array,...);
 void Array_set(Array array, double x, ...);
 void Array_output(Array array, char *fileout, enum precision p);
 Array Array_input(char *filein);
+Array Array_inputBMAT(char *filein);
 void Array_print(Array array);
 void Array_fprint(Array array, FILE *fp, char *sep);
 void Array_fprint_mod(Array array, FILE *fp, char *sep, int offset , int step, int depth);
