@@ -37,7 +37,7 @@ int main(int argc, char *argv[]){
 
 	FILE *gp;
 
-	if(argc > 3){
+	if(argc > 2){
 		filein = String_copy(argv[1]);	
 		cellsize = atof(argv[2]);
 	}else{
