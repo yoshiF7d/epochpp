@@ -64,7 +64,7 @@ int main(int argc, char *argv[]){
 	char command[512],command2[512]; 
 	char htag[8],vtag[8],*hname,*vname,*hlegend,*vlegend;
 	int mode=0, i,j,n,hbin,vbin,hi,vi,hii=0,vii=0;
-	double total_energy1, total_energy2,px,py,pz,ek,we,hmin,hmax,vmin,vmax;
+	double total_energy1, total_energy2,px,py,pz,ek,we,hmin,hmax,vmin,vmax,wmin,wmax,temp;
 	
 	Data datagrid=NULL,datapx=NULL,datapy=NULL,datapz=NULL,dataek=NULL,dataw=NULL,data=NULL,datah=NULL,datav=NULL,hist=NULL;
 	LinkedList datalist,namelist;
@@ -189,7 +189,6 @@ int main(int argc, char *argv[]){
 		case 2:
 		case 3:
 			datah = datagrid;
-			Data_muls(datagrid,1e+06,datagrid);
 			hii = hi - 1;
 			break;
 		case 4: datah = datapx; 
@@ -208,7 +207,6 @@ int main(int argc, char *argv[]){
 		case 2:
 		case 3:
 			datav = datagrid;
-			Data_muls(datagrid,1e+06,datagrid);
 			vii = vi - 1;
 			break;
 		case 4: datav = datapx; 
@@ -237,11 +235,18 @@ int main(int argc, char *argv[]){
 		if(hmax==-1){hmax = Data_max(data,0);}
 		fprintf(stderr,"hmin : %e, hmax : %e, vbin : %d\n",hmin,hmax,vbin);
 		hist = Data_histogram(data,hmin,hmax,vbin);
+		wmin = Data_get(hist,0,1);
+		wmax = Data_get(hist,0,1);
+		for(i=0;i<Data_getRow(hist);i++){
+			temp = Data_get(hist,i,1); 
+			if(wmin > temp){wmin = temp;}
+			if(wmax < temp){wmax = temp;}
+		}
 		Data_fprint(hist,fp,SEP);
 		fclose(fp);
 		snprintf(plotfile,256,"%s/plot.sh",command);
 		fp = fopen(plotfile,"w");
-		fprintf(fp,PLOTDIST,vlegend,hmin,hmax);
+		fprintf(fp,PLOTDIST,vlegend,hmin,hmax,wmin,wmax);
 		fclose(fp);
 		chmod(plotfile,0777);
 		
@@ -259,6 +264,13 @@ int main(int argc, char *argv[]){
 		fprintf(stderr,"hmin : %e, hmax : %e, hbin : %d\n",hmin,hmax,hbin);
 		fprintf(stderr,"vmin : %e, vmax : %e, vbin : %d\n",vmin,vmax,vbin);
 		hist = Data_histogram2D(data,hmin,vmin,hmax,vmax,hbin,vbin);
+		wmin = Data_get(hist,0,2);
+		wmax = Data_get(hist,0,2);
+		for(i=0;i<Data_getRow(hist);i++){
+			temp = Data_get(hist,i,2); 
+			if(wmin > temp){wmin = temp;}
+			if(wmax < temp){wmax = temp;}
+		}
 		fprinthist2D(hist,fp,hbin,vbin);
 		fclose(fp);
 		fp = fopen(filehist2,"w");
@@ -266,7 +278,7 @@ int main(int argc, char *argv[]){
 		fclose(fp);
 		snprintf(plotfile,256,"%s/plot.sh",command);
 		fp = fopen(plotfile,"w");
-		fprintf(fp,PLOTPHASE,hlegend,vlegend,hmin,hmax,vmin,vmax);
+		fprintf(fp,PLOTPHASE,hlegend,vlegend,hmin,hmax,vmin,vmax,wmin,wmax);
 		fclose(fp);
 		chmod(plotfile,0777);
 	}

@@ -7,5 +7,5 @@ for file in ${dirin}/*.sdf
 do
 	tmp=${file##*/}
 	tmp=${tmp%.*}
-	sdfinb ${file} >> ${out}
+	sdfintb ${file} >> ${out}
 done

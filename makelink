@@ -5,8 +5,8 @@ if [ $# -ne 1 ]; then
 	exit 1
 fi
 list=("sdf1d/sdf1d" "sdf1d/sdfs1d" "sdf2txt/sdf2txt" "sdf2txt/sdf2bmat" "sdf2txt/sdfs2txts" "sdf2txt/sdfs2bmats" "sdf2txt/sdfid" \
-"sdfen/sdfen" "sdfen/sdfsen" "sdfplot/sdfplot" "bmatplot/bmatplot" "bmatplot/bmatsplot" "sdfint/sdfint" "sdfint/sdfsint" \ 
-"sdfphase/sdfphase" \
+"sdfen/sdfen" "sdfen/sdfsen" "sdfplot/sdfplot" "bmatplot/bmatplot" "bmatplot/bmatsplot" "sdfint/sdfint" "sdfint/sdfsint" "sdfint/sdfintb" \ 
+"sdfint/sdfsintb" "sdfphase/sdfphase" \
 "sdfphase/sdfsphase" "sdfprobe/sdfprobe" "sdfprobe/sdfsprobe" "sdfwave/sdfwave2d" "visiter/visiter" "makemask/maskelipse")
 
 cd ${tdir} &&
