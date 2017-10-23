@@ -4,6 +4,7 @@ LIBS =
 INCLUDE = -I ../my_class/inc 
 LDFLAGS = -lm
 TARGET = maskelipse
+TARGET2 = maskcircles
 
 OBJDIR = ./obj
 SRCDIR = ./src
@@ -15,9 +16,16 @@ COMOBJS = $(addprefix $(COMDIR)/obj/,$(COMOBJNAMES))
 
 SRC1 = $(SRCDIR)/maskelipse.c
 OBJS1 = $(addprefix $(OBJDIR)/,$(notdir $(SRC1:.c=.o)))
+SRC2 = $(SRCDIR)/maskcircles.c
+OBJS2 = $(addprefix $(OBJDIR)/,$(notdir $(SRC2:.c=.o)))
 
 $(TARGET): $(OBJS1) $(COMOBJS) $(LIBS)
 	echo $(OBJS1)
+	echo $(COMOBJS)
+	$(COMPILER) -o $@ $^ $(LDFLAGS)
+
+$(TARGET2): $(OBJS2) $(COMOBJS) $(LIBS)
+	echo $(OBJS2)
 	echo $(COMOBJS)
 	$(COMPILER) -o $@ $^ $(LDFLAGS)
 
