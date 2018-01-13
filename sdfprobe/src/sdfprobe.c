@@ -346,7 +346,7 @@ int main(int argc, char *argv[]){
 	namelist = LinkedList_append(namelist,String_join(pname,"/Pz"));
 	namelist = LinkedList_append(namelist,String_join(pname,"/weight"));
 	
-	datalist = Data_loadSDFList(filesdf,namelist);
+	datalist = Data_loadSDFList2(filesdf,namelist);
 		
 	/*
 	LinkedList_deleteRoot(namelist,deallocate);

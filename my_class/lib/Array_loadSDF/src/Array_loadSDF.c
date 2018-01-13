@@ -167,7 +167,7 @@ LinkedList Array_loadSDFList2(char *file, LinkedList namelist){
 	LinkedList list,arraylist=NULL;
 	char *buf;
 	
-	printf("file name : %s\n",file);
+	//printf("file name : %s\n",file);
 	
 	err = stat(file,&statbuf);
 	if(err){

@@ -16,17 +16,14 @@ int main(int argc, char *argv[]){
 		exit(1);
 	}
 
-#ifdef LEAKDETECT
-	LeakDetector_set(stdout);
-#endif
 	
 	filein = argv[1];
 	fileout = argv[2];
 	idlist = LinkedList_create(String_copy("grid"));
 	
 	for(i=3;i<argc;i++){idlist = LinkedList_append(idlist,String_copy(argv[i]));}
-	datalist = Data_loadSDFList(filein,idlist);
 	
+	datalist = Data_loadSDFList2(filein,idlist);
 	fp = fopen(fileout,"w");
 	for(s=idlist;s;s=LinkedList_increment(s)){
 		buf = LinkedList_get(s);
@@ -56,7 +53,4 @@ int main(int argc, char *argv[]){
 	
 	LinkedList_deleteRoot(idlist,deallocate);
 	LinkedList_deleteRoot(datalist,Data_vdelete);
-#ifdef LEAKDETECT
-	LeakDetector_finish();
-#endif
 }
