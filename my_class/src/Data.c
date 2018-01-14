@@ -1119,57 +1119,61 @@ Data Data_ctake(Data data, int cs, int ce){
 }
 
 Data Data_histogram(Data data, double min, double max, int binc){
-	int i,j;
-	double *weight = allocate(binc*sizeof(double));
-	double dx = (max-min)/binc;
-	double coeff = 1.0/dx;
-	
-	Data data2 = Data2D_create(binc);
-	
-	for(i=0;i<binc;i++){
-		data2->elem[i][0] = min + (i+1)*dx;
-		weight[i] = 0;
-	}
-	
-	for(i=0;i<data->row;i++){
-		if((j=floor((data->elem[i][0]-min)/dx))<binc && j >= 0){
-			weight[j] += data->elem[i][1];
-		}
-	}
-	for(i=0;i<binc;i++){data2->elem[i][1] = weight[i]*coeff;}
-	deallocate(weight);
-	return data2;
+    int i,j;
+    //double *weight = allocate(binc*sizeof(double));
+    double dx = (max-min)/binc;
+    double coeff = 1.0/dx;
+    
+    Data data2 = Data2D_create(binc);
+    
+    for(i=0;i<binc;i++){
+        data2->elem[i][0] = min + (i+1)*dx;
+        data2->elem[i][1] = 0;
+        //weight[i] = 0;
+    }
+    
+    for(i=0;i<data->row;i++){
+        j = floor((data->elem[i][0]-min)/dx);
+        if(j < binc && j >= 0){
+            //weight[j] += data->elem[i][1];
+            data2->elem[j][1] += data->elem[i][1];
+        }
+    }
+    for(i=0;i<binc;i++){data2->elem[i][1] *= coeff;}
+    return data2;
 }
 
-
 Data Data_histogram2D(Data data, double min1, double min2, double max1, double max2, int binc1, int binc2){
-	int i,j,k, binc = binc1*binc2;
-	double *weight = allocate(binc*sizeof(double));
-	double dx = (max1-min1)/binc1;
-	double dy = (max2-min2)/binc2;
-	double coeff = 1.0/(dx*dy);
-	
-	Data data2 = Data_create(binc,3);
-	for(i=0;i<binc;i++){
-		data2->elem[i][0] = min1 + (i/binc2+1)*dx;
-		data2->elem[i][1] = min2 + (i%binc2+1)*dy;
-		weight[i] = 0;
-	}
-	
-	for(i=0;i<data->row;i++){
-		if((j=floor((data->elem[i][0]-min1)/dx))<binc1 && j >= 0){
-			if((k=floor((data->elem[i][1]-min2)/dy))<binc2 && k >= 0){
-				weight[binc2*j+k] += data->elem[i][2];
-				/*printf("weight[%d] : %f\n",j+binc2*k,weight[j+binc2*k]);*/
-			}
-		}
-	}
-	
-	/*printf("binc %d\n",binc);*/
-	
-	for(i=0;i<binc;i++){data2->elem[i][2] = weight[i]*coeff; /*printf("%f\n",data2->elem[i][2]);*/}
-	deallocate(weight);
-	return data2;
+    int i,j,k, binc = binc1*binc2;
+    double *weight = allocate(binc*sizeof(double));
+    double dx = (max1-min1)/binc1;
+    double dy = (max2-min2)/binc2;
+    double coeff = 1.0/(dx*dy);
+    
+    Data data2 = Data_create(binc,3);
+    for(i=0;i<binc;i++){
+        data2->elem[i][0] = min1 + (i/binc2+1)*dx;
+        data2->elem[i][1] = min2 + (i%binc2+1)*dy;
+        data2->elem[i][2] = 0;
+        /*weight[i] = 0;*/
+    }
+    
+    for(i=0;i<data->row;i++){
+        j=floor((data->elem[i][0]-min1)/dx);
+        if(j < binc1 && j >= 0){
+            k = floor((data->elem[i][1]-min2)/dy);
+            if(k < binc2 && k >= 0){
+                data2->elem[binc2*j+k][2] += data->elem[i][2];
+                /*weight[binc2*j+k] += data->elem[i][2];*/
+                /*printf("weight[%d] : %f\n",j+binc2*k,weight[j+binc2*k]);*/
+            }
+        }
+    }
+    
+    /*printf("binc %d\n",binc);*/
+    
+    for(i=0;i<binc;i++){data2->elem[i][2] *= coeff; /*printf("%f\n",data2->elem[i][2]);*/}
+    return data2;
 }
 
 /*Data2D*/

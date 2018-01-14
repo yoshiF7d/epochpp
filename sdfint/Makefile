@@ -39,7 +39,7 @@ $(TARGET2): $(OBJS2) $(COMOBJS) $(LIBS)
 $(TARGET3): $(OBJS3) $(COMOBJS) $(LIBS)
 	echo $(OBJS3)
 	echo $(COMOBJS)
-	$(COMPILER) -o $@ $^ $(LDFLAGS)
+	$(COMPILER) -o $@ $^ $(LDFLAGS) 
 
 
 $(COMOBJS) :

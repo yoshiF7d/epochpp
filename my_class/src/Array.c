@@ -14,7 +14,7 @@ Array Array_create(int depth , ...){
 	}
 	va_end(ap);
 	array->len = len;
-	array->elem = callocate(len,sizeof(double));
+	array->elem = allocate(len*sizeof(double));
 	return array;
 }
 
@@ -28,9 +28,17 @@ Array Array_create2(int depth, int *dim){
 		len *= array->dim[i];
 	}
 	array->len = len;
-	array->elem = callocate(len,sizeof(double));
+	array->elem = allocate(len*sizeof(double));
 	return array;
 }
+
+Array Array_import(int depth , int *dim){
+    Array array = allocate(sizeof(Array_Sub));
+    
+    return array;
+}
+
+
 
 void Array_delete(Array array){
 	if(array){

@@ -213,7 +213,6 @@ void rotate(Data data,double th, double ph){
 	}
 }
 */
-void Data_vdelete(void *data){Data_delete(data);}
 
 int main(int argc, char *argv[]){
 	char filesdf[256];	
@@ -441,7 +440,7 @@ int main(int argc, char *argv[]){
 	//e1 = clock();
 	//printf("eangd making base data : %lu\n",e1-s1);
 	//s2 = clock();
-	aeangd = Data_histogram2D2(angd,0,-180,90,180,addbinc,addbinc);
+	aeangd = Data_histogram2D(angd,0,-180,90,180,addbinc,addbinc);
 	//e2 = clock();
 	//printf("eangd making histogram : %lu\n",e2-s2);
 	//s3 = clock();
@@ -461,7 +460,7 @@ int main(int argc, char *argv[]){
 		Data_set(angd,i,2,Data_get(data,i,1)/sin(th)); /*weight / sin(th)*/
 	}
 
-	iangd = Data_histogram2D2(angd,0,-180,90,180,addbinc,addbinc);
+	iangd = Data_histogram2D(angd,0,-180,90,180,addbinc,addbinc);
 	fp = fopen(fileiangd,"w");
 	if(!fp){perror(fileiangd); exit(1);}
 	fprintPolar2D(iangd,fp,addbinc,addbinc);
@@ -473,7 +472,7 @@ int main(int argc, char *argv[]){
 		Data_translate(data,i,0,angd,i,0);
 		Data_translate(data,i,1,angd,i,2);
 	}
-	eangd = Data_histogram2D2(angd,minp,-180,maxp,180,adebinc,addbinc); 
+	eangd = Data_histogram2D(angd,minp,-180,maxp,180,adebinc,addbinc); 
 	fp = fopen(fileeangd,"w");
 	if(!fp){perror(fileeangd); exit(1);}
 	fprintPolar2D(eangd,fp,adebinc,addbinc);
@@ -501,7 +500,7 @@ int main(int argc, char *argv[]){
 			Data_translate(data,i,0,angd,i,1); /*energy*/
 			Data_set(angd,i,2,Data_get(data,i,1)); /*weight*/
 		}
-		eiangd = Data_histogram2D2(angd,-90,minp,90,maxp,addbinc,adebinc);  
+		eiangd = Data_histogram2D(angd,-90,minp,90,maxp,addbinc,adebinc);  
 		
 		snprintf(command,1024,"%s/eiangd/%ddeg",pname,180*k/piecutn);
 		mkdir(command,0777);
@@ -525,7 +524,7 @@ int main(int argc, char *argv[]){
 	//printf("eiang making time : %lu\n",end-start);
 	/*make espc*/	
 	//start = clock();
-	hist = Data_histogram2(data,min,max,esbinc);
+	hist = Data_histogram(data,min,max,esbinc);
 	fp = fopen(fileespc,"w");
 	if(!fp){perror(fileespc); exit(1);}
 	Data_fprint(hist,fp,SEP);

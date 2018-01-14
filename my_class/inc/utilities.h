@@ -14,7 +14,7 @@
 #include <time.h>
 #include <limits.h>
 
-//#define LEAKDETECT 0
+//#define LEAKDETECT 1
 /*LEAKDETECT 0 :  NORMAL*/
 /*LEAKDETECT 1 :  VERBOSE*/
 

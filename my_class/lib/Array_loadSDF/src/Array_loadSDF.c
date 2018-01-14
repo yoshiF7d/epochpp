@@ -16,9 +16,6 @@ Array Array_loadSDF(char *file, char *variable){
 	sdf_block_t *b;
 	Array array=NULL;
 	
-	printf("file name : %s\n",file);
-	printf("variable name : %s\n",variable);
-	
 	err = stat(file,&statbuf);
 	if(err){
 		fprintf(stderr,"Error opening file %s\n", file);
@@ -75,6 +72,7 @@ Array Array_loadSDF(char *file, char *variable){
 			break;
 		}
 	}
+    sdf_free_blocklist_data(h);
 	sdf_close(h);
 	return array;
 }
@@ -129,12 +127,12 @@ LinkedList Array_loadSDFList(char *file, int n, ...){
 
 	free(h->buffer);
 	h->buffer = NULL;
-	b = h->current_block = h->blocklist;
-	for(i=0;i<h->nblocks;i++,h->current_block = b->next){
-		b = h->current_block;
-		for(j=0;j<n;j++){
-			array = NULL;
-			len = strlen(buflist[j])+1;
+	for(j=0;j<n;j++){
+		array = NULL;
+		len = strlen(buflist[j])+1;
+		b = h->current_block = h->blocklist;
+		for(i=0;i<h->nblocks;i++,h->current_block = b->next){
+			b = h->current_block;
 			if(!memcmp(b->id,buflist[j],len)){
 				switch(b->blocktype){
 				  case SDF_BLOCKTYPE_PLAIN_VARIABLE:
@@ -149,10 +147,12 @@ LinkedList Array_loadSDFList(char *file, int n, ...){
 				  default:
 					break;
 				}
-				arraylist=LinkedList_append(arraylist,array);
 			}
 		}
+		if(!array){printf("Array_loadSDFList : variable %s is not found in %s\n",buflist[j],file);}
+		arraylist=LinkedList_append(arraylist,array);
 	}
+    sdf_free_blocklist_data(h);
 	sdf_close(h);
 	deallocate(buflist);
 	return arraylist;
@@ -198,12 +198,13 @@ LinkedList Array_loadSDFList2(char *file, LinkedList namelist){
 	}
 	free(h->buffer);
 	h->buffer = NULL;
-	b = h->current_block = h->blocklist;
-	for(i=0;i<h->nblocks;i++,h->current_block = b->next){
-		b = h->current_block;
-		for(list=namelist;list;list=LinkedList_increment(list)){
-			buf = LinkedList_get(list);
-			len = strlen(buf)+1;
+	for(list=namelist;list;list=LinkedList_increment(list)){
+		array = NULL;
+		buf = LinkedList_get(list);
+		len = strlen(buf)+1;
+		b = h->current_block = h->blocklist;
+		for(i=0;i<h->nblocks;i++,h->current_block = b->next){
+			b = h->current_block;
 			if(!memcmp(b->id,buf,len)){
 				switch(b->blocktype){
 				  case SDF_BLOCKTYPE_PLAIN_VARIABLE:
@@ -218,10 +219,12 @@ LinkedList Array_loadSDFList2(char *file, LinkedList namelist){
 				  default:
 					break;
 				}
-				arraylist=LinkedList_append(arraylist,array);
 			}
-		}
+		}	
+		if(!array){printf("Array_loadSDFList : variable %s is not found in %s\n",buf,file);}
+		arraylist=LinkedList_append(arraylist,array);
 	}
+    sdf_free_blocklist_data(h);
 	sdf_close(h);
 	return arraylist;
 }

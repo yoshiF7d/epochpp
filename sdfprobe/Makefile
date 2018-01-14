@@ -9,27 +9,27 @@ OBJDIR = ./obj
 SRCDIR = ./src
 VPATH =
 
-SOURCENAMES = sdfprobe.c Data.c LinkedList.c utilities.c
+COMDIR = ../my_class/
+COMOBJNAMES = Data.o LinkedList.o utilities.o
+COMOBJS = $(addprefix $(COMDIR)/obj/,$(COMOBJNAMES))
 
-SOURCES = $(addprefix $(SRCDIR)/, $(SOURCENAMES))
-OBJECTS = $(addprefix $(OBJDIR)/, $(SOURCENAMES:.c=.o))
+SRCS = $(wildcard $(SRCDIR)/*.c)
+OBJS = $(addprefix $(OBJDIR)/,$(notdir $(SRCS:.c=.o)))
 
-$(TARGET): $(OBJECTS) $(LIBS)
-	$(COMPILER) -o $@ $^ $(LDFLAGS)
-	
+$(TARGET): $(OBJS) $(COMOBJS) $(LIBS)
+	$(COMPILER) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	$(COMPILER) $(CFLAGS) $(INCLUDE) -o $@ -c $<
-
+$(COMOBJS) :
+	cd $(COMDIR) && make
 $(LIBS) :
-	cd lib && make
+	cd $(COMDIR)/lib && make
 
-$(OBJDIR)/sdfprobe.o : $(SRCDIR)/Data.h $(SRCDIR)/utilities.h
-$(OBJDIR)/Data.o : $(SRCDIR)/Data.h $(SRCDIR)/utilities.h
-$(OBJDIR)/LinkedList.o : $(SRCDIR)/LinkedList.h $(SRCDIR)/utilities.h
-$(OBJDIR)/utilities.o : $(SRCDIR)/utilities.h
-
-.POHNY : clean cleanlib
+.POHNY : clean cleanall cleanlib
 clean :
-	rm -f $(OBJECTS) $(TARGET)
-cleanlib :
-	cd lib && make clean
+	rm -f $(OBJS) $(TARGET)
+cleanall:
+	cd $(COMDIR) && make clean
+cleanlib:
+	cd $(COMDIR)/lib/Data_loadSDF && make clean
