@@ -15,7 +15,7 @@
     b = h->current_block; \
     if (b->done_info) return 0; \
     h->current_location = b->block_start + h->block_header_length; \
-　    b->done_info = 1; } while(0)
+    b->done_info = 1; } while(0)
 
 
 int sdf_read_plain_mesh_info(sdf_file_t *h)
