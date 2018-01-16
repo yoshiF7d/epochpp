@@ -70,7 +70,7 @@ Data Data_loadSDF(char *file, char *variable){
 			break;
 		}
 	}
-    sdf_free_blocklist_data(h);
+        sdf_free_blocklist_data(h);
 	sdf_close(h);
 	return data;
 }
@@ -149,10 +149,10 @@ LinkedList Data_loadSDFList(char *file, int n, ...){
 				break;
 			}
 		}
-		if(!data){printf("Data_loadSDFList : variable %s is not loaded\n",buflist[j]);}
+		//if(!data){printf("Data_loadSDFList : variable %s is not loaded\n",buflist[j]);}
 		datalist=LinkedList_append(datalist,data);
 	}
-    sdf_free_blocklist_data(h);
+    	sdf_free_blocklist_data(h);
 	sdf_close(h);
 	deallocate(buflist);
 	return datalist;
@@ -225,10 +225,10 @@ LinkedList Data_loadSDFList2(char *file, LinkedList namelist){
 				break;
 			}
 		}
-	 	if(!data){printf("Data_loadSDFList2 : variable %s is not loaded\n",buf);}
+	 	//if(!data){printf("Data_loadSDFList2 : variable %s is not loaded\n",buf);}
 		datalist=LinkedList_append(datalist,data);
 	}
-    sdf_free_blocklist_data(h);
+        sdf_free_blocklist_data(h);
 	sdf_close(h);
 	return datalist;
 }

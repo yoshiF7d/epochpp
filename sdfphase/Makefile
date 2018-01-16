@@ -1,5 +1,5 @@
 COMPILER = gcc
-CFLAGS = -O3 -g -fopenmp
+CFLAGS = -O3 -g 
 LIBS = ../my_class/lib/libData_loadSDF.a
 INCLUDE = -I ../my_class/inc
 LDFLAGS = -lm

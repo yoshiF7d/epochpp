@@ -63,26 +63,39 @@ int main(int argc, char *argv[]){
 	char filehist[256],filehist2[256],plotfile[256];
 	char command[512],command2[512]; 
 	char htag[8],vtag[8],*hname,*vname,*hlegend,*vlegend;
-	int mode=0, i,j,n,hbin,vbin,hi,vi,hii=0,vii=0;
-	double total_energy1, total_energy2,px,py,pz,ek,we,hmin,hmax,vmin,vmax,wmin,wmax,temp;
+	int opt,mode=0, i,j,n,hbin,vbin,hi,vi,hii=0,vii=0;
+	double total_energy1,c,mass,total_energy2,px,py,pz,ek,we,hmin,hmax,vmin,vmax,wmin,wmax,temp;
 	
 	Data datagrid=NULL,datapx=NULL,datapy=NULL,datapz=NULL,dataek=NULL,dataw=NULL,data=NULL,datah=NULL,datav=NULL,hist=NULL;
 	LinkedList datalist,namelist;
 	FILE *fp;	
-
-	if(argc >= 10){
-		strncpy(filesdf,argv[1],256);
-		strncpy(specname,argv[2],256);		
-		hmin = atof(argv[3]);
-		hmax = atof(argv[4]);
-		hbin = atoi(argv[5]);
-		vmin = atof(argv[6]);
-		vmax = atof(argv[7]);
-		vbin = atoi(argv[8]);
-		mode = atoi(argv[9]);
+	
+	mass = 9.10938356e-31;
+	c = 2997924558;
+	while((opt=getopt(argc,argv,"m:"))!=-1){
+		switch(opt){
+			case 'm':
+				mass = atof(optarg); break;	
+			default:
+				goto usage;
+		}
+	}
+	//printf("argc : %d\n",argc);
+	if(argc > optind+8){
+		strncpy(filesdf,argv[optind],256);
+		strncpy(specname,argv[optind+1],256);		
+		hmin = atof(argv[optind+2]);
+		hmax = atof(argv[optind+3]);
+		hbin = atoi(argv[optind+4]);
+		vmin = atof(argv[optind+5]);
+		vmax = atof(argv[optind+6]);
+		vbin = atoi(argv[optind+7]);
+		mode = atoi(argv[optind+8]);
 	}else{
+		usage:
 		fprintf(stderr,"usage : %s sdffile specname hmin hmax hbin vmin vmax vbin mode\n\n",argv[0]);
 		fprintf(stderr,"hbin,vbin is a horizontal & vertical bin count.\n");
+		fprintf(stderr,"option : -m : set particle mass. default mass is 9.11e-31\n");
 		fprintf(stderr,"mode specifies axis of phasespace.\n");
 		fprintf(stderr,"mode is a integer value interpreted as below\n");
 		fprintf(stderr,"1D distribution fucntion\n");
@@ -135,7 +148,28 @@ int main(int argc, char *argv[]){
 	datapz = LinkedList_getIndex(datalist,3);
 	dataek = LinkedList_getIndex(datalist,4);
 	dataw = LinkedList_getIndex(datalist,5);
-
+	if(!dataek){
+		//printf("calculated ek is used\n");
+		dataek = Data_create(dataw->row,dataw->column);	
+		for(i=0;i<dataw->row;i++){
+			for(j=0;j<dataw->column;j++){
+				px = datapx->elem[i][j];
+				py = datapy->elem[i][j];
+				pz = datapz->elem[i][j];
+				ek = sqrt(mass*mass+(px*px + py*py + pz*pz)/(c*c))*c*c;
+				dataek->elem[i][j] = ek;
+			}
+		}
+	}
+	for(i=0;i<dataw->row;i++){
+		for(j=0;j<dataw->column;j++){
+			px = datapx->elem[i][j];
+			py = datapy->elem[i][j];	
+			pz = datapz->elem[i][j];
+			ek = sqrt(mass*mass+(px*px + py*py + pz*pz)/(c*c))*c*c;
+			//if(i%10==0 && j%10==0){printf("ek1 : %e ek2 : %e\n",dataek->elem[i][j],ek);}	
+		}
+	}
 	/*
 	snprintf(command,512,"phase/%s/weight",specname2); mkdir(command,0777); 
 	snprintf(filew,256,"%s/%s.bmat",command,filename);
@@ -171,6 +205,7 @@ int main(int argc, char *argv[]){
 	exit(1);	
 	*/
 	n = Data_getRow(dataw);
+	//printf("particle count : %d\n",n);
 	hi = mode/10; vi = mode%10;
 	//fprintf(stderr,"hi : %d, vi : %d\n",hi,vi);
 	getname(&hname,hi); getname(&vname,vi);
@@ -233,7 +268,7 @@ int main(int argc, char *argv[]){
 		}
 		if(hmin==-1){hmin = Data_min(data,0);}
 		if(hmax==-1){hmax = Data_max(data,0);}
-		fprintf(stderr,"hmin : %e, hmax : %e, vbin : %d\n",hmin,hmax,vbin);
+		fprintf(stderr,"particle count : %d\n",n);
 		hist = Data_histogram(data,hmin,hmax,vbin);
 		wmin = Data_get(hist,0,1);
 		wmax = Data_get(hist,0,1);
@@ -242,6 +277,7 @@ int main(int argc, char *argv[]){
 			if(wmin > temp){wmin = temp;}
 			if(wmax < temp){wmax = temp;}
 		}
+		wmin = 1;
 		Data_fprint(hist,fp,SEP);
 		fclose(fp);
 		snprintf(plotfile,256,"%s/plot.sh",command);

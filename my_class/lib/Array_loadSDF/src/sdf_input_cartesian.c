@@ -551,10 +551,9 @@ int sdf_read_lagran_mesh(sdf_file_t *h)
 Array Array_sdf_read_plain_variable(sdf_file_t *h){
 	Array array = NULL;
 	//fprintf(stderr,"sdf_read_plain_variable\n");
-    sdf_block_t *b = h->current_block;
+    	sdf_block_t *b = h->current_block;
 	int i,j,n,row,col,len;
-    //clock_t start,end;
-	
+    //clock_t start,end;	
 	union un_array{
 		double *d;
 		float *f;
@@ -565,22 +564,16 @@ Array Array_sdf_read_plain_variable(sdf_file_t *h){
     h->current_location = b->data_location;
     //sdf_plain_mesh_distribution(h);
     //sdf_free_distribution(h);
-	array = Array_create2(b->ndims,b->local_dims);
     
     switch(b->datatype_out){
 	  case SDF_DATATYPE_REAL8:
-        a.d = b->data;
-        array->depth = b->ndims;
-        array->dim = allocate(sizeof(int));
-        memcpy(array->dim,b->local_dims,array->depth*sizeof(int));
-        for(i=0,len=1;i<array->depth;i++){
-            len *= array->dim[i];
-        }
-        sdf_helper_read_array(h, &array->elem, b->nelements_local);
+        	array = Array_create2(b->ndims,b->local_dims);
+            fseeko(h->filehandle, h->current_location, SEEK_SET);
+    		fread(array->elem,SDF_TYPE_SIZES[b->datatype],b->nelements_local,h->filehandle);
 		break;
 	  case SDF_DATATYPE_REAL4:
-        array = Array_create2(b->ndims,b->local_dims);
-        sdf_helper_read_array(h, &b->data, b->nelements_local);
+        	array = Array_create2(b->ndims,b->local_dims);
+        	sdf_helper_read_array(h, &b->data, b->nelements_local);
 		a.f = b->data;
 		for(i=0;i<b->nelements_local;i++){
 			array->elem[i] = (double)a.f[i];

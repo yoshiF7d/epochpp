@@ -562,25 +562,18 @@ Data Data_sdf_read_plain_variable(sdf_file_t *h)
     
     if (b->done_data) return NULL;
     if (!b->done_info) sdf_read_plain_variable_info(h);
-
-    h->current_location = b->data_location;
-
-    sdf_plain_mesh_distribution(h);
-
-    sdf_helper_read_array(h, &b->data, b->nelements_local);
-
-    	sdf_free_distribution(h);
+	h->current_location = b->data_location;
 	n = b->nelements_local;
 	col = b->local_dims[0];
 	row = n/col;
 	data = Data_create(row,col);
-	
 	switch(b->datatype_out){
 	  case SDF_DATATYPE_REAL8:
-		a.d = b->data;
-		for(i=0;i<n;i++){Data_set(data,i/col,i%col,a.d[i]);}
+		fseeko(h->filehandle, h->current_location, SEEK_SET);
+	        fread(data->elem[0],SDF_TYPE_SIZES[b->datatype],b->nelements_local,h->filehandle);
 		break;
 	  case SDF_DATATYPE_REAL4:
+    		sdf_helper_read_array(h, &b->data, b->nelements_local);
 		a.f = b->data;
 		for(i=0;i<n;i++){Data_set(data,i/col,i%col,(double)(a.f[i]));}
 		break;

@@ -149,7 +149,7 @@ LinkedList Array_loadSDFList(char *file, int n, ...){
 				}
 			}
 		}
-		if(!array){printf("Array_loadSDFList : variable %s is not found in %s\n",buflist[j],file);}
+		//if(!array){printf("Array_loadSDFList : variable %s is not found in %s\n",buflist[j],file);}
 		arraylist=LinkedList_append(arraylist,array);
 	}
     sdf_free_blocklist_data(h);
@@ -221,7 +221,7 @@ LinkedList Array_loadSDFList2(char *file, LinkedList namelist){
 				}
 			}
 		}	
-		if(!array){printf("Array_loadSDFList : variable %s is not found in %s\n",buf,file);}
+		//if(!array){printf("Array_loadSDFList : variable %s is not found in %s\n",buf,file);}
 		arraylist=LinkedList_append(arraylist,array);
 	}
     sdf_free_blocklist_data(h);

@@ -252,31 +252,22 @@ Data Data_sdf_read_point_variable(sdf_file_t *h)
 	
     if (b->done_data) return NULL;
 	if (!b->done_info) sdf_read_blocklist(h);
-	
-	sdf_point_factor(h, &b->nelements_local);
-	
+    b->nelements_local = b->dims[0];
     h->current_location = b->data_location;
-
-#ifdef PARALLEL
-    sdf_create_1d_distribution(h, b->dims[0], b->nelements_local,
-            b->starts[0]);
-#endif
-    sdf_helper_read_array(h, &b->data, b->nelements_local);
-    sdf_free_distribution(h);
-    sdf_convert_array_to_float(h, &b->data, b->nelements_local);
-    if (h->use_random) sdf_randomize_array(h, &b->data, b->nelements_local);
+    //sdf_convert_array_to_float(h, &b->data, b->nelements_local);
     h->current_location = h->current_location
 		+ SDF_TYPE_SIZES[b->datatype] * b->dims[0];
 	
 	n = b->nelements_local;
 	data = Data_create(b->nelements_local,1);
-	
+//	printf("nelements_local : %d\n",b->nelements_local);	
 	switch(b->datatype_out){
 	  case SDF_DATATYPE_REAL8:
-		a.d = b->data;
-		for(i=0;i<n;i++){Data_set(data,i,0,a.d[i]);}
+		fseeko(h->filehandle, h->current_location, SEEK_SET);
+    		fread(data->elem[0], SDF_TYPE_SIZES[b->datatype],b->nelements_local,h->filehandle);
 		break;
 	  case SDF_DATATYPE_REAL4:
+    		sdf_helper_read_array(h, &b->data, b->nelements_local);
 		a.f = b->data;
 		for(i=0;i<n;i++){Data_set(data,i,0,(double)(a.f[i]));}
 		break;

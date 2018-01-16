@@ -361,15 +361,15 @@ int main(int argc, char *argv[]){
         energy->ken = ken;
         energy->klen = speclen;
         energy->kenlist = kenlist;
-        Energy_fprint(energy,fp);
         LinkedList_deleteRoot(arylist,Array_vdelete);
         end2 = clock();
         time = (double)(end2-start2)/CLOCKS_PER_SEC;
         printf("total : %.2f sec\n",time);
+	printf("\033[F\033[J");
         printf("\033[F\033[J");
         printf("\033[F\033[J");
-        printf("\033[F\033[J");
-        //printf("\033[F\033[J");
+        Energy_fprint(energy,fp);
+	//printf("\033[F\033[J");
         //printf("\033[F\033[J");
     }
     LinkedList_deleteRoot(namelist,NULL);

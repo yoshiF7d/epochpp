@@ -11,7 +11,7 @@
 \tset yl \'Count [a.u]\' font \'Helvetica,26\' offset -2,0;\\\n\
 \tset tics font \'Helvetica,14\';\\\n\
 \tset xr[%e:%e];\\\n\
-\tset yr[1e-6:1e+0];\\\n\
+\tset yr[%e:%e];\\\n\
 \tset format x \\\"%%g\\\";\\\n\
 \tset format y \\\"10^{%%L}\\\";\\\n\
 \tset lmargin at screen 0.15;\\\n\
@@ -34,7 +34,7 @@ done"
 \t\tset yl \'%s\' font \'Helvetica,26\' offset -2,0;\\\n\
 \t\tset xr[%e:%e];\\\n\
 \t\tset yr[%e:%e];\\\n\
-\t\tset cbr[0:1e-04];\\\n\
+\t\tset cbr[%e:%e];\\\n\
 \t\tset size ratio 1;\\\n\
 \t\tset tics font \'Helvetica,14\';\\\n\
 \t\tset lmargin at screen 0.1;\\\n\
