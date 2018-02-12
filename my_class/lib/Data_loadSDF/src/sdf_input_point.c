@@ -154,8 +154,7 @@ static int sdf_helper_read_array(sdf_file_t *h, void **var_in, int count)
             MPI_INFO_NULL);
 #else
     fseeko(h->filehandle, h->current_location, SEEK_SET);
-    if (!fread(*var, SDF_TYPE_SIZES[b->datatype], count, h->filehandle))
-        return 1;
+    if (!fread(*var, SDF_TYPE_SIZES[b->datatype], count, h->filehandle)) return 1;
 #endif
 
     return 0;
@@ -255,9 +254,6 @@ Data Data_sdf_read_point_variable(sdf_file_t *h)
     b->nelements_local = b->dims[0];
     h->current_location = b->data_location;
     //sdf_convert_array_to_float(h, &b->data, b->nelements_local);
-    h->current_location = h->current_location
-		+ SDF_TYPE_SIZES[b->datatype] * b->dims[0];
-	
 	n = b->nelements_local;
 	data = Data_create(b->nelements_local,1);
 //	printf("nelements_local : %d\n",b->nelements_local);	

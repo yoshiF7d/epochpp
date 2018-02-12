@@ -4,7 +4,7 @@
 #include "LinkedList.h"
 #include "script.h"
 
-#define C_keV_inv 6.241509e+15
+#define C_eV_inv 6.241509e+18
 #define C_me 9.10938291e-31
 #define SEP " "
 void getname(char **name,int mode){
@@ -28,7 +28,7 @@ void getlegend(char **legend,int mode){
 		case 4: *legend = "Px [kg m s^-1]"; break;
 		case 5: *legend = "Py [kg m s^-1]"; break;
 		case 6: *legend = "Pz [kg m s^-1]"; break;
-		default : *legend = "Energy [keV]"; break;
+		default : *legend = "Energy [eV]"; break;
 	}
 }
 void fprinthist2D(Data data,FILE *fp, int hbin, int vbin){
@@ -130,7 +130,6 @@ int main(int argc, char *argv[]){
 		}
 		if(specname[i]=='\0'){break;}	
 	}
-	
 	mkdir("phase",0777); snprintf(command,512,"phase/%s",specname2); mkdir(command,0777);
 	
 	namelist = NULL;
@@ -148,28 +147,51 @@ int main(int argc, char *argv[]){
 	datapz = LinkedList_getIndex(datalist,3);
 	dataek = LinkedList_getIndex(datalist,4);
 	dataw = LinkedList_getIndex(datalist,5);
-	if(!dataek){
-		//printf("calculated ek is used\n");
+
+	if(!datagrid){
+		printf("grid/%s is missing in output %s\n",specname,filename);
+		exit(1);
+	}
+	if(!datapx){
+		printf("px/%s is missing in output %s\n",specname,filename);
+		exit(1);
+	}
+	if(!datapy){
+		printf("py/%s is missing in output %s\n",specname,filename);
+		exit(1);
+	}
+	if(!datapz){
+		printf("pz/%s is missing in output %s\n",specname,filename);
+		exit(1);
+	}
+	if(!dataw){
+		printf("weight/%s is missing in output %s\n",specname,filename);
+		exit(1);
+	}
+
+        if(!dataek){
 		dataek = Data_create(dataw->row,dataw->column);	
 		for(i=0;i<dataw->row;i++){
 			for(j=0;j<dataw->column;j++){
 				px = datapx->elem[i][j];
 				py = datapy->elem[i][j];
 				pz = datapz->elem[i][j];
-				ek = sqrt(mass*mass+(px*px + py*py + pz*pz)/(c*c))*c*c;
+				ek = sqrt(mass*mass+(px*px + py*py + pz*pz)/(c*c))*c*c - mass*c*c;
 				dataek->elem[i][j] = ek;
 			}
 		}
 	}
-	for(i=0;i<dataw->row;i++){
-		for(j=0;j<dataw->column;j++){
-			px = datapx->elem[i][j];
-			py = datapy->elem[i][j];	
-			pz = datapz->elem[i][j];
-			ek = sqrt(mass*mass+(px*px + py*py + pz*pz)/(c*c))*c*c;
-			//if(i%10==0 && j%10==0){printf("ek1 : %e ek2 : %e\n",dataek->elem[i][j],ek);}	
+	/*
+		for(i=0;i<dataw->row;i++){
+			for(j=0;j<dataw->column;j++){
+				px = datapx->elem[i][j];
+				py = datapy->elem[i][j];
+				pz = datapz->elem[i][j];
+				ek = sqrt(mass*mass+(px*px + py*py + pz*pz)/(c*c))*c*c - mass*c*c;
+				//if(i%10000){printf("ek1:%e\nek2:%e\n",ek,dataek->elem[i][0]);}	
+			}
 		}
-	}
+	*/	
 	/*
 	snprintf(command,512,"phase/%s/weight",specname2); mkdir(command,0777); 
 	snprintf(filew,256,"%s/%s.bmat",command,filename);
@@ -205,7 +227,7 @@ int main(int argc, char *argv[]){
 	exit(1);	
 	*/
 	n = Data_getRow(dataw);
-	//printf("particle count : %d\n",n);
+	printf("particle count : %d\n",n);
 	hi = mode/10; vi = mode%10;
 	//fprintf(stderr,"hi : %d, vi : %d\n",hi,vi);
 	getname(&hname,hi); getname(&vname,vi);
@@ -233,7 +255,7 @@ int main(int argc, char *argv[]){
 		case 6: datah = datapz;
 			break;
 		default: datah = dataek;
-			Data_muls(dataek,C_keV_inv,dataek);
+			Data_muls(dataek,C_eV_inv,dataek);
 			break;
 	}
 	switch(vi){
@@ -251,7 +273,7 @@ int main(int argc, char *argv[]){
 		case 6: datav = datapz;
 			break;
 		default: datav = dataek;
-			Data_muls(dataek,C_keV_inv,dataek);
+			Data_muls(dataek,C_eV_inv,dataek);
 			break;
 	}
 	//fprintf(stderr,"hii : %d, vii : %d\n",hii,vii);

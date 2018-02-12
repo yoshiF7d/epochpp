@@ -27,7 +27,7 @@ do
 	mod=$(($count % $skip))
 	if [ $mod -eq 0 ]; then
 		echo sdfphase -m ${mass} ${file} ${spname} ${hmin} ${hmax} ${hbin} ${vmin} ${vmax} ${vbin} ${mode}
-		outdir=$(sdfphase -m ${mass} ${file} ${spname} ${hmin} ${hmax} ${hbin} ${vmin} ${vmax} ${vbin} ${mode})
+		sdfphase -m ${mass} ${file} ${spname} ${hmin} ${hmax} ${hbin} ${vmin} ${vmax} ${vbin} ${mode}
 	fi
 	count=$(($count+1))
 done
