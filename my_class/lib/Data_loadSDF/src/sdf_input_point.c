@@ -163,9 +163,9 @@ static int sdf_helper_read_array(sdf_file_t *h, void **var_in, int count)
 
 
 Data Data_sdf_read_point_mesh(sdf_file_t *h){
-    Data data=NULL;
-    sdf_block_t *b = h->current_block;
-    union un_array{
+	Data data=NULL;
+	sdf_block_t *b = h->current_block;
+	union un_array{
 	double *d;
 	float *f;
     }a;
@@ -177,17 +177,12 @@ Data Data_sdf_read_point_mesh(sdf_file_t *h){
     h->current_location = b->data_location;
     if (!b->grids) b->grids = calloc(b->ndims, sizeof(float*));
     data = Data_create(b->nelements_local,b->ndims);
-    switch(b->datatype_out){
+    switch(b->datatype){
 	  case SDF_DATATYPE_REAL8:
 		for(n=0;n<b->ndims;n++){
-			sdf_helper_read_array(h, &b->grids[n], b->nelements_local);
-			sdf_free_distribution(h);
-			sdf_convert_array_to_float(h, &b->grids[n], b->nelements_local);	
-			a.d = b->grids[n];
-			for(i=0;i<b->nelements_local;i++){
-				Data_set(data,i,n,a.d[i]);
-			}
-		 	h->current_location = h->current_location + SDF_TYPE_SIZES[b->datatype] * b->dims[0];
+		 	fseeko(h->filehandle, h->current_location, SEEK_SET);
+			fread(data->elem[0], SDF_TYPE_SIZES[b->datatype],b->nelements_local,h->filehandle);
+			h->current_location = h->current_location + SDF_TYPE_SIZES[b->datatype] * b->dims[0];
 		}
 		break;
 	  case SDF_DATATYPE_REAL4:
@@ -256,15 +251,15 @@ Data Data_sdf_read_point_variable(sdf_file_t *h)
     //sdf_convert_array_to_float(h, &b->data, b->nelements_local);
 	n = b->nelements_local;
 	data = Data_create(b->nelements_local,1);
-//	printf("nelements_local : %d\n",b->nelements_local);	
-	switch(b->datatype_out){
+	//printf("nelements_local : %d\n",b->nelements_local);	
+	switch(b->datatype){
 	  case SDF_DATATYPE_REAL8:
-		fseeko(h->filehandle, h->current_location, SEEK_SET);
-    		fread(data->elem[0], SDF_TYPE_SIZES[b->datatype],b->nelements_local,h->filehandle);
+			fseeko(h->filehandle, h->current_location, SEEK_SET);
+			fread(data->elem[0], SDF_TYPE_SIZES[b->datatype],b->nelements_local,h->filehandle);
 		break;
 	  case SDF_DATATYPE_REAL4:
-    		sdf_helper_read_array(h, &b->data, b->nelements_local);
-		a.f = b->data;
+			sdf_helper_read_array(h, &b->data, b->nelements_local);
+			a.f = b->data;
 		for(i=0;i<n;i++){Data_set(data,i,0,(double)(a.f[i]));}
 		break;
 	  default:

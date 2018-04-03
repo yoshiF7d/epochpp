@@ -348,7 +348,6 @@ int main(int argc, char *argv[]){
 	datalist = Data_loadSDFList2(filesdf,namelist);
 		
 	/*
-	LinkedList_deleteRoot(namelist,deallocate);
 	for(list=datalist;list;list=LinkedList_increment(list)){
 		data = LinkedList_get(list);
 		printf("Row : %d Column : %d\n",Data_getRow(data),Data_getColumn(data));
@@ -389,7 +388,7 @@ int main(int argc, char *argv[]){
 		py2 = a10*px1 + a11*py1 + a12*pz1;
 		pz2 = a20*px1 + a21*py1 + a22*pz1;
 	
-		//printf("p1 -> p2 : (%e,%e,%e) -> (%e,%e,%e)\n",px1,py1,pz1,px2,py2,pz2);
+		printf("p1 -> p2 : (%e,%e,%e) -> (%e,%e,%e)\n",px1,py1,pz1,px2,py2,pz2);
 
 		Data_set(data,i,2,px2);
 		Data_set(data,i,3,py2);
@@ -401,7 +400,7 @@ int main(int argc, char *argv[]){
 		Data_set(data,i,0,toev(sqrt( (mass*C_c*C_c)*(mass*C_c*C_c) + (px1*px1+py1*py1+pz1*pz1)*C_c*C_c ) - mass*C_c*C_c));
 	}
 	
-	//Data_print(data);
+	Data_print(data);
 	
 	if(min<0){min = Data_min(data,0);}
 	if(max<0){max = Data_max(data,0);}
@@ -531,7 +530,6 @@ int main(int argc, char *argv[]){
 	fclose(fp);
 	//end = clock();
 	//printf("espc making time : %lu\n",end-start);	
-
 	//start = clock();	
 	fp = fopen(plotespc,"w");
 	if(!fp){perror(plotespc); exit(1);}
@@ -565,6 +563,7 @@ int main(int argc, char *argv[]){
 	Data_delete(datapz);
 	Data_delete(dataw);
 	*/
+	
 	LinkedList_deleteRoot(datalist,Data_vdelete);
 	LinkedList_deleteRoot(namelist,deallocate);
 	Data_delete(data);
