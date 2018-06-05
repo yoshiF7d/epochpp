@@ -42,7 +42,7 @@ int main(int argc, char *argv[]){
 	char *dirin,*filein=NULL,*fileout,*specname;
 	int row=-1,i,j,k,s,len,count,filecount;
 	double time;
-	LinkedList mainlist,list,list0; 
+	LinkedList mainlist=NULL,list; 
 	Data data,tsdata;
 	DIR *dp;
 	LineProfile lineProfile;
@@ -116,9 +116,9 @@ int main(int argc, char *argv[]){
 	tsdata = Data_create(filecount,data->column);
 	Data_delete(data);
 	
-	for(list0=mainlist,count=0;list0;list0=list0->next,count++){
+	for(list=mainlist,count=0;list;list=list->next,count++){
         start = clock();
-        lineProfile = list0->content;
+        lineProfile = list->content;
         printf("processing %s (%d/%d)\n",lineProfile->fileName,count,filecount);
         printf("[");
         for(i=0;i<100;i++){
@@ -147,8 +147,8 @@ int main(int argc, char *argv[]){
         printf("\033[F\033[J");
     }
 	
-	for(list0=mainlist,count=0;list0;list0=list0->next,count++){
-		lineProfile = list0->content;
+	for(list=mainlist,count=0;list;list=list->next,count++){
+		lineProfile = list->content;
 		memcpy(tsdata->elem[count],lineProfile->array,(tsdata->column)*sizeof(double));
 	}
 	Data_output(tsdata,fileout,p_float);
