@@ -129,7 +129,7 @@ int main(int argc, char *argv[]){
         }
         printf("]");
         printf(" %.1f %%",100*(double)count/filecount);
-        printf(" ETA %d min\n",(int)((filecount-count)*time/60));
+        printf(" ETA %d min\n",(int)((double)(filecount-count)*time/60));
         //start = clock();
 		data = Data_loadSDF(lineProfile->fileName,specname);
         //end = clock();
