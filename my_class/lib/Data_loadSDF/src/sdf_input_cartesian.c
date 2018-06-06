@@ -326,7 +326,6 @@ static int sdf_helper_read_array(sdf_file_t *h, void **var_in, int count)
     int sz;
 	
 	if (b->ng) return sdf_helper_read_array_halo(h, var_in);
-
     if (h->mmap) {
         *var_ptr = h->mmap + h->current_location;
         return 0;
@@ -334,12 +333,10 @@ static int sdf_helper_read_array(sdf_file_t *h, void **var_in, int count)
 
     sz = SDF_TYPE_SIZES[b->datatype];
     if (h->use_float && b->datatype == SDF_DATATYPE_REAL8) {
-		printf("convert\n");
 		convert = 1;
         *var_ptr = var = malloc(count * sz);
     } else {
         convert = 0;
-		printf("no convert\n");
         if (!var) *var_ptr = var = malloc(count * sz);
     }
 
@@ -577,7 +574,6 @@ Data Data_sdf_read_plain_variable(sdf_file_t *h)
 	  case SDF_DATATYPE_REAL4:
 			sdf_helper_read_array(h, &b->data, b->nelements_local);
 			a.f = b->data;
-			printf("n : %d\n",n);
 			for(i=0;i<n;i++){
 				data->elem[0][i] = (double)(a.f[i]);
 			}
