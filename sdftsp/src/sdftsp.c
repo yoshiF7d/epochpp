@@ -89,7 +89,7 @@ double *takeLineProfile(Data data, int len, double s[2], double e[2]){
 		x = s[0] + i*(e[0]-s[0])/length;
 		y = s[1] + i*(e[1]-s[1])/length;
 		if(x >= 0 && x < data->column && y >= 0 && y < data->row){
-			array[i] = data->elem[(int)x][(int)y];
+			array[i] = data->elem[(int)y][(int)x];
 		}else{
 			array[i] = 0;
 		}
