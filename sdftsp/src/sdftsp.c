@@ -120,7 +120,7 @@ void drawLine(Data data,double s[2], double e[2]){
 int main(int argc, char *argv[]){
 	char *dirin,*filein=NULL,*fileout,*specname,*lineString=NULL,*dfile=NULL;
 	int row=-1,i,j,k,len,count,filecount,maxcount=-1,isLineSet=0;
-	double time=0;
+	double duration=0;
 	double o[2],t[2],s[2],e[2];
 	LinkedList mainlist=NULL,list; 
 	Data data,tsdata;
@@ -241,7 +241,7 @@ int main(int argc, char *argv[]){
 	for(list=mainlist,count=0;list;list=list->next,count++){
 		if(count % 10 == 0){
 			time(&end);
-			time = end - start;
+			duration = (end - start)*0.1;
 			time(&start);
 		}
 		lineProfile = list->content;
@@ -254,7 +254,7 @@ int main(int argc, char *argv[]){
         }
         printf("]");
         printf(" %.1f %%",100*(double)count/filecount);
-        printf(" ETA %.1f min\n",(double)(filecount-count)*time/60);
+		printf(" ETA %.1f min\n",(double)(filecount-count)*duration/60);
         //start = clock();
 		data = Data_loadSDF(lineProfile->fileName,specname);
         //end = clock();
