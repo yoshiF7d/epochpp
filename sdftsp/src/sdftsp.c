@@ -147,9 +147,8 @@ int main(int argc, char *argv[]){
 	LineProfile lineProfile;
 	int opt;
 	struct dirent *entry;
-	struct timeval tss,tee,td;
-	struct rusage ts,te;
-	//LeakDetector_set(stdout);
+	clock_t start,end;
+		//LeakDetector_set(stdout);
     while((opt=getopt(argc,argv,"r:l:n:d:"))!=-1){
         switch(opt){
             case 'r':
@@ -226,7 +225,7 @@ int main(int argc, char *argv[]){
 		printf("(t[0],t[1]) : (%e,%e)\n",t[0],t[1]);
 	}
     lineProfile = mainlist->content;
-	getrusage(RUSAGE_SELF,&ts);
+	start = clock();
 	data = Data_loadSDF(lineProfile->fileName,specname);
 	if(data == NULL){
 		printf("Output \"%s\" is missing in %s\n",specname,filein);
@@ -258,18 +257,11 @@ int main(int argc, char *argv[]){
 		 Data_output(data,dfile,p_float);
 	}
 	Data_delete(data);
-	getrusage(RUSAGE_SELF,&te);
-	tss = ts.ru_utime;
-	tee = te.ru_utime;
-	td = timediff(tss,tee);
-	time = (double)(td.tv_sec+(td.tv_usec)*1e-6);
-	tss = ts.ru_stime;
-	tee = te.ru_stime;
-	td = timediff(tss,tee);
-	time += (double)(td.tv_sec+(td.tv_usec)*1e-6);
+	end = clock();
+	time = (double)(end-start)*1e-6;
 	
 	for(list=mainlist,count=0;list;list=list->next,count++){
-		getrusage(RUSAGE_SELF,&ts);
+		start = clock();
 		lineProfile = list->content;
         printf("processing %s (%d/%d)\n",lineProfile->fileName,count,filecount);
         printf("[");
@@ -293,16 +285,8 @@ int main(int argc, char *argv[]){
 			}
 		}
 		Data_delete(data);
-        //end = clock();
-		getrusage(RUSAGE_SELF,&te);
-		tss = ts.ru_utime;
-		tee = te.ru_utime;
-		td = timediff(tss,tee);
-		time = (double)(td.tv_sec+(td.tv_usec)*1e-6);
-		tss = ts.ru_stime;
-		tee = te.ru_stime;
-		td = timediff(tss,tee);
-		time += (double)(td.tv_sec+(td.tv_usec)*1e-6);
+        end = clock();
+		time = (double)(end-start)*1e-6;
 		printf("\033[F\033[J");
         printf("\033[F\033[J");
     }
