@@ -86,7 +86,7 @@ double *takeLineProfile(Data data, int len, double s[2], double e[2]){
 	double x,y,length = sqrt((e[0] - s[0])*(e[0] - s[0]) + (e[1] - s[1])*(e[1] - s[1]));
 	for(i=0;i<len;i++){
 		x = s[0] + i*(e[0]-s[0])/length;
-		y = (double)(data->row) - (s[1] + i*(e[1]-s[1])/length);
+		y = s[1] + i*(e[1]-s[1])/length;
 		if(x >= 0 && x < data->column && y >= 0 && y < data->row){
 			array[i] = data->elem[(int)x][(int)y];
 		}else{
@@ -105,7 +105,7 @@ void drawLine(Data data,double s[2], double e[2]){
 		if(max < data->elem[0][i]){max = data->elem[0][i];}
 	}
 	for(i=0;i<data->row;i++){
-		y = (data->row - 1 - i);
+		y = i;
 		for(j=0;j<data->column;j++){
 			x = j;
 			Y = (x-s[0])*(e[1]-s[1])/(e[0]-s[0]) + s[1];
@@ -118,7 +118,7 @@ void drawLine(Data data,double s[2], double e[2]){
 
 int main(int argc, char *argv[]){
 	char *dirin,*filein=NULL,*fileout,*specname,*lineString=NULL,*dfile=NULL;
-	int row=-1,i,j,k,len,count,filecount,maxcount=-1;
+	int row=-1,i,j,k,len,count,filecount,maxcount=-1,isLineSet=0;
 	double time=0;
 	double o[2],t[2],s[2],e[2];
 	LinkedList mainlist=NULL,list; 
@@ -136,6 +136,7 @@ int main(int argc, char *argv[]){
                 break;
 			case 'l':
 				lineString = String_copy(optarg);
+				isLineSet = 1;
 				break;
 			case 'd':
 				dfile = String_copy(optarg);
@@ -155,13 +156,13 @@ int main(int argc, char *argv[]){
 			   "this program makes a time-spce-plot by taking a line profile at\n"
 			   "middle row of each time slices and stack them vertically  a time-spce-plot\n"
 			   "options :\n"
-			   "-r : set row number\n"
-			   "-l \"ox,oy,tx,ty\" : set the line for line profile\n"
+			   "-r [row index]: set row index\n"
+			   "-l [\"ox,oy,tx,ty\"] : set the line for line profile\n"
 			   "	(ox,oy) is origin point of the line\n"
 			   "	(tx,ty) is tangent vector of the line\n"
 			   "	line equation : tx*(y - oy) - ty*(x - ox) = 0\n"
-			   "-d : output bmat file for checking the line\n."
-			   "-n : set maximum number of data files\n."
+			   "-d [file name]: output bmat file for checking the line\n"
+			   "-n [maximum file number]: set maximum number of data files\n"
 			   ,
 			   argv[0]
         );
@@ -194,12 +195,12 @@ int main(int argc, char *argv[]){
 	mainlist=LinkedList_sort(mainlist,LineProfile_vcompare);
 	if(maxcount > 0){
 		for(i=0,list=mainlist;i<maxcount-1 && list->next;i++,list=list->next){}
-		LinkedList_deleteRoot(list->next);
+		LinkedList_deleteRoot(list->next,LineProfile_vdelete);
 		list->next = NULL;
 		filecount = maxcount;
 	}
 	parseLineString(lineString,o,t);
-	if(lineString){
+	if(isLineSet){
 		printf("(o[0],o[1]) : (%e,%e)\n",o[0],o[1]);
 		printf("(t[0],t[1]) : (%e,%e)\n",t[0],t[1]);
 	}
@@ -211,7 +212,7 @@ int main(int argc, char *argv[]){
         exit(1);
     }
 	
-	if(lineString){
+	if(isLineSet){
 		len = setTSSize(data->column,data->row,o,t,s,e);
 		printf("len : %d\n",len);
 		printf("s[0],s[1] : %e,%e",s[0],s[1]);
@@ -255,7 +256,7 @@ int main(int argc, char *argv[]){
         //start = clock();
 		data = Data_loadSDF(lineProfile->fileName,specname);
         //end = clock();
-		if(lineString){
+		if(isLineSet){
 			lineProfile->array = takeLineProfile(data,len,s,e);
 		}else{
 			lineProfile->array = allocate(data->column*sizeof(double));
