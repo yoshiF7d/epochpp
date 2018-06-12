@@ -215,8 +215,8 @@ int main(int argc, char *argv[]){
 	if(isLineSet){
 		len = setTSSize(data->column,data->row,o,t,s,e);
 		printf("len : %d\n",len);
-		printf("s[0],s[1] : %e,%e",s[0],s[1]);
-		printf("e[0],e[1] : %e,%e",e[0],e[1]);
+		printf("s[0],s[1] : %e,%e\n",s[0],s[1]);
+		printf("e[0],e[1] : %e,%e\n",e[0],e[1]);
 	}else{
 		len = data->column;
 		if(row < 0){
@@ -252,7 +252,7 @@ int main(int argc, char *argv[]){
         }
         printf("]");
         printf(" %.1f %%",100*(double)count/filecount);
-        printf(" ETA %.2f min\n",(int)((double)(filecount-count)*time/60));
+        printf(" ETA %.1f min\n",(double)(filecount-count)*time/60);
         //start = clock();
 		data = Data_loadSDF(lineProfile->fileName,specname);
         //end = clock();
