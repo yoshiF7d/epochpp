@@ -125,9 +125,10 @@ int main(int argc, char *argv[]){
     if(optind >= argc){
         usage:
         printf(
-               "usage : %s [input directory name] [species name] [output file name] (-r row number)\n"
+               "usage : %s [input directory name] [species name] [output file name]\n"
 			   "this program makes a time-spce-plot by taking a line profile at\n"
 			   "middle row of each time slices and stack them vertically  a time-spce-plot\n"
+			   "options :\n"
 			   "-r : set row number.\n"
 			   "-l \"ox,oy,tx,ty\" : set line.\n"
 			   "(ox,oy) is origin point of the line.\n"
@@ -140,13 +141,9 @@ int main(int argc, char *argv[]){
     }
     if(argc >= optind+1){
         dirin = String_copy(argv[optind]);
-    }else{
-		goto usage;
-	}
+    }
     if(argc >= optind+2){
 		specname = String_copy(argv[optind+1]);
-	}else{
-		goto usage;
 	}
     if(argc >= optind+3){
         fileout = String_copy(argv[optind+2]);
