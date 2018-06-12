@@ -12,6 +12,7 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <time.h>
+#include <sys/resource.h>
 #include <limits.h>
 
 //#define LEAKDETECT 1
