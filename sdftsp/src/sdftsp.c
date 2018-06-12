@@ -40,7 +40,7 @@ void LineProfile_vdelete(void *lp){
 
 void parseLineString(char *lineString, double o[2], double t[2]){
 	if(lineString){
-		for(;!isalpha(*lineString) && *lineString;lineString++){}
+		for(;isalpha(*lineString) && *lineString;lineString++){}
 		o[0] = atof(strtok(lineString,","));
 		o[1] = atof(strtok(NULL,","));
 		t[0] = atof(strtok(NULL,","));
@@ -86,7 +86,7 @@ double *takeLineProfile(Data data, int len, double s[2], double e[2]){
 	double x,y,length = sqrt((e[0] - s[0])*(e[0] - s[0]) + (e[1] - s[1])*(e[1] - s[1]));
 	for(i=0;i<len;i++){
 		x = s[0] + ((double)i)*(e[0]-s[0])/length;
-		y = (double)(data->row) - s[1] + ((double)i)*(e[1]-s[1])/length;
+		y = (double)(data->row) - (s[1] + ((double)i)*(e[1]-s[1])/length);
 		if(x >= 0 && x < data->column && y >= 0 && y < data->row){
 			array[i] = data->elem[(int)x][(int)y];
 		}else{
@@ -99,7 +99,7 @@ double *takeLineProfile(Data data, int len, double s[2], double e[2]){
 int main(int argc, char *argv[]){
 	char *dirin,*filein=NULL,*fileout,*specname,*lineString=NULL;
 	int row=-1,i,j,k,len,count,filecount;
-	double time;
+	double time=0;
 	double o[2],t[2],s[2],e[2];
 	LinkedList mainlist=NULL,list; 
 	Data data,tsdata;
@@ -168,6 +168,7 @@ int main(int argc, char *argv[]){
 	printf("(o[0],o[1]) : (%e,%e)\n",o[0],o[1]);
 	printf("(t[0],t[1]) : (%e,%e)\n",t[0],t[1]);
     lineProfile = mainlist->content;
+	start = clock();
 	data = Data_loadSDF(lineProfile->fileName,specname);
 	if(data == NULL){
 		printf("Output \"%s\" is missing in %s\n",specname,filein);
@@ -197,6 +198,8 @@ int main(int argc, char *argv[]){
 	
 	tsdata = Data_create(filecount,len);
 	Data_delete(data);
+	end = clock();
+	time = (double)(end-start)/CLOCKS_PER_SEC;
 	
 	for(list=mainlist,count=0;list;list=list->next,count++){
         start = clock();
@@ -239,7 +242,8 @@ int main(int argc, char *argv[]){
 	Data_output(tsdata,fileout,p_float);
 	Data_delete(tsdata);
     LinkedList_deleteRoot(mainlist,LineProfile_vdelete);
-    deallocate(dirin);
+    deallocate(lineString);
+	deallocate(dirin);
     deallocate(fileout);
     return 0;
 }
