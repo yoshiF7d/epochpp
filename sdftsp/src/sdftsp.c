@@ -85,8 +85,8 @@ double *takeLineProfile(Data data, int len, double s[2], double e[2]){
 	double *array = allocate(len*sizeof(double));
 	double x,y,length = sqrt((e[0] - s[0])*(e[0] - s[0]) + (e[1] - s[1])*(e[1] - s[1]));
 	for(i=0;i<len;i++){
-		x = s[0] + ((double)i)*(e[0]-s[0])/length;
-		y = (double)(data->row) - (s[1] + ((double)i)*(e[1]-s[1])/length);
+		x = s[0] + i*(e[0]-s[0])/length;
+		y = (double)(data->row) - (s[1] + i*(e[1]-s[1])/length);
 		if(x >= 0 && x < data->column && y >= 0 && y < data->row){
 			array[i] = data->elem[(int)x][(int)y];
 		}else{
@@ -96,9 +96,29 @@ double *takeLineProfile(Data data, int len, double s[2], double e[2]){
 	return array;
 }
 
+void drawLine(Data data,double s[2], double e[2]){
+	int i,j;
+	double x,y,Y;
+	double max = data->elem[0][0];
+	double length = sqrt((e[0] - s[0])*(e[0] - s[0]) + (e[1] - s[1])*(e[1] - s[1]));
+	for(i=0;i<data->row*data->column;i++){
+		if(max < data->elem[0][i]){max = data->elem[0][i];}
+	}
+	for(i=0;i<data->row;i++){
+		y = (data->row - 1 - i);
+		for(j=0;j<data->column;j++){
+			x = j;
+			Y = (x-s[0])*(e[1]-s[1])/(e[0]-s[0]) + s[1];
+			if(abs(y-Y)<=2){
+				data->elem[i][j] = max;
+			}
+		}
+	}
+}
+
 int main(int argc, char *argv[]){
-	char *dirin,*filein=NULL,*fileout,*specname,*lineString=NULL;
-	int row=-1,i,j,k,len,count,filecount;
+	char *dirin,*filein=NULL,*fileout,*specname,*lineString=NULL,*dfile=NULL;
+	int row=-1,i,j,k,len,count,filecount,maxcount=-1;
 	double time=0;
 	double o[2],t[2],s[2],e[2];
 	LinkedList mainlist=NULL,list; 
@@ -109,13 +129,19 @@ int main(int argc, char *argv[]){
 	struct dirent *entry;
 	clock_t start,end;
 	//LeakDetector_set(stdout);
-    while((opt=getopt(argc,argv,"r:l:"))!=-1){
+    while((opt=getopt(argc,argv,"r:l:n:d:"))!=-1){
         switch(opt){
             case 'r':
 				row = atoi(optarg);
                 break;
 			case 'l':
 				lineString = String_copy(optarg);
+				break;
+			case 'd':
+				dfile = String_copy(optarg);
+				break;
+			case 'n':
+				maxcount = atoi(optarg);
 				break;
             default:
                 goto usage;
@@ -129,11 +155,13 @@ int main(int argc, char *argv[]){
 			   "this program makes a time-spce-plot by taking a line profile at\n"
 			   "middle row of each time slices and stack them vertically  a time-spce-plot\n"
 			   "options :\n"
-			   "-r : set row number.\n"
-			   "-l \"ox,oy,tx,ty\" : set line.\n"
-			   "(ox,oy) is origin point of the line.\n"
-			   "(tx,ty) is tangent vector of the line.\n"
-			   "line equation : tx*(y - oy) - ty*(x - ox) = 0\n"
+			   "-r : set row number\n"
+			   "-l \"ox,oy,tx,ty\" : set the line for line profile\n"
+			   "	(ox,oy) is origin point of the line\n"
+			   "	(tx,ty) is tangent vector of the line\n"
+			   "	line equation : tx*(y - oy) - ty*(x - ox) = 0\n"
+			   "-d : output bmat file for checking the line\n."
+			   "-n : set maximum number of data files\n."
 			   ,
 			   argv[0]
         );
@@ -164,9 +192,17 @@ int main(int argc, char *argv[]){
     }
     closedir(dp);
 	mainlist=LinkedList_sort(mainlist,LineProfile_vcompare);
+	if(maxcount > 0){
+		for(i=0,list=mainlist;i<maxcount-1 && list->next;i++,list=list->next){}
+		LinkedList_deleteRoot(list->next);
+		list->next = NULL;
+		filecount = maxcount;
+	}
 	parseLineString(lineString,o,t);
-	printf("(o[0],o[1]) : (%e,%e)\n",o[0],o[1]);
-	printf("(t[0],t[1]) : (%e,%e)\n",t[0],t[1]);
+	if(lineString){
+		printf("(o[0],o[1]) : (%e,%e)\n",o[0],o[1]);
+		printf("(t[0],t[1]) : (%e,%e)\n",t[0],t[1]);
+	}
     lineProfile = mainlist->content;
 	start = clock();
 	data = Data_loadSDF(lineProfile->fileName,specname);
@@ -179,7 +215,7 @@ int main(int argc, char *argv[]){
 		len = setTSSize(data->column,data->row,o,t,s,e);
 		printf("len : %d\n",len);
 		printf("s[0],s[1] : %e,%e",s[0],s[1]);
-		printf("s[0],s[1] : %e,%e",e[0],e[1]);
+		printf("e[0],e[1] : %e,%e",e[0],e[1]);
 	}else{
 		len = data->column;
 		if(row < 0){
@@ -188,22 +224,24 @@ int main(int argc, char *argv[]){
 			printf("input row is larger than data row\n");
 			exit(1);
 		}
-		/*
 		s[0] = 0;
 		s[1] = row;
 		t[0] = data->column;
 		t[1] = row;
-		*/
 	}
 	
 	tsdata = Data_create(filecount,len);
+	if(dfile){
+		 drawLine(data,s,e);
+		 Data_output(data,dfile,p_float);
+	}
 	Data_delete(data);
 	end = clock();
 	time = (double)(end-start)/CLOCKS_PER_SEC;
 	
 	for(list=mainlist,count=0;list;list=list->next,count++){
-        start = clock();
-        lineProfile = list->content;
+		start = clock();
+		lineProfile = list->content;
         printf("processing %s (%d/%d)\n",lineProfile->fileName,count,filecount);
         printf("[");
         for(i=0;i<100;i++){
@@ -213,7 +251,7 @@ int main(int argc, char *argv[]){
         }
         printf("]");
         printf(" %.1f %%",100*(double)count/filecount);
-        printf(" ETA %d min\n",(int)((double)(filecount-count)*time/60));
+        printf(" ETA %.2f min\n",(int)((double)(filecount-count)*time/60));
         //start = clock();
 		data = Data_loadSDF(lineProfile->fileName,specname);
         //end = clock();
@@ -229,8 +267,6 @@ int main(int argc, char *argv[]){
         //end = clock();
         end = clock();
         time = (double)(end-start)/CLOCKS_PER_SEC;
-        printf("total : %.2f sec\n",time);
-		printf("\033[F\033[J");
         printf("\033[F\033[J");
         printf("\033[F\033[J");
     }
