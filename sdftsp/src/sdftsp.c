@@ -117,6 +117,25 @@ void drawLine(Data data,double s[2], double e[2]){
 	}
 }
 
+/*https://stackoverflow.com/questions/17705786/getting-negative-values-using-clock-gettime*/
+struct timespec timediff(struct timespec start, struct timespec end)
+{
+	struct timespec temp;
+	
+	if ((end.tv_nsec-start.tv_nsec)<0)
+	{
+		temp.tv_sec = end.tv_sec-start.tv_sec-1;
+		temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
+	}
+	else
+	{
+		temp.tv_sec = end.tv_sec-start.tv_sec;
+		temp.tv_nsec = end.tv_nsec-start.tv_nsec;
+	}
+	return temp;
+}
+
+
 int main(int argc, char *argv[]){
 	char *dirin,*filein=NULL,*fileout,*specname,*lineString=NULL,*dfile=NULL;
 	int row=-1,i,j,k,len,count,filecount,maxcount=-1,isLineSet=0;
@@ -128,7 +147,7 @@ int main(int argc, char *argv[]){
 	LineProfile lineProfile;
 	int opt;
 	struct dirent *entry;
-	struct timeval ts,te;
+	struct timespec ts,te,td;
 	//LeakDetector_set(stdout);
     while((opt=getopt(argc,argv,"r:l:n:d:"))!=-1){
         switch(opt){
@@ -206,7 +225,7 @@ int main(int argc, char *argv[]){
 		printf("(t[0],t[1]) : (%e,%e)\n",t[0],t[1]);
 	}
     lineProfile = mainlist->content;
-	gettimeofday(&ts,NULL);
+	clock_gettime(CLOCK_REALTIME,&ts);
 	data = Data_loadSDF(lineProfile->fileName,specname);
 	if(data == NULL){
 		printf("Output \"%s\" is missing in %s\n",specname,filein);
@@ -238,11 +257,12 @@ int main(int argc, char *argv[]){
 		 Data_output(data,dfile,p_float);
 	}
 	Data_delete(data);
-	gettimeofday(&te,NULL);
-	time = (double)(te.tv_usec-ts.tv_usec)*1e-6;
+	clock_gettime(CLOCK_REALTIME,&te);
+	td = timediff(ts,te);
+	time = (double)(td.tv_sec+(td.tv_nsec)*1e-9);
 	
 	for(list=mainlist,count=0;list;list=list->next,count++){
-		gettimeofday(&ts,NULL);
+		clock_gettime(CLOCK_REALTIME,&ts);
 		lineProfile = list->content;
         printf("processing %s (%d/%d)\n",lineProfile->fileName,count,filecount);
         printf("[");
@@ -267,9 +287,10 @@ int main(int argc, char *argv[]){
 		}
 		Data_delete(data);
         //end = clock();
-		gettimeofday(&te,NULL);
-		time = (double)(te.tv_usec-ts.tv_usec)*1e-6;
-        printf("\033[F\033[J");
+		td = timediff(ts,te);
+		clock_gettime(CLOCK_REALTIME,&te);
+		time = (double)(td.tv_sec+(td.tv_nsec)*1e-9);
+		printf("\033[F\033[J");
         printf("\033[F\033[J");
     }
 	
