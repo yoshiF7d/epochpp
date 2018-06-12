@@ -117,25 +117,6 @@ void drawLine(Data data,double s[2], double e[2]){
 	}
 }
 
-/*https://stackoverflow.com/questions/17705786/getting-negative-values-using-clock-gettime*/
-struct timeval timediff(struct timeval start, struct timeval end)
-{
-	struct timeval temp;
-	
-	if ((end.tv_usec-start.tv_usec)<0)
-	{
-		temp.tv_sec = end.tv_sec-start.tv_sec-1;
-		temp.tv_usec = 1000000+end.tv_usec-start.tv_usec;
-	}
-	else
-	{
-		temp.tv_sec = end.tv_sec-start.tv_sec;
-		temp.tv_usec = end.tv_usec-start.tv_usec;
-	}
-	return temp;
-}
-
-
 int main(int argc, char *argv[]){
 	char *dirin,*filein=NULL,*fileout,*specname,*lineString=NULL,*dfile=NULL;
 	int row=-1,i,j,k,len,count,filecount,maxcount=-1,isLineSet=0;
@@ -147,7 +128,7 @@ int main(int argc, char *argv[]){
 	LineProfile lineProfile;
 	int opt;
 	struct dirent *entry;
-	clock_t start,end;
+	time_t start,end;
 		//LeakDetector_set(stdout);
     while((opt=getopt(argc,argv,"r:l:n:d:"))!=-1){
         switch(opt){
@@ -225,7 +206,6 @@ int main(int argc, char *argv[]){
 		printf("(t[0],t[1]) : (%e,%e)\n",t[0],t[1]);
 	}
     lineProfile = mainlist->content;
-	start = clock();
 	data = Data_loadSDF(lineProfile->fileName,specname);
 	if(data == NULL){
 		printf("Output \"%s\" is missing in %s\n",specname,filein);
@@ -257,11 +237,13 @@ int main(int argc, char *argv[]){
 		 Data_output(data,dfile,p_float);
 	}
 	Data_delete(data);
-	end = clock();
-	time = (double)(end-start)*1e-6;
-	
+	time(&start);
 	for(list=mainlist,count=0;list;list=list->next,count++){
-		start = clock();
+		if(count % 10 == 0){
+			time(&end);
+			time = end - start;
+			time(&start);
+		}
 		lineProfile = list->content;
         printf("processing %s (%d/%d)\n",lineProfile->fileName,count,filecount);
         printf("[");
@@ -285,8 +267,6 @@ int main(int argc, char *argv[]){
 			}
 		}
 		Data_delete(data);
-        end = clock();
-		time = (double)(end-start)*1e-6;
 		printf("\033[F\033[J");
         printf("\033[F\033[J");
     }
