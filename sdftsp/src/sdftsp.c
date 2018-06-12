@@ -67,11 +67,11 @@ int setTSSize(int xsize,int ysize,double o[2],double t[2],double s[2],double e[2
 	}
 	
 	if(ye < 0){
-		e[0] = xe;
-		e[1] = ysize;
-	}else if(ys > ysize){
 		e[0] = xs;
 		e[1] = 0;
+	}else if(ye > ysize){
+		e[0] = xe;
+		e[1] = ysize;
 	}else{
 		e[0] = xsize;
 		e[1] = ye;
@@ -84,6 +84,7 @@ double *takeLineProfile(Data data, int len, double s[2], double e[2]){
 	int i;
 	double *array = allocate(len*sizeof(double));
 	double x,y,length = sqrt((e[0] - s[0])*(e[0] - s[0]) + (e[1] - s[1])*(e[1] - s[1]));
+	
 	for(i=0;i<len;i++){
 		x = s[0] + i*(e[0]-s[0])/length;
 		y = s[1] + i*(e[1]-s[1])/length;
