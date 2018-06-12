@@ -128,7 +128,7 @@ int main(int argc, char *argv[]){
 	LineProfile lineProfile;
 	int opt;
 	struct dirent *entry;
-	clock_t start,end;
+	struct timeval ts,te;
 	//LeakDetector_set(stdout);
     while((opt=getopt(argc,argv,"r:l:n:d:"))!=-1){
         switch(opt){
@@ -206,7 +206,7 @@ int main(int argc, char *argv[]){
 		printf("(t[0],t[1]) : (%e,%e)\n",t[0],t[1]);
 	}
     lineProfile = mainlist->content;
-	start = clock();
+	gettimeofday(&ts,NULL);
 	data = Data_loadSDF(lineProfile->fileName,specname);
 	if(data == NULL){
 		printf("Output \"%s\" is missing in %s\n",specname,filein);
@@ -238,11 +238,11 @@ int main(int argc, char *argv[]){
 		 Data_output(data,dfile,p_float);
 	}
 	Data_delete(data);
-	end = clock();
-	time = (double)(end-start)/CLOCKS_PER_SEC;
+	gettimeofday(&te,NULL);
+	time = (double)(te.tv_usec-ts.tv_usec)*1e-6;
 	
 	for(list=mainlist,count=0;list;list=list->next,count++){
-		start = clock();
+		gettimeofday(&ts,NULL);
 		lineProfile = list->content;
         printf("processing %s (%d/%d)\n",lineProfile->fileName,count,filecount);
         printf("[");
@@ -267,8 +267,8 @@ int main(int argc, char *argv[]){
 		}
 		Data_delete(data);
         //end = clock();
-        end = clock();
-        time = (double)(end-start)/CLOCKS_PER_SEC;
+		gettimeofday(&te,NULL);
+		time = (double)(te.tv_usec-ts.tv_usec)*1e-6;
         printf("\033[F\033[J");
         printf("\033[F\033[J");
     }
