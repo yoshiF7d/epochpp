@@ -109,7 +109,7 @@ int main(int argc, char *argv[]){
 	struct dirent *entry;
 	clock_t start,end;
 	//LeakDetector_set(stdout);
-    while((opt=getopt(argc,argv,"r:"))!=-1){
+    while((opt=getopt(argc,argv,"r:l:"))!=-1){
         switch(opt){
             case 'r':
 				row = atoi(optarg);
