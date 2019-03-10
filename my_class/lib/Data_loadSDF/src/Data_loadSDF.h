@@ -4,4 +4,5 @@
 Data Data_loadSDF(char *file, char *variable);
 LinkedList Data_loadSDFList(char *file, int n, ...);
 LinkedList Data_loadSDFList2(char *file, LinkedList namelist);
+Data Data_loadSDFPoint(char *file, LinkedList namelist);
 #endif

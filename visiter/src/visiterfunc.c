@@ -369,6 +369,7 @@ void visiter_drawpng(LinkedList list){
 	
 	len = LinkedList_getLength(list);
 	vi = LinkedList_getIndex(list,0); data = VisiterInfo_getData(vi);
+	if(!data){printf("no data is loaded. please use \"load\" function\n"); return;}
 	if(data->column <= 2){visiter_draw1dpng(list); return;}
 	if(len != 1 && len != 2 && len != 3){printdoc_imp(visiter_drawpng);return;}
 	if(data){rs=0;cs=0;re=Data_getRow(data)-1;ce=Data_getColumn(data)-1;}
@@ -690,7 +691,6 @@ char *getfullpath(char *path){
 			perror("getfullpath");
 			exit(1);
 		}
-		len=strlen(p);
 		len += 1 + strlen(path) + 1;
 		buf = allocate(len*sizeof(char*));
 		snprintf(buf,len,"%s/%s",p,path);
@@ -735,7 +735,7 @@ void visiter_series(LinkedList list){
 	if(len < 3){printdoc_imp(visiter_series); return;}
 	
 	ht = VisiterInfo_getHashTable(vi);
-	snprintf(optdef,128,"%s%s%s","load(0,0,-1,-1,\"",vi->options.fieldSeparators[0],"\")");
+	snprintf(optdef,128,"load");
 		
 	full = getfullpath(String_stripdq(LinkedList_getIndex(list,1)));
 	//printf("full : %s\n",full);
@@ -855,7 +855,7 @@ void visiter_setsep(LinkedList list){
 
 #define visiter_binop(func) void visiter_##func(LinkedList list){\
 	int len,rs=0,cs=0,re=-1,ce=-1;\
-	char *buf;\
+	char *buf,*buf2;\
 	double value;\
 	FILE *fp=NULL;\
 	VisiterInfo vi = NULL;\
@@ -864,6 +864,7 @@ void visiter_setsep(LinkedList list){
 	if(len != 2 && len != 3 && len != 6 && len != 7){printdoc_imp(visiter_##func); return;}\
 	vi = LinkedList_getIndex(list,0);\
 	data3 = data = VisiterInfo_getData(vi);\
+	buf = LinkedList_getIndex(list,1);\
 	if(data==NULL){printf("no data is loaded. please use \"load\" function\n"); return;}\
 	if(len == 6 || len == 7){\
 		rs = atoi((char*)LinkedList_getIndex(list,2));\
@@ -876,7 +877,18 @@ void visiter_setsep(LinkedList list){
 	if(!check(data,rs,cs,re,ce)){return;}\
 	if(isFloat(buf)){\
 		value = atof(buf);\
-	}else{data2 = Data_load(String_stripdq(buf),0,0,-1,-1,vi->options.fieldSeparators[0]);}\
+	}else{\
+		buf2 = String_stripdq(buf);\
+		if(!strcmp(".bmat",getFileExtension(buf2))){\
+			data2 = Data_loadBMAT(buf2);\
+		}\
+		else if(!strcmp(".bary",getFileExtension(buf2))){\
+			data2 = Data_loadBARY(buf2);\
+		}\
+		else{\
+			data2 = Data_load(buf2,0,0,-1,-1,vi->options.fieldSeparators[0]);\
+		}\
+	}\
 	if(len == 3){\
 		fp = wopen(String_stripdq(LinkedList_getIndex(list,2)));\
 		data3 = NULL;\
@@ -1577,8 +1589,33 @@ LinkedList parsefunc(char *buf){
 	return list;
 }
 
+void visiter_export(LinkedList list){
+	int i,j,len;
+	double max;
+	FILE *fp = stdout;	
+	VisiterInfo vi=NULL;
+	Data data=NULL;
+	char *name,*filein,*fileout;
+	
+	len = LinkedList_getLength(list);
+	vi = LinkedList_getIndex(list,0);
+	data = VisiterInfo_getData(vi);
+	if(!data){printf("no data is loaded. please use \"load\" function\n");return;}
+	if(len != 1 && len != 2){printdoc_imp(visiter_export);return;}
+	if(len==1){
+		filein = getFileName(vi->filename);
+		name=String_ncopy(filein,strlen(filein)-strlen(getFileExtension(filein)));
+		fileout=String_join(name,".bmat");
+		Data_output(data,fileout,p_float);
+		deallocate(name);
+		deallocate(fileout);
+	}
+	if(len==2){
+		fileout = String_stripdq(LinkedList_getIndex(list,1));
+		Data_output(data,fileout,p_float);
+	}
+}
 #define doc(NAME,print) if(func==visiter_##NAME){print; return;}
-
 /*http://stackoverflow.com/questions/3585846/color-text-in-terminal-aplications-in-unix*/
 #define KNRM  "\x1B[0m"
 #define KRED  "\x1B[31m"
@@ -2041,7 +2078,31 @@ void printdoc_imp(Func func){
 		,"fwhm",p,p
 		)
 	)
-	
+	doc(export,
+		printf(
+		BOLD "%-10s" USAGE "export[(\"OUTPUTFILE\"])]\n"
+		"%-10s" EXAMPLE "export, export(\"OUTPUTFILE\")\n"
+		RESET
+		"%-10s" KNRM "export data to \"OUTPUTFILE\" in bmat format\n"
+		"%-10s" KNRM "bmat format :\n"
+		"%-10s" KNRM "\tmeta data : 12 bytes\n"
+		"%-10s" KNRM "\tmain data : row*column*(4 or 8) bytes\n"
+		"%-10s" KNRM "data type (int32),row (int32),column (int32),data (Real32 or Real64)...\n"
+		"%-10s" KNRM "data type :\n\t0 : Real64\n\t1 : Real32\n"
+		"\n\n"
+		,"export",p,p,p,p,p,p,p,p
+		)
+	)
+	doc(drawpng,
+		printf(
+		BOLD "%-10s" USAGE "drawpng[[\"directory name\"],[\"command file\"])], draw(\"command file\"),\n"
+		"%-10s" EXAMPLE "drawpng, drawpng(\"png/\",\"gnucom.txt\")\n"					
+		RESET
+		"%-10s" KNRM "draw 2d map with gnuplot in png file\n"
+		"%-10s" "you can provide gnuplot command file in the last argument\n"
+		,"drawpng",p,p,p,p
+		)
+	)
 	else{printf("no documentation is provided\n"); return;}
 /*	doc(select,
 		printf(

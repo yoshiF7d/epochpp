@@ -97,7 +97,8 @@ FUNC(rrotate) \
 FUNC(lrotate) \
 FUNC(transpose) \
 FUNC(vreflect) \
-FUNC(hreflect)
+FUNC(hreflect) \
+FUNC(export)
 
 FUNCLIST(PROTOTYPE) /*prototype declaration*/
 

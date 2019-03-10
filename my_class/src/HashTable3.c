@@ -10,7 +10,8 @@ typedef struct st_hashtable{
 	char *infolist;
 	int count;
 	int size;
-	char *(*getkey)(void*);
+	unsigned long (*getHash)(void*);
+	char *(*getKey)(void*);
 }HashTable_Sub;
 
 typedef struct st_hashtable_content *HashTableContent;
@@ -19,9 +20,14 @@ int bitcount(int b);
 char *bitprint(int b, int length);
 void bitprint2(int b, int length);
 void bitprint3(int b, int length);
+unsigned long HashTable_vgetHash(void *key);
+unsigned long HashTable_getHash_getKey_mod(void *content, char *(*getKey)(void*));
+unsigned long HashTable_getHash_getKey(void *content);
+void HashTable_getHash_getKey_set(char *(*getKey)(void*));
 
 ArrayList HashTable_gather(HashTable ht);
-char *HashTable_default_getkey(void* c){return c;}
+char *HashTable_default_getKey(void* c){return c;}
+unsigned long HashTable_vgetHash(void *key);
 HashTable HashTable_create(int size){
 	int i;
 	HashTable table = allocate(sizeof(HashTable_Sub));
@@ -30,11 +36,13 @@ HashTable HashTable_create(int size){
 	for(i=0;i<size;i++){table->infolist[i] = 0;}
 	table->size = size;
 	table->count = 0;
-	table->getkey = HashTable_default_getkey;
+	table->getKey = HashTable_default_getKey;
+	HashTable_getHash_getKey_set(HashTable_default_getKey);
+	table->getHash = HashTable_getHash_getKey;
 	return table;
 }
 
-HashTable HashTable_create2(int size, char *(*getkey)(void*)){
+HashTable HashTable_create2(int size, char *(*getKey)(void*)){
 	int i;
 	HashTable table = allocate(sizeof(HashTable_Sub));
 	table->list = ArrayList_create(size);
@@ -42,7 +50,22 @@ HashTable HashTable_create2(int size, char *(*getkey)(void*)){
 	for(i=0;i<size;i++){table->infolist[i] = 0;}
 	table->size = size;
 	table->count = 0;
-	table->getkey = getkey;
+	table->getKey = getKey;
+	HashTable_getHash_getKey_set(HashTable_default_getKey);
+	table->getHash = HashTable_getHash_getKey;
+	return table;
+}
+
+HashTable HashTable_create3(int size, unsigned long (*getHash)(void*)){
+	int i;
+	HashTable table = allocate(sizeof(HashTable_Sub));
+	table->list = ArrayList_create(size);
+	table->infolist = allocate(size);
+	for(i=0;i<size;i++){table->infolist[i] = 0;}
+	table->size = size;
+	table->count = 0;
+	table->getKey = NULL;
+	table->getHash = getHash;
 	return table;
 }
  
@@ -52,7 +75,7 @@ void HashTable_delete(HashTable table, void (*delete)(void*)){
 	table->list = NULL;
 	deallocate(table->infolist);
 	table->infolist = NULL;
-	table->getkey = NULL;
+	table->getHash = NULL;
 	deallocate(table);
 }
 
@@ -75,7 +98,32 @@ HashTable HashTable_resize(HashTable ht, int size){
 	for(i=0;i<count;i++){
 		content = ArrayList_getContent(list,i);
 		if(content){
-			HashTable_append(ht,ht->getkey(content),content);
+			HashTable_append(ht,ht->getKey(content),content);
+		}
+	}
+	//HashTableContent_toString_finish();
+	ArrayList_delete(list,NULL);
+	return ht;
+}
+
+HashTable HashTable_resize2(HashTable ht, int size){
+	int i,index,count;
+	char *key;
+	void *content;
+	
+	ArrayList list = HashTable_gather(ht);
+	count = ht->count;
+	ArrayList_delete(ht->list,NULL);
+	deallocate(ht->infolist);
+	ht->list = ArrayList_create(size);
+	ht->infolist = allocate(size);
+	for(i=0;i<size;i++){ht->infolist[i]=0;}
+	//HashTableContent_toString_init(printch2);
+	ht->count = 0; ht->size = size;
+	for(i=0;i<count;i++){
+		content = ArrayList_getContent(list,i);
+		if(content){
+			HashTable_append2(ht,content);
 		}
 	}
 	//HashTableContent_toString_finish();
@@ -97,7 +145,6 @@ ArrayList HashTable_gather(HashTable ht){
 	return list;
 }
 
-
 #define CHUNKSIZE 2
 unsigned long HashTable_getHash(char *key){
 	int i,j;
@@ -117,6 +164,18 @@ unsigned long HashTable_getHash(char *key){
 	sum2 += sum1;
 	return sum2;
 }
+unsigned long HashTable_vgetHash(void *key){return HashTable_getHash(key);}
+unsigned long HashTable_getHash_getKey_mod(void *content, char *(*getKey)(void*)){
+	static char *(*getKey_imp)(void*);
+	if(getKey){
+		getKey_imp = getKey;
+	}else{
+		return HashTable_getHash(getKey_imp(content));
+	}
+}
+	
+unsigned long HashTable_getHash_getKey(void *content){return HashTable_getHash_getKey_mod(content,NULL);}
+void HashTable_getHash_getKey_set(char *(*getKey)(void*)){HashTable_getHash_getKey_mod(NULL,getKey);}
 
 #define rollindex(index) ((index<0) ? hashtable->size + (index) : (index))
 #define onebit(n) (1<<(n))
@@ -186,6 +245,68 @@ HashTable HashTable_append(HashTable hashtable, char *key, void *content){
 	return hashtable;
 }
 
+HashTable HashTable_append2(HashTable hashtable, void *content){
+	if(!content){return hashtable;}
+	unsigned int index = hashtable->getHash(content)%hashtable->size;
+	unsigned int index_sav = index;
+	int i,j,k;
+	char *info;
+	unsigned int s,t; /*size of s must be bigger than size of htc->info*/
+	enum {none,success,swap,resize}flag = none;
+	i=0;
+	//printf("HashTable_append : key : %s\tindex : %d\n",key,index);
+	if(hashtable->count == hashtable->size){flag = resize;}
+	/*search for empty slot*/
+	while(flag != resize && ArrayList_getContent(hashtable->list,index)){
+		index++; i++;
+		if(index == hashtable->size){index = 0;}
+		if(i == hashtable->size){flag = resize; break;}
+	}
+	/*list[index] is the empty slot (have to use ArrayList_getContent to refer)*/
+	while(flag != resize){
+		if(i < NEIGHBOR_LENGTH){flag = success; break;}
+		/*empty slot is at further than neighbor length*/
+		j=1;
+		while(flag != swap && j<NEIGHBOR_LENGTH){
+			info = &hashtable->infolist[rollindex(index-j)];
+			t = s = onebit(j);
+			//printf("index : %d\tj : %d\n",index, j);
+			//printf("%s\n",htc->key);
+			//printf("info\t"); bitprint2(*info,8);
+			//printf("s\t"); bitprint2(s,8);
+			j++; k=1; s >>=1;
+			while(s){
+				if(*info & s){
+					alterinfo(*info,s,t);
+					ArrayList_swap(hashtable->list,rollindex(index-k),index);
+					//printf("i : %d\tj : %d\tSWAP(%d,%d)\n",i,j,rollindex(index-k),index);
+					//HashTable_print(hashtable,NULL); printf("\n");
+					i -= k; index = rollindex(index-k);
+					flag = swap;
+					break;
+				}
+				s >>= 1; k++;
+			}
+		}
+		if(flag == swap){flag = none;}
+		else{flag = resize;}
+	}
+	if(flag == success){
+		ArrayList_setContent(hashtable->list,index,content);
+		hashtable->count++;
+		info = &hashtable->infolist[index_sav];
+		*info |= 1<< i;
+		//printf("success\ti:%d\tindex:%d\t",i,index_sav%hashtable->size); bitprint2(*info,8);
+	}else if(flag == resize){
+		fprintf(stderr,"HashTable_append : resize operation\n");
+		HashTable_resize2(hashtable,2*hashtable->size);
+		HashTable_append2(hashtable,content);
+	}else{
+		printf("HashTable_append : something unexpected happend\n");
+	}
+	//HashTable_print(hashtable,NULL); printf("\n");		
+	return hashtable;
+}
 #undef rollindex
 
 void *HashTable_find(HashTable hashtable, char *key){
@@ -203,7 +324,33 @@ void *HashTable_find(HashTable hashtable, char *key){
 		if(!(content = ArrayList_getContent(hashtable->list,index))){s <<= 1;continue;}
 		if(!(*info & s)){s <<= 1;continue;}
 		//printf("%s\n",htc->key);
-		if(!strcmp(hashtable->getkey(content),key)){
+		if(hashtable->getHash(content)==HashTable_getHash(key)){
+			return content;
+		}
+		//bitprint2(s,8);
+		s <<= 1;
+	}
+  unregistered:
+	//printf("HashTable_find : key \"%s\" is unregistered\n",key);
+	return NULL;
+}
+
+void *HashTable_find2(HashTable hashtable, int id){
+	char *info,i,s;
+	void *content;
+	unsigned int index = id%hashtable->size;
+	//printf("key : %s\tindex :  %d\n",key,index); 
+	content = ArrayList_getContent(hashtable->list,index);
+	if(!content){goto unregistered;}
+	info = &hashtable->infolist[index];
+	s = 1;
+	//bitprint2(*info,8); 
+	for(i=0;i<NEIGHBOR_LENGTH;i++,index++){
+		if(index == hashtable->size){index = 0;}
+		if(!(content = ArrayList_getContent(hashtable->list,index))){s <<= 1;continue;}
+		if(!(*info & s)){s <<= 1;continue;}
+		//printf("%s\n",htc->key);
+		if(hashtable->getHash(content)==id){
 			return content;
 		}
 		//bitprint2(s,8);
@@ -257,8 +404,6 @@ void bitprint3(int b, int length){
 		else{putchar('0');}
 	}
 }
-
-
 
 void HashTable_print(HashTable hashtable, char *(*toString)(void*)){
 	int i,max,temp;
