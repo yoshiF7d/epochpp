@@ -144,6 +144,7 @@ double *takeAveragedLineProfile(Data data, int len, double s[2], double e[2], do
 				}
 			}
 		}
+		//if(i%10==0){printf("array[%d] : %e, count : %d\n",i,array[i],count);}
 		array[i] /= count;
 	}
 	//Data_output(data,"dbg.bmat",p_float);
