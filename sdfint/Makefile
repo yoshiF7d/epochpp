@@ -6,6 +6,7 @@ LDFLAGS = -lm
 TARGET1 = sdfintb
 TARGET2 = sdfint
 TARGET3 = sdfensmall
+TARGET4 = sdfints
 
 OBJDIR = ./obj
 SRCDIR = ./src
@@ -18,13 +19,15 @@ COMOBJS = $(addprefix $(COMDIR)/obj/,$(COMOBJNAMES))
 SRC1 = $(SRCDIR)/sdfintb.c
 SRC2 = $(SRCDIR)/sdfint.c
 SRC3 = $(SRCDIR)/sdfensmall.c
+SRC4 = $(SRCDIR)/sdfints.c
 
 OBJS1 = $(addprefix $(OBJDIR)/,$(notdir $(SRC1:.c=.o)))
 OBJS2 = $(addprefix $(OBJDIR)/,$(notdir $(SRC2:.c=.o)))
 OBJS3 = $(addprefix $(OBJDIR)/,$(notdir $(SRC3:.c=.o)))
+OBJS4 = $(addprefix $(OBJDIR)/,$(notdir $(SRC4:.c=.o)))
 
 all:
-	make $(TARGET1) ; make $(TARGET2) ; make $(TARGET3)
+	make $(TARGET1) ; make $(TARGET2) ; make $(TARGET3) ; make $(TARGET4)
 
 $(TARGET1): $(OBJS1) $(COMOBJS) $(LIBS)
 	echo $(OBJS1)
@@ -41,6 +44,10 @@ $(TARGET3): $(OBJS3) $(COMOBJS) $(LIBS)
 	echo $(COMOBJS)
 	$(COMPILER) -o $@ $^ $(LDFLAGS) 
 
+$(TARGET4): $(OBJS4) $(COMOBJS) $(LIBS)
+	echo $(OBJS4)
+	echo $(COMOBJS)
+	$(COMPILER) -o $@ $^ $(LDFLAGS) 
 
 $(COMOBJS) :
 	cd $(COMDIR) && make
@@ -53,7 +60,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 .POHNY : clean cleanall cleanlib
 clean :
-	rm -f $(OBJS1) $(TARGET1) $(OBJS2) $(TARGET2) $(OBJS3) $(TARGET3)
+	rm -f $(OBJS1) $(TARGET1) $(OBJS2) $(TARGET2) $(OBJS3) $(TARGET3) $(OBJS4) $(TARGET4)
 cleanall:
 	cd $(COMDIR) && make clean
 cleanlib :
