@@ -61,7 +61,7 @@ if args.highlight is not None:
 	args.highlight = parselim(args.highlight)
 
 if args.lim is not None:
-	args.highlight = parselim(args.lim)
+	args.lim = parselim(args.lim)
 	
 def sdfen(file):
 	if file.endswith('.sdf'):
