@@ -7,32 +7,50 @@ import os
 import sys
 import argparse
 import re
+import contextlib
 
-C_c=2.997925e+08
-C_me=9.109383e-31
-C_q=1.60217657e-19
+class DummyFile(object):
+	def write(self,x): pass
+@contextlib.contextmanager
+def nostdout() :
+	save_stdout = sys.stdout
+	sys.stdout = DummyFile()
+	yield
+	sys.stdout = save_stdout
+
+def parselim(limstr):
+	l0,l1 = limstr.split(",")
+	l0 = l0.lstrip('([').lstrip()
+	l1 = l1.rstrip(')]').rstrip()
+	return [float(l0),float(l1)]
 
 parser = argparse.ArgumentParser(description='create density map images')
 parser.add_argument('indir',help='set input directory')
 parser.add_argument('variable',help='set variable name',nargs='?')
 parser.add_argument('outdir',help='set output directory',default=os.getcwd(),nargs='?')
-parser.add_argument('-m','--min',type=float,help='set min')
+parser.add_argument('-l','--lim',type=float,help='set limits',metavar='[min,max]')
 parser.add_argument('-M','--max',type=float,help='set max')
-parser.add_argument('-c','--highlight',help='highlight value in range (hmin,hmax)',metavar='(hmin,hmax)')
+parser.add_argument('-c','--highlight',help='highlight value in range [hmin,hmax]',metavar='[hmin,hmax]')
+parser.add_argument('-f','--flim',type=str,help='process from fmin th file to fmax th file (index starts from 0). usage : -f [fmin,fmax]',metavar='[fmin,fmax]')
+
 args=parser.parse_args()
 
-files = os.listdir(args.indir)
+files = [file for file in os.listdir(args.indir) if file.endswith('.sdf')]
 files.sort()
-for file in files:
-	if file.endswith('.sdf'):
-		data = sh.getdata(file)
-		print file
-		break		
 
-if args.variable is None:
-	print 'choose variable from list shown below (mesh variable only)'
+if args.flim is not None:
+	args.flim = list(map(int,parselim(args.flim)))
+	files = files[args.flim[0]:args.flim[1]]
+else:
+	args.flim = [0,len(files)-1]
+
+with nostdout():
+	data = sh.getdata(files[0])
+
+if args.variable is None or not hasattr(data,args.variable):
+	print('choose variable from list shown below (mesh variable only)')
 	for x in  data.__dict__:
-		print x
+		print(x)
 	sys.exit()
 
 var = getattr(data,args.variable).data
@@ -41,34 +59,29 @@ if not os.path.exists(args.outdir):
 	os.makedirs(args.outdir)
 
 if args.highlight is not None:
-	hmin,hmax = args.highlight.split(",")
-	hmin = hmin.lstrip('([').lstrip()
-	hmax = hmax.rstrip(')]').rstrip()
-	hmin = float(hmin)
-	hmax = float(hmax)
+	args.highlight = parselim(args.highlight)
 
+if args.lim is not None:
+	args.highlight = parselim(args.lim)
+	
 def sdfen(file):
 	if file.endswith('.sdf'):
 		print('processing '+ file)
-		data=sh.getdata(file)
+		with nostdout():
+			data=sh.getdata(file)
 		var = np.flipud(getattr(data,args.variable).data.transpose())
-		if args.min is None:
-			min = np.min(var)
+		if args.lim is None:
+			min = np.min(var) 
+			max = np.max(var)
 		else:
-			min = args.min
-		
-		if args.max is None:
-			max = np.max(var)	
-		else:
-			max = args.max
-		
-		print 'min : ' + str(min)
-		print 'max : ' + str(max)
+			min,max = args.lim
+		print('min : ' + str(min))
+		print('max : ' + str(max))
 		if args.highlight is not None:
 			print 'hmin : ' + str(hmin)
 			print 'hmax : ' + str(hmax)
-			hhmin = (hmin-min)/(max-min)
-			hhmax = (hmax-min)/(max-min)
+			hhmin = (args.highlight[0]-min)/(max-min)
+			hhmax = (args.highlight[1]-min)/(max-min)
 			r = (var-min)/(max-min)
 			b = (var-min)/(max-min)
 			g = (var-min)/(max-min)
@@ -81,7 +94,7 @@ def sdfen(file):
 			plt.imshow(var,cmap=plt.get_cmap("gray_r"),norm=mpl.colors.Normalize(min,max),interpolation='none')
 			plt.colorbar()
 
-		plt.title('Particles',fontname='Arial',fontsize=30)
+		plt.title(args.variable,fontname='Arial',fontsize=20)
 		ax = plt.gca()
 		#ax.get_xaxis().set_major_formatter(mpl.ticker.FormatStrFormatter('%.0e'))
 		#ax.get_yaxis().set_major_formatter(mpl.ticker.FormatStrFormatter('%.0e'))
