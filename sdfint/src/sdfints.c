@@ -58,13 +58,16 @@ int main(int argc, char *argv[]){
 	Array mask=NULL;
 
 	FILE *gp;
-	while((opt=getopt(argc,argv,"b:m:"))!=-1){
+	while((opt=getopt(argc,argv,"b:m:n:"))!=-1){
 		switch(opt){
+			case 'n':
+				maxcount = atoi(optarg);
+				break;
 			case 'b':
 				dirbg = String_join(optarg,"/");
 				break;
 			case 'm':
-				filemask = String_join(optarg,"/");
+				filemask = String_copy(optarg);
 				break;
 			default:
 				goto usage;
@@ -74,7 +77,8 @@ int main(int argc, char *argv[]){
 	if(optind+1 >= argc){
 		usage:
 		printf(
-			   "usage : %s [inputdir name] [outputfile name] [-b bg dir name] [-m mask file name (.bary)]\n",
+			   "usage : %s [inputdir name] [outputfile name] [-b bg dir name] "
+			   "[-m mask file name (.bary)] [-n max file count]\n",
 			   argv[0]
 		);
 		exit(0);	
@@ -105,6 +109,7 @@ int main(int argc, char *argv[]){
 	if(maxcount > 0){
 		for(i=0,list=mainlist;i<maxcount-1 && list->next;i++,list=list->next){}
 		LinkedList_deleteRoot(list->next,deallocate);
+		list->next = NULL;
 		filecount = maxcount;
 	}
 	
@@ -119,6 +124,16 @@ int main(int argc, char *argv[]){
 			duration = (end - start)*0.1;
 			time(&start);
 		}
+		printf("processing %s (%d/%d)\n",list->content,count,filecount);
+		printf("[");
+		for(i=0;i<100;i++){
+			if(i<100*count/filecount){printf("=");}
+			else if(i==100*count/filecount){printf("🐌");}
+			else{printf(" ");}
+		}
+		printf("]");
+		printf(" %.1f %%",100*(double)count/filecount);
+		printf(" ETA %.1f min\n",(double)(filecount-count)*duration/60);
 		file = String_join(dirin,list->content);
 		en=calcen(file,mask);
 		deallocate(file);
@@ -130,19 +145,9 @@ int main(int argc, char *argv[]){
 			enbg=0;
 		}
 		ennet=en-enbg; 
-		
 		fprintf(fp,"%e\t%e\t%e\n",ennet,enbg,en);
-		
-		printf("processing %s (%d/%d)\n",list->content,count,filecount);
-		printf("[");
-		for(i=0;i<100;i++){
-			if(i<100*count/filecount){printf("=");}
-			else if(i==100*count/filecount){printf("🐌");}
-			else{printf(" ");}
-		}
-		printf("]");
-		printf(" %.1f %%",100*(double)count/filecount);
-		printf(" ETA %.1f min\n",(double)(filecount-count)*duration/60);
+		printf("\033[F\033[J");
+		printf("\033[F\033[J");
 	}
 	
 	fclose(fp);	
