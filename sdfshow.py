@@ -78,8 +78,6 @@ def sdfen(file):
 		print('min : ' + str(min))
 		print('max : ' + str(max))
 		if args.highlight is not None:
-			print 'hmin : ' + str(hmin)
-			print 'hmax : ' + str(hmax)
 			hhmin = (args.highlight[0]-min)/(max-min)
 			hhmax = (args.highlight[1]-min)/(max-min)
 			r = (var-min)/(max-min)
