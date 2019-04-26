@@ -112,7 +112,7 @@ double *takeLineProfile(Data data, int len, double s[2], double e[2]){
 	}
 	return array;
 }
-double *takeAveragedLineProfile(Data data, int len, double s[2], double e[2], double rn[2]){
+double *takeAveragedLineProfile(Data data, int len, double s[2], double e[2], double rn[2], double width){
 	int i,j,k;
 	int count=0;
 	double *array = allocate(len*sizeof(double));
@@ -133,7 +133,7 @@ double *takeAveragedLineProfile(Data data, int len, double s[2], double e[2], do
 				qq = q[0]*q[0] + q[1]*q[1];
 				h = pq/length;
 				v = (-q[0]*p[1] + q[1]*p[0])/length;
-				if( fabs(h-i)<0.5 && v >= rn[0] && v <= rn[1] ){
+				if( fabs(h-i)<width && v >= rn[0] && v <= rn[1] ){
 					if(0 <= x + j && x + j < data->column){
 						if(0 <= y + k && y + k < data->row){
 							//if(i%100<1){data->elem[(int)(y+k)][(int)(x+j)] = 1e+30;}
@@ -195,7 +195,7 @@ void drawLine(Data data,double s[2], double e[2]){
 int main(int argc, char *argv[]){
 	char *dirin,*filein=NULL,*fileout,*specname,*lineString=NULL,*dfile=NULL,*regionString;
 	int row=-1,i,j,k,len,count,filecount,maxcount=-1,isLineSet=0,isRegionSet=0;
-	double duration=0;
+	double duration=0,width=0.5;
 	double o[2],t[2],s[2],e[2];
 	double rn[2],rt[2];
 	LinkedList mainlist=NULL,list; 
@@ -206,11 +206,14 @@ int main(int argc, char *argv[]){
 	struct dirent *entry;
 	time_t start,end;
 		//LeakDetector_set(stdout);
-    while((opt=getopt(argc,argv,"r:l:n:d:a:"))!=-1){
+    while((opt=getopt(argc,argv,"r:l:n:d:a:w:"))!=-1){
         switch(opt){
             case 'r':
 				row = atoi(optarg);
                 break;
+			case 'w':
+				width = atof(optarg);
+				break;
 			case 'l':
 				lineString = String_copy(optarg);
 				isLineSet = 1;
@@ -284,13 +287,15 @@ int main(int argc, char *argv[]){
 		list->next = NULL;
 		filecount = maxcount;
 	}
-	parseLineString(lineString,o,t);
 	if(isLineSet){
+		printf("-l %s\n",lineString);
+		parseLineString(lineString,o,t);
 		printf("(o[0],o[1]) : (%e,%e)\n",o[0],o[1]);
 		printf("(t[0],t[1]) : (%e,%e)\n",t[0],t[1]);
 	}
-	parseLineString(regionString,rt,rn);
 	if(isRegionSet){
+		printf("-a %s\n",regionString);
+		parseLineString(regionString,rt,rn);
 		printf("(rt[0],rt[1]) : (%e,%e)\n",rt[0],rt[1]);
 		printf("(rn[0],rn[1]) : (%e,%e)\n",rn[0],rn[1]);
 	}
@@ -350,7 +355,7 @@ int main(int argc, char *argv[]){
         //end = clock();
 		if(isLineSet){
 			if(isRegionSet){
-				lineProfile->array = takeAveragedLineProfile(data,len,s,e,rn);
+				lineProfile->array = takeAveragedLineProfile(data,len,s,e,rn,width);
 			}else{
 				lineProfile->array = takeLineProfile(data,len,s,e);
 			}
