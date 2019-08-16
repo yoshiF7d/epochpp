@@ -161,7 +161,7 @@ for file in files:
 	axes[1].set_xlabel('Energy [eV]',fontsize=18)
 	axes[1].set_ylabel('Count [a.u]',fontsize=18)
 	axes[1].fill_between(0.5*(hist[1][1:]+hist[1][:-1]), hist[0]+tiny, y2=cmax, color='gray')
-	plt.suptitle(os.path.splitext(os.path.basename(file))[0]+' fs',fontsize=40)
+	plt.suptitle(os.path.splitext(os.path.basename(file))[0],fontsize=30)
 	fig.tight_layout()
 	plt.savefig(args.outdir+'/'+os.path.splitext(os.path.basename(file))[0]+'.png')
 	plt.close()
