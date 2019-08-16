@@ -1591,6 +1591,7 @@ LinkedList parsefunc(char *buf){
 
 void visiter_export(LinkedList list){
 	int i,j,len;
+	enum precision type=p_double;
 	double max;
 	FILE *fp = stdout;	
 	VisiterInfo vi=NULL;
@@ -1601,20 +1602,33 @@ void visiter_export(LinkedList list){
 	vi = LinkedList_getIndex(list,0);
 	data = VisiterInfo_getData(vi);
 	if(!data){printf("no data is loaded. please use \"load\" function\n");return;}
-	if(len != 1 && len != 2){printdoc_imp(visiter_export);return;}
+	if(len != 1 && len != 2 && len != 3){printdoc_imp(visiter_export);return;}
+	if(len>=2){
+		name = LinkedList_getIndex(list,1);
+		if(isInt(name)){
+			type = atoi(name);
+			name = NULL;
+			len = 1;
+		}else{
+			fileout = name;	
+			if(len==3){type = atoi(LinkedList_getIndex(list,2));}
+			Data_output(data,fileout,type);
+		}	
+	}
 	if(len==1){
 		filein = getFileName(vi->filename);
 		name=String_ncopy(filein,strlen(filein)-strlen(getFileExtension(filein)));
 		fileout=String_join(name,".bmat");
-		Data_output(data,fileout,p_float);
+		fp = wopen(fileout);	
+		if(fp){
+			fclose(fp);
+			Data_output(data,fileout,type);	
+		}
 		deallocate(name);
 		deallocate(fileout);
 	}
-	if(len==2){
-		fileout = String_stripdq(LinkedList_getIndex(list,1));
-		Data_output(data,fileout,p_float);
-	}
 }
+
 #define doc(NAME,print) if(func==visiter_##NAME){print; return;}
 /*http://stackoverflow.com/questions/3585846/color-text-in-terminal-aplications-in-unix*/
 #define KNRM  "\x1B[0m"
@@ -2080,7 +2094,7 @@ void printdoc_imp(Func func){
 	)
 	doc(export,
 		printf(
-		BOLD "%-10s" USAGE "export[(\"OUTPUTFILE\"])]\n"
+		BOLD "%-10s" USAGE "export[(\"OUTPUTFILE\"]),(data type)]\n"
 		"%-10s" EXAMPLE "export, export(\"OUTPUTFILE\")\n"
 		RESET
 		"%-10s" KNRM "export data to \"OUTPUTFILE\" in bmat format\n"
@@ -2088,9 +2102,9 @@ void printdoc_imp(Func func){
 		"%-10s" KNRM "\tmeta data : 12 bytes\n"
 		"%-10s" KNRM "\tmain data : row*column*(4 or 8) bytes\n"
 		"%-10s" KNRM "data type (int32),row (int32),column (int32),data (Real32 or Real64)...\n"
-		"%-10s" KNRM "data type :\n\t0 : Real64\n\t1 : Real32\n"
+		"%-10s" KNRM "data type :\t(0 : Real64\t1 : Real32)\n"
 		"\n\n"
-		,"export",p,p,p,p,p,p,p,p
+		,"export",p,p,p,p,p,p,p
 		)
 	)
 	doc(drawpng,
@@ -2100,7 +2114,7 @@ void printdoc_imp(Func func){
 		RESET
 		"%-10s" KNRM "draw 2d map with gnuplot in png file\n"
 		"%-10s" "you can provide gnuplot command file in the last argument\n"
-		,"drawpng",p,p,p,p
+		,"drawpng",p,p,p
 		)
 	)
 	else{printf("no documentation is provided\n"); return;}

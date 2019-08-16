@@ -651,16 +651,16 @@ void Data_output(Data data, char *fileout, enum precision p){
 		}
 		break;
 	  case p_float:
-        f = allocate(data->row*data->column*sizeof(float));
-        for(i=0;i<data->row;i++){
+        	f = allocate(data->row*data->column*sizeof(float));
+        	for(i=0;i<data->row;i++){
 			for(j=0;j<data->column;j++){
 				f[i*data->column+j]=data->elem[i][j];
 			}
 		}
-        if((w1=fwrite(f,sizeof(float),data->row*data->column,fp))!=data->row*data->column){
-            fprintf(stderr,"Data_output : output error. trying to write %d bytes, but %d bytes are written \n",data->row*data->column*4,w1*4); exit(1);
-        }
-        deallocate(f);
+        	if((w1=fwrite(f,sizeof(float),data->row*data->column,fp))!=data->row*data->column){
+            		fprintf(stderr,"Data_output : output error. trying to write %d bytes, but %d bytes are written \n",data->row*data->column*4,w1*4); exit(1);
+        	}
+        	deallocate(f);
 		break;
 	}
 	fclose(fp);
