@@ -64,7 +64,7 @@ double Data_fwhm(Data data, double xmin, double xmax, double *xl, double *xr);
 
 void Data_print(Data data);
 void Data_fprint(Data data, FILE *fp, char *sep);
-enum precision{p_double,p_float};
+enum precision{p_double,p_float,p_char};
 void Data_output(Data data, char *fileout, enum precision p);
 Data Data_input(char *filein);
 Data Data_loadBMAT(char *filein);

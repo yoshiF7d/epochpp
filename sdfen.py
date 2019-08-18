@@ -105,6 +105,10 @@ if args.olim is not None:
 for k,v in args.__dict__.items():
 	print(k + " : "+ str(v))
 
+def shuffle_in_unison(x,y,z):
+	p = np.random.permutation(len(x))
+	return x[p],y[p],z[p]
+
 for file in files:
 	print('processing '+ file)
 	with nostdout():
@@ -135,6 +139,8 @@ for file in files:
 			extent=[args.xlim[0],args.xlim[1],args.ylim[0],args.ylim[1]],
 			interpolation='none'
 		)
+	
+	x,y,c = shuffle_in_unison(x,y,c)
 	axes[0].scatter(x,y,color=c,s=0.1)
 	axes[0].set_title('Particles',fontsize=30)
 	axes[0].get_xaxis().set_major_formatter(mpl.ticker.FormatStrFormatter('%.0e'))

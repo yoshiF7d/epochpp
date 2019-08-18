@@ -640,6 +640,8 @@ void Data_output(Data data, char *fileout, enum precision p){
 	FILE *fp=fopen(fileout,"wb");
 	int w1,i,j;
 	float *f;
+	char *c;
+	double max,min;
 	if(!fp){fprintf(stderr,"Data_output : fopen error\n"); exit(1);}
 	fwrite(&p,sizeof(enum precision),1,fp);
 	fwrite(&data->row,sizeof(int),1,fp);
@@ -662,6 +664,28 @@ void Data_output(Data data, char *fileout, enum precision p){
         	}
         	deallocate(f);
 		break;
+	  case p_char:
+		max = min = data->elem[0][0];
+		for(i=0;i<data->row;i++){
+			for(j=0;j<data->column;j++){
+				if(max < data->elem[i][j]){max = data->elem[i][j];}
+				if(min > data->elem[i][j]){min = data->elem[i][j];}
+			}
+		}
+		c = allocate(data->row*data->column*sizeof(char));
+		if((max-min)==0){for(i=0;i<data->row*data->column;i++){c[i] = 0;}}
+		else{
+			for(i=0;i<data->row;i++){
+				for(j=0;j<data->column;j++){
+					c[i*data->column+j]=255*(data->elem[i][j]-min)/(max-min);
+				}
+			}
+		}
+        	if((w1=fwrite(c,sizeof(char),data->row*data->column,fp))!=data->row*data->column){
+            		fprintf(stderr,"Data_output : output error. trying to write %d bytes, but %d bytes are written \n",data->row*data->column*1,w1*1); exit(1);
+        	}
+		deallocate(c);
+		break;
 	}
 	fclose(fp);
 }
@@ -672,10 +696,11 @@ Data Data_input(char *filein){
 	FILE *fp=fopen(filein,"rb");
 	int r=0,c=0,count=0,i,j;
 	float *f;
+	char *ca;
 	enum precision p;
 	if(!fp){fprintf(stderr,"Data_input : fopen error\n"); exit(1);}
 	fread(&p,sizeof(enum precision),1,fp);
-	if(p != p_double && p != p_float){fprintf(stderr,"Data_input : data type infomation is corrupted.\n"); exit(1);}
+	if(p != p_double && p != p_float && p !=p_char){fprintf(stderr,"Data_input : data type infomation is corrupted.\n"); exit(1);}
 	fread(&r,sizeof(int),1,fp);
 	fread(&c,sizeof(int),1,fp);
 	//fprintf(stderr,"row : %d\n",r);
@@ -694,14 +719,28 @@ Data Data_input(char *filein){
 			fprintf(stderr,"Data_input : data size should be %lu byte, but is %lu byte\n",sizeof(enum precision)+2*sizeof(int)+r*c*sizeof(float),size);
 		}
 		data = Data_create(r,c);
-        f = allocate(r*c*sizeof(float));
-        fread(f,sizeof(float),r*c,fp);
-        for(i=0;i<data->row;i++){
+        	f = allocate(r*c*sizeof(float));
+        	fread(f,sizeof(float),r*c,fp);
+        	for(i=0;i<data->row;i++){
 			for(j=0;j<data->column;j++){
 				data->elem[i][j] = f[i*c+j];
 			}
 		}
-        deallocate(f);
+       		deallocate(f);
+		break;
+	  case p_char:
+		if(size!=sizeof(enum precision)+2*sizeof(int)+r*c*sizeof(char)){
+			fprintf(stderr,"Data_input : data size should be %lu byte, but is %lu byte\n",sizeof(enum precision)+2*sizeof(int)+r*c*sizeof(char),size);
+		}
+		data = Data_create(r,c);
+        	ca = allocate(r*c*sizeof(char));
+        	fread(ca,sizeof(float),r*c,fp);
+        	for(i=0;i<data->row;i++){
+			for(j=0;j<data->column;j++){
+				data->elem[i][j] = (unsigned char)ca[i*c+j];
+			}
+		}
+       		deallocate(ca);
 		break;
 	}
 	fclose(fp);
