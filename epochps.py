@@ -75,7 +75,7 @@ with open(epscript,mode='w') as f:
 	f.write('i=0\n')
 	f.write('for ((i=0;i<\"${#dirlist[@]}\";i++))\n')
 	f.write('do')
-	f.write('	echo \"processing ${taglist[$i]}\" \n')
+	f.write('	echo \"simulation ${taglist[$i]}\" \n')
 	f.write('	cd ${dirlist[$i]}\n')
 	f.write('	./' + runscript + '\n')
 	f.write('	cd ../\n')
