@@ -179,7 +179,6 @@ static int sdf_free_distribution(sdf_file_t *h)
 
 static int sdf_helper_read_array_halo(sdf_file_t *h, void **var_in)
 {
-	fprintf(stderr,"sdf_read_array_halo\n");
     sdf_block_t *b = h->current_block;
     char **var_ptr = (char**)var_in;
     char *var = *var_ptr;
@@ -326,7 +325,6 @@ static int sdf_helper_read_array(sdf_file_t *h, void **var_in, int count)
     char convert;
     int sz;
 	
-	fprintf(stderr,"sdf_helper_read_array\n");	
 	if (b->ng) return sdf_helper_read_array_halo(h, var_in);
 
     if (h->mmap) {
@@ -400,7 +398,6 @@ static int sdf_helper_read_array(sdf_file_t *h, void **var_in, int count)
 
 int sdf_read_plain_mesh(sdf_file_t *h)
 {
-	fprintf(stderr,"sdf_read_plain_mesh\n");
     sdf_block_t *b = h->current_block;
     int n;
 
@@ -453,7 +450,6 @@ int sdf_read_lagran_mesh(sdf_file_t *h)
     int n;
     uint64_t nelements = 1;
 	
-	fprintf(stderr,"sdf_read_lagran_mesh\n");
     if (b->done_data) return 0;
     if (!b->done_info) sdf_read_blocklist(h);
 
@@ -503,7 +499,6 @@ int sdf_read_lagran_mesh(sdf_file_t *h)
 int sdf_read_plain_variable(sdf_file_t *h)
 {
 	Data data;
-	//fprintf(stderr,"sdf_read_plain_variable\n");
     sdf_block_t *b = h->current_block;
 	int i,j,n,row,col;
 	double *a;
