@@ -9,11 +9,12 @@ import ast
 import sys
 import collections
 
-parser = argparse.ArgumentParser(description='setup multiple epoch simulations for parameter sweeping')
+parser = argparse.ArgumentParser(description='setup multiple epoch simulations for parameter sweeping',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('template',help='template input file. the keywords \'$0\',\'$1\',... in the template file are replaced by xi,yi,... in params')
 parser.add_argument('params',help='parameter lists. syntax : \"[[x1,x2,...],[y1,y2,...],...]\".')
 parser.add_argument('runscript',help='script to run each simulation')
-parser.add_argument('-n','--runall',type=str,help='name of the script to run all simulations. default file name is \'epochps_runall.sh\'')
+parser.add_argument('-i','--inputfile',type=str,default='input.deck',help='name of the input file made from template input file')
+parser.add_argument('-r','--runall',type=str,default='epochps_runall.sh',help='name of the script to run all simulations.')
 parser.add_argument('-c','--copyfiles',type=str,help='files that are copied to all simulation folders. syntax : \"[\'file1\',\'file2\',...]\"')
 args=parser.parse_args()
 
@@ -76,10 +77,9 @@ listParser = ListParser()
 srcfile=args.template
 params=listParser.parse(args.params)
 runscript=args.runscript
-if args.runall is not None:
-	epscript=args.runall
-else:
-	epscript='epochps_runall.sh'
+epscript=args.runall
+inputfile=args.inputfile
+
 if args.copyfiles is not None:
 	copyfiles=listParser.parse(args.copyfiles)
 
@@ -114,10 +114,10 @@ for i in range(n):
 	print(tag)
 	if not os.path.exists(dir):
 		os.mkdir(dir)
-	with open(dir+'/input.deck',mode='w') as f:
+	with open(dir+'/'+inputfile,mode='w') as f:
 		f.write(dst)
-	with open(dir+'/deck.file',mode='w') as f:
-		f.write('.')
+#	with open(dir+'/deck.file',mode='w') as f:
+#		f.write('.')
 	if args.copyfiles is not None:
 		if isinstance(copyfiles,basestring):
 			if os.path.exists(copyfiles):
