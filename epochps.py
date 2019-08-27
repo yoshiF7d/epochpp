@@ -141,7 +141,7 @@ with open(epscript,mode='w') as f:
 	f.write('dirlist=' + '(' + ','.join(dirlist) + ')\n' )	
 	f.write('taglist=' + '(' + ','.join(taglist) + ')\n' )
 	f.write('for i in range(len(dirlist)):\n')
-	f.write('\tprint(\"simulation \"+taglist[i]+dirlist[i])\n')
+	f.write('\tprint(\"simulation \"+taglist[i])\n')
 	f.write('\tsubprocess.call(\'./'+runscript+'\',cwd=dirlist[i]) \n')
 	os.chmod(epscript,0777)
 
