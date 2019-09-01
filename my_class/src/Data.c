@@ -785,6 +785,8 @@ Data Data_loadBARY(char *filein){
 		for(i=0;i<len;i++){elem[i] = f[i];}
 		deallocate(f);
 		break;
+	  default:
+	  	break;
 	}
 	data = Data_create(dim[1],dim[0]);
 	for(i=0;i<dim[1];i++){

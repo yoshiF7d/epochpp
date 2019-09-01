@@ -568,8 +568,9 @@ Array Array_sdf_read_plain_variable(sdf_file_t *h){
     switch(b->datatype_out){
 	  case SDF_DATATYPE_REAL8:
         	array = Array_create2(b->ndims,b->local_dims);
-            fseeko(h->filehandle, h->current_location, SEEK_SET);
-    		fread(array->elem,SDF_TYPE_SIZES[b->datatype],b->nelements_local,h->filehandle);
+        	sdf_helper_read_array(h, (void**)(&array->elem), b->nelements_local);
+		//fseeko(h->filehandle, h->current_location, SEEK_SET);
+    		//fread(array->elem,SDF_TYPE_SIZES[b->datatype],b->nelements_local,h->filehandle);
 		break;
 	  case SDF_DATATYPE_REAL4:
         	array = Array_create2(b->ndims,b->local_dims);

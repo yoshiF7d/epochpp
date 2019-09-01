@@ -172,6 +172,7 @@ unsigned long HashTable_getHash_getKey_mod(void *content, char *(*getKey)(void*)
 	}else{
 		return HashTable_getHash(getKey_imp(content));
 	}
+	return 0;
 }
 	
 unsigned long HashTable_getHash_getKey(void *content){return HashTable_getHash_getKey_mod(content,NULL);}

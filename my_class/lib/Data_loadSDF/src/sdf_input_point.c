@@ -180,8 +180,9 @@ Data Data_sdf_read_point_mesh(sdf_file_t *h){
     switch(b->datatype){
 	  case SDF_DATATYPE_REAL8:
 		for(n=0;n<b->ndims;n++){
-		 	fseeko(h->filehandle, h->current_location, SEEK_SET);
-			fread(data->elem[0], SDF_TYPE_SIZES[b->datatype],b->nelements_local,h->filehandle);
+			sdf_helper_read_array(h, (void**)&(data->elem[0]), b->nelements_local);
+			//fseeko(h->filehandle, h->current_location, SEEK_SET);
+			//fread(data->elem[0], SDF_TYPE_SIZES[b->datatype],b->nelements_local,h->filehandle);
 			h->current_location = h->current_location + SDF_TYPE_SIZES[b->datatype] * b->dims[0];
 		}
 		break;
@@ -254,8 +255,9 @@ Data Data_sdf_read_point_variable(sdf_file_t *h)
 	//printf("nelements_local : %d\n",b->nelements_local);	
 	switch(b->datatype){
 	  case SDF_DATATYPE_REAL8:
-			fseeko(h->filehandle, h->current_location, SEEK_SET);
-			fread(data->elem[0], SDF_TYPE_SIZES[b->datatype],b->nelements_local,h->filehandle);
+			sdf_helper_read_array(h, (void**)&data->elem[0], b->nelements_local);
+			//fseeko(h->filehandle, h->current_location, SEEK_SET);
+			//fread(data->elem[0], SDF_TYPE_SIZES[b->datatype],b->nelements_local,h->filehandle);
 		break;
 	  case SDF_DATATYPE_REAL4:
 			sdf_helper_read_array(h, &b->data, b->nelements_local);
@@ -273,7 +275,7 @@ Data Data_sdf_read_point_variable(sdf_file_t *h)
 		n = b->nelements_local;
 		for(i=0;i<n;i++){
 			Data_set(data,i,0,a[i]);
-		}
+		k
 		Data_output(data,fileout,p_float);
 		Data_delete(data);
 	}else if (b->datatype_out == SDF_DATATYPE_REAL8) {
