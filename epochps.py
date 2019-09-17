@@ -14,7 +14,7 @@ parser.add_argument('template',help='template input file. the keywords \'$0\',\'
 parser.add_argument('params',help='parameter lists. syntax : \"[[x1,x2,...],[y1,y2,...],...]\".')
 parser.add_argument('runscript',help='script to run each simulation')
 parser.add_argument('-i','--inputfile',type=str,default='input.deck',help='name of the input file made from template input file')
-parser.add_argument('-r','--runall',type=str,default='epochps_runall.py',help='name of the script to run all simulations.')
+parser.add_argument('-r','--runallfile',type=str,default='epochps_runall.py',help='name of the script to run all simulations.')
 parser.add_argument('-c','--copyfiles',type=str,help='files that are copied to all simulation folders. syntax : \"[\'file1\',\'file2\',...]\"')
 args=parser.parse_args()
 
@@ -60,7 +60,7 @@ class ListParser:
 			elif c == '\"':
 #				msg += 'Double Quote'
 				self.index = i+1+elf.string[i+1:].index('\"')+1
-				list.append(self.string[i+1:self.index-1])
+				list.append(self.string[i+2:self.index-2])
 				i = self.index-1
 #			else:
 #				msg += 'Else'
@@ -73,12 +73,7 @@ class ListParser:
 		return list
 
 listParser = ListParser()
-
-srcfile=args.template
 params=listParser.parse(args.params)
-runscript=args.runscript
-epscript=args.runall
-inputfile=args.inputfile
 
 if args.copyfiles is not None:
 	copyfiles=listParser.parse(args.copyfiles)
@@ -86,7 +81,7 @@ if args.copyfiles is not None:
 #params = [[1e+19,1e+20,1e+21],[1000,500,100],['a','b','c'],['d','e']]
 dirlist=[]
 taglist=[]
-with open(srcfile) as f:
+with open(args.template) as f:
 	src=f.read()
 
 n = 1
@@ -114,7 +109,7 @@ for i in range(n):
 	print(tag)
 	if not os.path.exists(dir):
 		os.mkdir(dir)
-	with open(dir+'/'+inputfile,mode='w') as f:
+	with open(dir+'/'+args.inputfile,mode='w') as f:
 		f.write(dst)
 #	with open(dir+'/deck.file',mode='w') as f:
 #		f.write('.')
@@ -129,12 +124,12 @@ for i in range(n):
 					shutil.copyfile(file,dir+'/'+file)
 					os.chmod(dir+'/'+file,0777)
 	
-	shutil.copyfile(runscript,dir+'/'+runscript)
-	os.chmod(dir+'/'+runscript,0777)
+	shutil.copyfile(args.runscript,dir+'/'+args.runscript)
+	os.chmod(dir+'/'+args.runscript,0777)
 	dirlist.append('\''+dir+'\'')
 	taglist.append('\''+tag+'\'')
 
-with open(epscript,mode='w') as f:
+with open(args.runallfile,mode='w') as f:
 	f.write('#!/usr/bin/env python\n')
 	f.write('import subprocess\n')
 	f.write('import os\n')
@@ -142,12 +137,12 @@ with open(epscript,mode='w') as f:
 	f.write('taglist=' + '(' + ','.join(taglist) + ')\n' )
 	f.write('for i in range(len(dirlist)):\n')
 	f.write('\tprint(\"simulation \"+taglist[i])\n')
-	f.write('\tsubprocess.call(\'./'+runscript+'\',cwd=dirlist[i]) \n')
-	os.chmod(epscript,0777)
+	f.write('\tsubprocess.call(\'./'+args.runscript+'\',cwd=dirlist[i]) \n')
+	os.chmod(args.runallfile,0777)
 
 print('simulation count : ' + str(n))
-print('input deck template : ' + srcfile)
-print('run script  : ' + runscript)
+print('input deck template : ' + args.template)
+print('run script  : ' + args.runscript)
 if args.copyfiles is not None:
 	print('copyfiles  : ' + str(copyfiles))
-print('type ./'+epscript+' to start simulations')
+print('type ./'+args.runallfile+' to start simulations')
