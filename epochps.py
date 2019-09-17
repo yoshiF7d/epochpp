@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python 
 import os
 import stat
 import numpy as np
@@ -90,6 +90,10 @@ for i in range(len(params)):
 
 ind = np.zeros(len(params),dtype=np.uint8)
 
+if len(params) == 1:
+	n -= 1
+print(len(params))
+
 for i in range(n):
 	ii=i
 	for j in range(len(params)):
@@ -127,10 +131,10 @@ for i in range(n):
 	shutil.copyfile(args.runscript,dir+'/'+args.runscript)
 	os.chmod(dir+'/'+args.runscript,0777)
 	dirlist.append('\''+dir+'\'')
-	taglist.append('\''+tag+'\'')
+	taglist.append('"""'+tag+'"""')
 
 with open(args.runallfile,mode='w') as f:
-	f.write('#!/usr/bin/env python\n')
+	f.write('#!/usr/bin/env python -u\n')
 	f.write('import subprocess\n')
 	f.write('import os\n')
 	f.write('dirlist=' + '(' + ','.join(dirlist) + ')\n' )	
