@@ -145,18 +145,18 @@ int Energy_vcompare(void *e1, void *e2){
 int main(int argc, char *argv[]){
 	char *dirin,*filein=NULL,*fileout;
 	
-	int i,j,k,s,len,speclen=0,domsetflag=0,namelistlen,initialflag=0,count,filecount;
+	int i,j,k,s,len,speclen=0,domsetflag=0,namelistlen,initialflag=0,count,filecount,meshcount=0;
 	double box[3]={1,1,1};
 	int domain[3][2]={{0,1},{0,1},{0,1}};
-    double time;
+	double time;
 	double ec,bc,bx,by,bz,ex,ey,ez,ek,nd;
-	double een=0,ben=0,ken=0,area=1;	
+	double een=0,ben=0,ken=0,area=1;
 	double *kenlist;
 	LinkedList list0=NULL,list=NULL,list2=NULL,namelist=NULL,arylist=NULL,speclist=NULL,mainlist=NULL;
 	Array aryex,aryey,aryez,arybx,aryby,arybz,aryek,arynd;
 	Spec spec;
     Energy energy;
-	FILE *fp=stdout;;
+	FILE *fp=stdout;
 	DIR *dp;
 	int opt;
 	struct dirent *entry;
@@ -200,12 +200,14 @@ int main(int argc, char *argv[]){
         setbox(box,argv[optind+1]);
     }
     if(argc >= optind+3){
-        fileout = String_copy(argv[optind+2]);		
+        fileout = String_copy(argv[optind+2]);
         fp = fopen(fileout,"w");
-    }
+		setbuf(fp,NULL);
+	}
 
-    area = box[0]*box[1]*box[2];	
-    namelist = LinkedList_append(namelist,"ex");
+    area = box[0]*box[1]*box[2];
+    meshcount = (domain[0][1] - domain[0][0])*(domain[1][1] - domain[1][0])*(domain[2][1] - domain[2][0]);
+	namelist = LinkedList_append(namelist,"ex");
     namelist = LinkedList_append(namelist,"ey");
     namelist = LinkedList_append(namelist,"ez");
     namelist = LinkedList_append(namelist,"bx");
@@ -349,13 +351,13 @@ int main(int argc, char *argv[]){
                 for(j=domain[1][0];j<domain[1][1];j++){
                     for(k=domain[2][0];k<domain[2][1];k++){
                         kenlist[s] += Array_get(spec->ekary,i,j,k)*Array_get(spec->ndary,i,j,k);}
-                }	
+                }
             }
-            kenlist[s] *= area;
+            kenlist[s] *= area/meshcount;
         }
-        een *= area;
-        ben *= area;
-        ken *= area;
+        een *= area/meshcount;
+        ben *= area/meshcount;
+        ken *= area/meshcount;
         energy->een = een;
         energy->ben = ben;
         energy->ken = ken;
