@@ -93,29 +93,29 @@ int main(int argc, char *argv[]){
 		mode = atoi(argv[optind+8]);
 	}else{
 		usage:
-		fprintf(stderr,"usage : %s sdffile specname hmin hmax hbin vmin vmax vbin mode\n\n",argv[0]);
-		fprintf(stderr,"hbin,vbin is a horizontal & vertical bin count.\n");
-		fprintf(stderr,"option : -m : set particle mass. default mass is 9.11e-31\n");
-		fprintf(stderr,"mode specifies axis of phasespace.\n");
-		fprintf(stderr,"mode is a integer value interpreted as below\n");
-		fprintf(stderr,"1D distribution fucntion\n");
-		fprintf(stderr,"01 : f(x)\n");
-		fprintf(stderr,"02 : f(y)\n");
-		fprintf(stderr,"03 : f(z)\n");
-		fprintf(stderr,"04 : f(px)\n");
-		fprintf(stderr,"05 : f(py)\n");
-		fprintf(stderr,"06 : f(pz)\n");
-		fprintf(stderr,"07 : f(e)\n");		
-		fprintf(stderr,"2D phase space\n");
-		fprintf(stderr,"11 : x-x\n");
-		fprintf(stderr,"12 : x-y\n");
-		fprintf(stderr,"13 : x-z\n");
-		fprintf(stderr,"14 : x-px\n");
-		fprintf(stderr,"15 : x-py\n");
-		fprintf(stderr,"16 : x-pz\n");
-		fprintf(stderr,"17 : x-e\n");
-		fprintf(stderr,"example\n");
-		fprintf(stderr,"25 : y-py\n");
+		fprintf(stdout,"usage : %s sdffile specname hmin hmax hbin vmin vmax vbin mode\n\n",argv[0]);
+		fprintf(stdout,"hbin,vbin is a horizontal & vertical bin count.\n");
+		fprintf(stdout,"option : -m : set particle mass. default mass is 9.11e-31\n");
+		fprintf(stdout,"mode specifies axis of phasespace.\n");
+		fprintf(stdout,"mode is a integer value interpreted as below\n");
+		fprintf(stdout,"1D distribution fucntion\n");
+		fprintf(stdout,"01 : f(x)\n");
+		fprintf(stdout,"02 : f(y)\n");
+		fprintf(stdout,"03 : f(z)\n");
+		fprintf(stdout,"04 : f(px)\n");
+		fprintf(stdout,"05 : f(py)\n");
+		fprintf(stdout,"06 : f(pz)\n");
+		fprintf(stdout,"07 : f(e)\n");		
+		fprintf(stdout,"2D phase space\n");
+		fprintf(stdout,"11 : x-x\n");
+		fprintf(stdout,"12 : x-y\n");
+		fprintf(stdout,"13 : x-z\n");
+		fprintf(stdout,"14 : x-px\n");
+		fprintf(stdout,"15 : x-py\n");
+		fprintf(stdout,"16 : x-pz\n");
+		fprintf(stdout,"17 : x-e\n");
+		fprintf(stdout,"example\n");
+		fprintf(stdout,"25 : y-py\n");
 		return 0;
 	}
 	
@@ -232,7 +232,7 @@ int main(int argc, char *argv[]){
 	//fprintf(stderr,"hi : %d, vi : %d\n",hi,vi);
 	getname(&hname,hi); getname(&vname,vi);
 	getlegend(&hlegend,hi); getlegend(&vlegend,vi);
-	fprintf(stderr,"%s-%s\n",hname,vname);
+	fprintf(stdout,"%s-%s\n",hname,vname);
 	
 	vii = 0; hii = 0;
 	snprintf(command,512,"phase/%s/%s-%s",specname2,hname,vname);
@@ -290,7 +290,7 @@ int main(int argc, char *argv[]){
 		}
 		if(hmin==-1){hmin = Data_min(data,0);}
 		if(hmax==-1){hmax = Data_max(data,0);}
-		fprintf(stderr,"particle count : %d\n",n);
+		fprintf(stdout,"particle count : %d\n",n);
 		hist = Data_histogram(data,hmin,hmax,vbin);
 		wmin = Data_get(hist,0,1);
 		wmax = Data_get(hist,0,1);
@@ -319,8 +319,8 @@ int main(int argc, char *argv[]){
 		if(hmax==-1){hmax = Data_max(data,0);}
 		if(vmin==-1){vmin = Data_min(data,1);}
 		if(vmax==-1){vmax = Data_max(data,1);}
-		fprintf(stderr,"hmin : %e, hmax : %e, hbin : %d\n",hmin,hmax,hbin);
-		fprintf(stderr,"vmin : %e, vmax : %e, vbin : %d\n",vmin,vmax,vbin);
+		fprintf(stdout,"hmin : %e, hmax : %e, hbin : %d\n",hmin,hmax,hbin);
+		fprintf(stdout,"vmin : %e, vmax : %e, vbin : %d\n",vmin,vmax,vbin);
 		hist = Data_histogram2D(data,hmin,vmin,hmax,vmax,hbin,vbin);
 		wmin = Data_get(hist,0,2);
 		wmax = Data_get(hist,0,2);
