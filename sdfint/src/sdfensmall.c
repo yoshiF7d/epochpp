@@ -234,7 +234,6 @@ int main(int argc, char *argv[]){
             filein = allocate(len+1);
             snprintf(filein,len+1,"%s/%s",dirin,entry->d_name);
             mainlist = LinkedList_append(mainlist,Energy_create(filein));
-            
         }
     }
     closedir(dp);
@@ -281,7 +280,6 @@ int main(int argc, char *argv[]){
             if(i<100*count/filecount){printf("=");}
             else if(i==100*count/filecount){printf("🐌");}
             else{printf(" ");}
-            
         }
         printf("]");
         printf(" %.1f %%",100*(double)count/filecount);
