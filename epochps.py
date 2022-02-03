@@ -75,7 +75,13 @@ class ListParser:
 			self.index = self.length-1
 		return list
 
-def replaceParams(src,file,params,ind):
+def replaceParams(filein,fileout,params,ind):
+	if os.path.exists(filein):
+		with open(filein) as f:
+			src=f.read()
+	else:
+		return
+	
 	tag=' : { '
 	for j in range(len(params)):
 		ss = '$'+str(j)
@@ -86,7 +92,7 @@ def replaceParams(src,file,params,ind):
 		tag += ss + ' -> ' + rs 
 	tag+=' }'
 	
-	with open(file,mode='w') as f:
+	with open(fileout,mode='w') as f:
 		f.write(src)
 	
 	return tag
@@ -99,19 +105,10 @@ if args.copyfiles is not None:
 
 if args.parameterized_copyfiles is not None:
 	args.parameterized_copyfiles=listParser.parse(args.parameterized_copyfiles)
-	pcslist=[]
-	for pc in args.parameterized_copyfiles:
-		if os.path.exists(pc):
-			with open(pc) as f:
-				pcslist.append(f.read())
-			
-	args.parameterized_copyfiles=list(zip(args.parameterized_copyfiles,pcslist))
 
 #params = [[1e+19,1e+20,1e+21],[1000,500,100],['a','b','c'],['d','e']]
 dirlist=[]
 taglist=[]
-with open(args.template) as f:
-	src=f.read()
 
 n = 1
 for i in range(len(params)):
@@ -144,12 +141,12 @@ for i in range(n):
 	if not os.path.exists(dir):
 		os.mkdir(dir)
 	
-	tag=replaceParams(src,dir+'/'+args.inputfile,params,ind)
+	tag=replaceParams(args.template,dir+'/'+args.inputfile,params,ind)
 	print(dir+tag)
 		
 	if args.parameterized_copyfiles is not None:
 		for pc in args.parameterized_copyfiles:
-			replaceParams(pc[1],dir+'/'+pc[0],params,ind)
+			replaceParams(pc,dir+'/'+pc,params,ind)
 		
 	if args.copyfiles is not None:
 		for file in args.copyfiles:
@@ -182,6 +179,6 @@ print('run script  : ' + args.runscript)
 if args.copyfiles is not None:
 	print('copyfiles  : ' + str(args.copyfiles))
 if args.parameterized_copyfiles is not None:
-	print('parameterized_copyfiles  : ' + str([x[0] for x in args.parameterized_copyfiles]))
+	print('parameterized_copyfiles  : ' + str(args.parameterized_copyfiles))
 	
 print('type ./'+args.runallfile+' to start simulations')
