@@ -17,8 +17,8 @@ parser.add_argument('-i','--inputfile',type=str,default='input.deck',help='name 
 parser.add_argument('-r','--runallfile',type=str,default='epochps_runall.py',help='name of the script to run all simulations.')
 parser.add_argument('-C','--copyfiles',type=str,help='files that are copied to all simulation folders. syntax : \"[\'file1\',\'file2\',...]\"')
 parser.add_argument('-c','--parameterized_copyfiles',type=str,help='keywords \'$0\',\'$1\',... in parameterized copyfiles are replaced')
-args=parser.parse_args()
-parser.add_argument('-p','--parameterized_runscript',action=store_true,help='keywords \'$0\',\'$1\',... in runscript are replaced')
+parser.add_argument('--remove_directories',action='store_true',help='make script that removes directories')
+parser.add_argument('-p','--parameterized_runscript',action='store_true',help='keywords \'$0\',\'$1\',... in runscript are replaced')
 args=parser.parse_args()
 
 class ListParser:
@@ -106,7 +106,7 @@ if args.parameterized_copyfiles is not None:
 				pcslist.append(f.read())
 			
 	args.parameterized_copyfiles=list(zip(args.parameterized_copyfiles,pcslist))
-	
+
 #params = [[1e+19,1e+20,1e+21],[1000,500,100],['a','b','c'],['d','e']]
 dirlist=[]
 taglist=[]
@@ -121,8 +121,18 @@ ind = np.zeros(len(params),dtype=np.uint8)
 
 if len(params) == 1:
 	n -= 1
-	
-#print(len(params))
+
+if args.remove_directories:
+	for i in range(n):
+		ii=i
+		for j in range(len(params)):
+			ind[j]=ii%len(params[j])
+			ii = ii//len(params[j])
+		dirlist.append(''.join(map(str,ind)))
+	with open('rmall.sh',mode='w') as f:
+		f.write('rm -r ' + ' '.join(dirlist))
+		os.chmod('rmall.sh',0o777)
+	sys.exit()
 
 for i in range(n):
 	ii=i
@@ -130,6 +140,7 @@ for i in range(n):
 		ind[j]=ii%len(params[j])
 		ii = ii//len(params[j])
 	dir = ''.join(map(str,ind))
+	
 	if not os.path.exists(dir):
 		os.mkdir(dir)
 	
