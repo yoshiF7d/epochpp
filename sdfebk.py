@@ -64,7 +64,7 @@ if args.equation is not None:
 	np.savetxt('dmask.txt',args.mask,fmt='%.1e')
 
 output = args.outfile and open(args.outfile, 'w') or sys.stdout
-output.write("filename\telectric energy [J]\tmagnetic energy [J]\tkinetic energy [J]\n")
+output.write("filename\telectric energy [J]\tmagnetic energy [J]\tkinetic energy [J]\ttotal energy [J]\n")
 
 ec = 0.5*8.854187e-12
 bc = 0.5/1.256637e-6
@@ -119,8 +119,9 @@ def sdfen(file):
 	een = een.sum()
 	ben = ben.sum()
 	ken = ken.sum()
+	ten = een+ben+ken
 
-	output.write(f'{file}\t{een:e}\t{ben:e}\t{ken:e}\n')
+	output.write(f'{file}\t{een:e}\t{ben:e}\t{ken:e}\t{ten:e}\n')
 
 for file in files:	
 	sdfen(file)

@@ -15,7 +15,8 @@ parser.add_argument('params',help='parameter lists. syntax : \"[[x1,x2,...],[y1,
 parser.add_argument('runscript',help='script to run each simulation')
 parser.add_argument('-i','--inputfile',type=str,default='input.deck',help='name of the input file made from template input file')
 parser.add_argument('-r','--runallfile',type=str,default='epochps_runall.py',help='name of the script to run all simulations.')
-parser.add_argument('-c','--copyfiles',type=str,help='files that are copied to all simulation folders. syntax : \"[\'file1\',\'file2\',...]\"')
+parser.add_argument('-C','--copyfiles',type=str,help='files that are copied to all simulation folders. syntax : \"[\'file1\',\'file2\',...]\"')
+parser.add_argument('-c','--parameterized_copyfiles',type=str,help='keywords \'$0\',\'$1\',... in parameterized copyfiles are replaced')
 args=parser.parse_args()
 
 class ListParser:
@@ -72,12 +73,38 @@ class ListParser:
 			self.index = self.length-1
 		return list
 
+def replaceParams(src,file,params,ind):
+	tag=' : { '
+	for j in range(len(params)):
+		ss = '$'+str(j)
+		rs = str(params[j][ind[j]])
+		src = src.replace(ss,rs)
+		if j != 0:
+			tag += ' , '
+		tag += ss + ' -> ' + rs 
+	tag+=' }'
+	
+	with open(file,mode='w') as f:
+		f.write(src)
+	
+	return tag
+
 listParser = ListParser()
 params=listParser.parse(args.params)
 
 if args.copyfiles is not None:
-	copyfiles=listParser.parse(args.copyfiles)
+	args.copyfiles=listParser.parse(args.copyfiles)
 
+if args.parameterized_copyfiles is not None:
+	args.parameterized_copyfiles=listParser.parse(args.parameterized_copyfiles)
+	pcslist=[]
+	for pc in args.parameterized_copyfiles:
+		if os.path.exists(pc):
+			with open(pc) as f:
+				pcslist.append(f.read())
+			
+	args.parameterized_copyfiles=list(zip(args.parameterized_copyfiles,pcslist))
+	
 #params = [[1e+19,1e+20,1e+21],[1000,500,100],['a','b','c'],['d','e']]
 dirlist=[]
 taglist=[]
@@ -92,7 +119,8 @@ ind = np.zeros(len(params),dtype=np.uint8)
 
 if len(params) == 1:
 	n -= 1
-print(len(params))
+	
+#print(len(params))
 
 for i in range(n):
 	ii=i
@@ -100,36 +128,24 @@ for i in range(n):
 		ind[j]=ii%len(params[j])
 		ii = ii//len(params[j])
 	dir = ''.join(map(str,ind))
-	dst = src
-	tag=dir + ' : { '
-	for j in range(len(params)):
-		ss = '$'+str(j)
-		rs = str(params[j][ind[j]])
-		dst = dst.replace(ss,rs)
-		if j != 0:
-			tag += ' , '
-		tag += ss + ' -> ' + rs 
-	tag+=' }'
-	print(tag)
 	if not os.path.exists(dir):
 		os.mkdir(dir)
-	with open(dir+'/'+args.inputfile,mode='w') as f:
-		f.write(dst)
-#	with open(dir+'/deck.file',mode='w') as f:
-#		f.write('.')
+	
+	tag=replaceParams(src,dir+'/'+args.inputfile,params,ind)
+	print(dir+tag)
+		
+	if args.parameterized_copyfiles is not None:
+		for pc in args.parameterized_copyfiles:
+			replaceParams(pc[1],dir+'/'+pc[0],params,ind)
+		
 	if args.copyfiles is not None:
-		if isinstance(copyfiles,basestring):
-			if os.path.exists(copyfiles):
-				shutil.copyfile(copyfiles,dir+'/'+copyfiles)
-				os.chmod(dir+'/'+copyfiles,0777)
-		elif isinstance(copyfiles, collections.Iterable):
-			for file in copyfiles:
-				if os.path.exists(file):
-					shutil.copyfile(file,dir+'/'+file)
-					os.chmod(dir+'/'+file,0777)
+		for file in args.copyfiles:
+			if os.path.exists(file):
+				shutil.copyfile(file,dir+'/'+file)
+				os.chmod(dir+'/'+file,0o777)
 	
 	shutil.copyfile(args.runscript,dir+'/'+args.runscript)
-	os.chmod(dir+'/'+args.runscript,0777)
+	os.chmod(dir+'/'+args.runscript,0o777)
 	dirlist.append('\''+dir+'\'')
 	taglist.append('"""'+tag+'"""')
 
@@ -142,11 +158,14 @@ with open(args.runallfile,mode='w') as f:
 	f.write('for i in range(len(dirlist)):\n')
 	f.write('\tprint(\"simulation \"+taglist[i])\n')
 	f.write('\tsubprocess.call(\'./'+args.runscript+'\',cwd=dirlist[i]) \n')
-	os.chmod(args.runallfile,0777)
+	os.chmod(args.runallfile,0o777)
 
 print('simulation count : ' + str(n))
 print('input deck template : ' + args.template)
 print('run script  : ' + args.runscript)
 if args.copyfiles is not None:
-	print('copyfiles  : ' + str(copyfiles))
+	print('copyfiles  : ' + str(args.copyfiles))
+if args.parameterized_copyfiles is not None:
+	print('parameterized_copyfiles  : ' + str([x[0] for x in args.parameterized_copyfiles]))
+	
 print('type ./'+args.runallfile+' to start simulations')
