@@ -153,6 +153,8 @@ for i in range(n):
 			if os.path.exists(file):
 				shutil.copyfile(file,dir+'/'+file)
 				os.chmod(dir+'/'+file,0o777)
+			else:
+				print(file + ' is missing')
 	
 	if args.parameterized_runscript:
 		replaceParams(args.runscript,dir+'/'+args.runscript,params,ind)
