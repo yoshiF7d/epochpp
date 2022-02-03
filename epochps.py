@@ -18,6 +18,8 @@ parser.add_argument('-r','--runallfile',type=str,default='epochps_runall.py',hel
 parser.add_argument('-C','--copyfiles',type=str,help='files that are copied to all simulation folders. syntax : \"[\'file1\',\'file2\',...]\"')
 parser.add_argument('-c','--parameterized_copyfiles',type=str,help='keywords \'$0\',\'$1\',... in parameterized copyfiles are replaced')
 args=parser.parse_args()
+parser.add_argument('-p','--parameterized_runscript',action=store_true,help='keywords \'$0\',\'$1\',... in runscript are replaced')
+args=parser.parse_args()
 
 class ListParser:
 	def __init__(self,string=''):
@@ -144,7 +146,10 @@ for i in range(n):
 				shutil.copyfile(file,dir+'/'+file)
 				os.chmod(dir+'/'+file,0o777)
 	
-	shutil.copyfile(args.runscript,dir+'/'+args.runscript)
+	if args.parameterized_runscript:
+		replaceParams(args.runscript,dir+'/'+args.runscript,params,ind)
+	else:
+		shutil.copyfile(args.runscript,dir+'/'+args.runscript)
 	os.chmod(dir+'/'+args.runscript,0o777)
 	dirlist.append('\''+dir+'\'')
 	taglist.append('"""'+tag+'"""')
