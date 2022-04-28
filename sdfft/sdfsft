@@ -1,0 +1,11 @@
+#!/bin/sh
+dir=${1:-.}
+files="${dir}/*.sdf"
+
+parallel 'echo sdfft {} && ~/epochpp/sdfft/sdfft {}' ::: ${files}
+
+#for file in ${files}
+#do
+#	echo sdfft ${file} 
+#	~/epochpp/sdfft/sdfft ${file} 
+#done
