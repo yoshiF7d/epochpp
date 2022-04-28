@@ -1,5 +1,6 @@
 #include "Data_FFT.h"
-#define Data_FFT_large_prime 
+int primePrimitiveRoot(int p);
+int powerMod(int a, int b, int m);
 
 double Data_FFT_cos(int n, int m){
 	if(n == 0){
@@ -895,4 +896,45 @@ void Data_FFT_mod(Data data, Data temp, int n, int sign){
 	Data_delete(pdata);
 	Data_delete(pomega);
 	Data_delete(ptemp);
+}
+
+void Data_abs(Data re, Data im){
+	int i,j;
+	for(i=0;i<re->row;i++){
+		for(j=0;j<re->column;j++){
+			re->elem[i][j] = sqrt((re->elem[i][j])*(re->elem[i][j]) + (im->elem[i][j])*(im->elem[i][j]));
+		}
+	}
+}
+
+void Data_log(Data data){
+	int i,j;
+	for(i=0;i<data->row;i++){
+		for(j=0;j<data->column;j++){
+			data->elem[i][j] = log(data->elem[i][j]);
+		}
+	}
+}
+
+void Data_shift(Data data){
+	int i,j,ii,jj;
+	int center[2];
+	Data data2 = Data_create(data->row,data->column);
+	
+	center[0] = data->row/2;
+	center[1] = data->column/2;
+	
+	for(i=0;i<data->row;i++){
+		for(j=0;j<data->column;j++){
+			ii = (center[0] + i)%data->row;
+			jj = (center[1] + j)%data->column;
+			data2->elem[i][j] = data->elem[ii][jj];
+		}
+	}
+	for(i=0;i<data->row;i++){
+		for(j=0;j<data->column;j++){
+			data->elem[i][j] = data2->elem[i][j];
+		}
+	}
+	Data_delete(data2);
 }

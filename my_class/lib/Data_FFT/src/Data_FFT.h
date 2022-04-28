@@ -10,4 +10,7 @@ void Data_FFT2D(Data re, Data im);
 void Data_IFFT2D(Data re, Data im);
 void Data_FFT_prime(Data data);
 void Data_IFFT_prime(Data data);
+void Data_abs(Data re, Data im);
+void Data_log(Data data);
+void Data_shift(Data data);
 #endif

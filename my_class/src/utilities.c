@@ -320,7 +320,7 @@ char *itoa(int a){
 }
 
 char *strhead(char *str){
-	while((*str==' ' || *str == '\t') && str != '\0'){str++;}
+	while((*str==' ' || *str == '\t') && *str != '\0'){str++;}
 	return str;
 } 
 
