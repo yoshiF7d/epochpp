@@ -173,6 +173,10 @@ int main(int argc, char *argv[]){
 	xmax = datag->elem[0][c] - datag->elem[0][0];
 	ymax = datag->elem[1][r] - datag->elem[1][0];
 	
+	//printf("%dx%d\n",datag->row,datag->column);
+	//printf("%dx%d\n",c,r);
+	//printf("%ex%e\n",xmax,ymax);
+	
 	area = xmax * ymax;
 	
 	if(xmax > ymax){

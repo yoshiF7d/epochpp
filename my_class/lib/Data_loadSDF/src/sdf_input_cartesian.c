@@ -414,7 +414,7 @@ Data Data_sdf_read_plain_mesh(sdf_file_t *h){
 		if(col < b->local_dims[n]){col = b->local_dims[n];}
 	}
 	
-	col--;
+	//col--;
 	
 	data = Data_create(row,col);
 	Data_setall(data,0);
