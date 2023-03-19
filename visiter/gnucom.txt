@@ -1,2 +1,0 @@
-set term png truecolor enhanced size 820, 510;
-set output "out.png"
