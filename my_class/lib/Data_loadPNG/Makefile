@@ -23,7 +23,7 @@ $(COMOBJS) :
 	cd $(COMOBJDIR) && make
 
 $(OBJDIR)/%.o : $(SRCDIR)/%.c
-	$(COMPILER) $(CFLAGS) $(INCLUDE) -o $@ -c $<
+	$(COMPILER) $(CFLAGS) $(INCLUDE) $(LDFLAGS) -o $@ -c $<
 
 clean :
 	rm -f $(OBJDIR)/*.o
